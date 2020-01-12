@@ -47,3 +47,14 @@ compile_commands.json
 
 # QtCreator local machine specific files for imported projects
 *creator.user*
+*.bak
+seviz/x64/
+seviz/debug/
+seviz/.vs/
+seviz/.qmake.stash
+seviz/seviz.vcxproj.user
+seviz/release/
+seviz/msvc_make.bat
+seviz/seviz.vcxproj.filters
+seviz/seviz.vcxproj
+seviz/seviz.sln
