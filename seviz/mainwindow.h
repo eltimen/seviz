@@ -1,7 +1,9 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <memory>
 #include <QMainWindow>
+#include "Book.h"
 
 namespace Ui {
 class MainWindow;
@@ -17,6 +19,7 @@ public:
 
 private:
     Ui::MainWindow *ui;
+	Book* m_book;
 };
 
 #endif // MAINWINDOW_H

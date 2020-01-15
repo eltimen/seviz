@@ -3,14 +3,16 @@
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow),
+	m_book(nullptr)
 {
     ui->setupUi(this);
 
-	ui->webEngineView->setUrl(QUrl("file:///embedded_web_resources/index.html"));
+    m_book = new Book(ui->webEngineView);
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+	delete m_book;
 }

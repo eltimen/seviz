@@ -1,10 +1,21 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="utf-8">
-    <title>title</title>
-  </head>
-  <body>
-    <h1>dummy</h1>
-  </body>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <script type="text/javascript" src="qrc:///qtwebchannel/qwebchannel.js"></script>
+    <script src="./adapter.js"></script>
+    <script src="./3rdparty/jszip.min.js"></script>
+    <script src="./3rdparty/epub.js"></script>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+
+<body>
+    <a id="prev" href="#prev" class="navlink">...</a>
+    <div id="viewer" class="scrolled"></div>
+    <a id="next" href="#next" class="navlink">...</a>
+
+    <script src="render.js"></script>
+</body>
 </html>
