@@ -8,7 +8,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    m_book = new Book(ui->webEngineView);
+    m_book = new Book("ivanhoe.epub", ui->webEngineView);
+    
 }
 
 MainWindow::~MainWindow()

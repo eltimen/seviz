@@ -6,13 +6,14 @@
 
 class EpubRenderer : public QObject
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
     explicit EpubRenderer(QWebEngineView*);
 
-	// open
+	void open(const QString& opfPath);
 	// close
 	// взять изменения dom?
+	// reload
 	
 	// C++ не позволяет делать namespace внутри классов. вложенные классы имеют ограничения.
 	// [[deprecated("При использовании возможны конфликты с JS/CSS других плагинов.")]] ?
@@ -23,6 +24,14 @@ public:
 	// зарегистрировать обработчик
 	// снять регистрацию обработчика
 	// сигнал для сбора данных для показа элемента модели
+	
+public slots:
+	void setPageLoadedState(bool loaded) { 
+		// std::conditional_variable
+		qDebug() << "page loaded: " << loaded;
+		if (loaded)
+			this->open("ivanhoe.epub");
+	}
 
 private:
 	QWebEngineView *m_view;

@@ -1,58 +1,77 @@
-// Load the opf
-var book = ePub("ivanhoe.epub");
-var rendition = book.renderTo("viewer", {
-    flow: "scrolled-doc",
-    width: "100%"
-});
 
-rendition.display();
+class Render {
+    book;
+    rendition;
+    prev;
+    next; 
 
-var next = document.getElementById("next");
-next.addEventListener("click", function (e) {
-    rendition.next();
-    e.preventDefault();
-}, false);
+    constructor() {
+        this.next = document.getElementById("next");
+        this.next.addEventListener("click", function (e) {
+            this.rendition.next();
+            e.preventDefault();
+        }.bind(this), false);
 
-var prev = document.getElementById("prev");
-prev.addEventListener("click", function (e) {
-    rendition.prev();
-    e.preventDefault();
-}, false);
+        this.prev = document.getElementById("prev");
+        this.prev.addEventListener("click", function (e) {
+            this.rendition.prev();
+            e.preventDefault();
+        }.bind(this), false);
+    };
 
-rendition.on("relocated", function (location) {
-    console.log(location);
-});
+    open(path) {
+        console.log(path);
+        this.book = ePub(path);
+        this.rendition = this.book.renderTo("viewer", {
+            flow: "scrolled-doc",
+            width: "100%"
+        });
+        this._setup();
+        this.rendition.display();
+    };
 
-rendition.on("rendered", function (section) {
-    var nextSection = section.next();
-    var prevSection = section.prev();
+    _setup() {
+        this.rendition.on("relocated", function (location) {
+            console.log(location);
+        }.bind(this));
 
-    if (nextSection) {
-        nextNav = book.navigation.get(nextSection.href);
+        this.rendition.on("rendered", function (section) {
+            var nextSection = section.next();
+            var prevSection = section.prev();
 
-        if (nextNav) {
-            nextLabel = nextNav.label;
-        } else {
-            nextLabel = "next";
-        }
+            if (nextSection) {
+                let nextNav = this.book.navigation.get(nextSection.href);
 
-        next.textContent = nextLabel + " »";
-    } else {
-        next.textContent = "";
+                let nextLabel;
+                if (nextNav) {
+                    nextLabel = nextNav.label;
+                } else {
+                    nextLabel = "next";
+                }
+
+                this.next.textContent = nextLabel + " >>";
+            } else {
+                this.next.textContent = "";
+            }
+
+            if (prevSection) {
+                let prevNav = this.book.navigation.get(prevSection.href);
+
+                let prevLabel;
+                if (prevNav) {
+                    prevLabel = prevNav.label;
+                } else {
+                    prevLabel = "previous";
+                }
+
+                this.prev.textContent = "<< " + prevLabel;
+            } else {
+                this.prev.textContent = "";
+            }
+
+        }.bind(this)); 
     }
+}
 
-    if (prevSection) {
-        prevNav = book.navigation.get(prevSection.href);
-
-        if (prevNav) {
-            prevLabel = prevNav.label;
-        } else {
-            prevLabel = "previous";
-        }
-
-        prev.textContent = "« " + prevLabel;
-    } else {
-        prev.textContent = "";
-    }
-
-});
+let render = new Render();
+window.render = render;
