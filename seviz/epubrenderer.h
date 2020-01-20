@@ -6,36 +6,36 @@
 
 class EpubRenderer : public QObject
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
     explicit EpubRenderer(QWebEngineView*);
 
-	void open(const QString& opfPath);
-	// close
-	// взять изменения dom?
-	// reload
-	
-	// C++ не позволяет делать namespace внутри классов. вложенные классы имеют ограничения.
-	// [[deprecated("При использовании возможны конфликты с JS/CSS других плагинов.")]] ?
-	// запустить js на странице
-	// добавить css на страницу
+    void open(const QString& opfPath);
+    // close
+    // взять изменения dom?
+    // reload
+    
+    // C++ не позволяет делать namespace внутри классов. вложенные классы имеют ограничения.
+    // [[deprecated("При использовании возможны конфликты с JS/CSS других плагинов.")]] ?
+    // запустить js на странице
+    // добавить css на страницу
 
-	// геттеры элементов модели по их позиции
-	// зарегистрировать обработчик
-	// снять регистрацию обработчика
-	// сигнал для сбора данных для показа элемента модели
-	
+    // геттеры элементов модели по их позиции
+    // зарегистрировать обработчик
+    // снять регистрацию обработчика
+    // сигнал для сбора данных для показа элемента модели
+    
 public slots:
-	void setPageLoadedState(bool loaded) { 
-		// std::conditional_variable
-		qDebug() << "page loaded: " << loaded;
-		if (loaded)
-			this->open("ivanhoe.epub");
-	}
+    void setPageLoadedState(bool loaded) { 
+        // std::conditional_variable
+        qDebug() << "page loaded: " << loaded;
+        if (loaded)
+            this->open("ivanhoe.epub");
+    }
 
 private:
-	QWebEngineView *m_view;
-	QWebChannel* m_webchannel;
+    QWebEngineView *m_view;
+    QWebChannel* m_webchannel;
 };
 
 #endif // EPUBRENDERER_H

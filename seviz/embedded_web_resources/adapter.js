@@ -6,5 +6,3 @@ let channel = new QWebChannel(qt.webChannelTransport,
     });
 
 console.log(channel);
-
-// TODO promise

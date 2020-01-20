@@ -25,17 +25,23 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++14
 
 SOURCES += \
+        AbstractModule.cpp \
         Book.cpp \
+        ModuleManager.cpp \
         epubrenderer.cpp \
         main.cpp \
         mainwindow.cpp \
-        model/Book.cpp
+        modules/SyntaxTree/SyntaxTree.cpp
 
 HEADERS += \
+        AbstractModule.h \
         Book.h \
+        ModuleManager.h \
         epubrenderer.h \
+        exceptions.h \
         mainwindow.h \
-        model/Book.h
+        modules/SyntaxTree/SyntaxTree.h \
+        modules/modules.h
 
 FORMS += \
         mainwindow.ui

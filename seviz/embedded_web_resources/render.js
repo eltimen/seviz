@@ -30,6 +30,10 @@ class Render {
         this.rendition.display();
     };
 
+    getBookPageContent() {
+        return this.rendition.getContents()[0].content;
+    }
+
     _setup() {
         this.rendition.on("relocated", function (location) {
             console.log(location);
