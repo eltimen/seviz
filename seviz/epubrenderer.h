@@ -11,7 +11,7 @@ public:
     explicit EpubRenderer(QWebEngineView*);
 
     void open(const QString& opfPath);
-    // close
+    void close();
     // взять изменения dom?
     // reload
     
@@ -27,10 +27,10 @@ public:
     
 public slots:
     void setPageLoadedState(bool loaded) { 
-        // std::conditional_variable
+        // conditional variable?
         qDebug() << "page loaded: " << loaded;
-        if (loaded)
-            this->open("ivanhoe.epub");
+        //if (loaded)
+            //this->open("ivanhoe.epub");
     }
 
 private:

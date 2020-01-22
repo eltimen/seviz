@@ -279,3 +279,7 @@ svg {
   stroke: #777;
   fill: #777;
 }
+
+#help {
+    margin-left: 10px;
+}

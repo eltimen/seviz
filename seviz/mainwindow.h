@@ -18,11 +18,17 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+private slots:
+    void onFileOpen();
+    void onFileSave();
+    void onAbout();
+
 private:
     void initToolbar();
 
     Ui::MainWindow *ui;
-    Book* m_book;
+    Book* m_book = nullptr;
+    EpubRenderer* m_bookViewer = nullptr;
     ModuleManager m_manager;
 };
 

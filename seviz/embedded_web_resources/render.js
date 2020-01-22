@@ -4,8 +4,10 @@ class Render {
     rendition;
     prev;
     next; 
+    alreadyOpened;
 
     constructor() {
+        this.alreadyOpened = false;
         this.next = document.getElementById("next");
         this.next.addEventListener("click", function (e) {
             this.rendition.next();
@@ -21,6 +23,7 @@ class Render {
 
     open(path) {
         console.log(path);
+        document.getElementById("help").style.display = "none";
         this.book = ePub(path);
         this.rendition = this.book.renderTo("viewer", {
             flow: "scrolled-doc",
@@ -28,7 +31,12 @@ class Render {
         });
         this._setup();
         this.rendition.display();
+        this.alreadyOpened = true;
     };
+
+    close() {
+        this.rendition.destroy();
+    }
 
     getBookPageContent() {
         return this.rendition.getContents()[0].content;

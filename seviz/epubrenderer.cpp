@@ -14,8 +14,13 @@ EpubRenderer::EpubRenderer(QWebEngineView* view) :
 }
 
 void EpubRenderer::open(const QString& opfPath) {
-
+    close();
     QString cmd = QStringLiteral(R"(window.render.open("%1"))").arg(opfPath);
     qDebug() << cmd;
+    m_view->page()->runJavaScript(cmd, [](const QVariant& v) { qDebug() << v.toString(); });
+}
+
+void EpubRenderer::close() {
+    QString cmd = QStringLiteral(R"(window.render.close())");
     m_view->page()->runJavaScript(cmd, [](const QVariant& v) { qDebug() << v.toString(); });
 }
