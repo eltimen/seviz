@@ -14,20 +14,20 @@ public:
 	Feature(const QString& id,
 		const QIcon& icon,
 		const QString& tooltipText,
-		const QDockWidget* window,
+		QDockWidget* window,
 		AbstractModule* owner,
 		bool affectsView = false) :
-		m_id(id), m_icon(icon), m_text(tooltipText), m_window(window), m_owner(owner), m_affectsView(affectsView) 
+		id(id), icon(icon), text(tooltipText), window(window), owner(owner), affectsView(affectsView) 
 	{}
 
 	~Feature() = default;
 
-	QString m_id;
-	QIcon m_icon;
-	QString m_text;
+	QString id;
+	QIcon icon;
+	QString text;
 
-	AbstractModule* m_owner;
+	AbstractModule* owner;
 
-	const QDockWidget* m_window = nullptr;
-	bool m_affectsView = false;
+	QDockWidget* window = nullptr;
+	bool affectsView = false;
 };

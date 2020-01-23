@@ -1,17 +1,18 @@
 #include "SyntaxTree.h"
 
 SyntaxTree::SyntaxTree() : 
-    AbstractModule("syntax-tree")
+    AbstractModule("SyntaxTree")
 {
+    m_dock = new QDockWidget(m_id);
+    m_dock->setWidget(&m_widget);
 }
 
-SyntaxTree::~SyntaxTree()
-{
+SyntaxTree::~SyntaxTree() {
 }
 
-QList<Feature> SyntaxTree::getFeatures() {
+QList<Feature> SyntaxTree::features() {
     return { 
-        Feature("show", QIcon(), "SyntaxTree", nullptr, this) 
+        Feature("show", QIcon(), m_id, m_dock, this) 
     };
 }
 

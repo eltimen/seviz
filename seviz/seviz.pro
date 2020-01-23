@@ -31,7 +31,8 @@ SOURCES += \
         epubrenderer.cpp \
         main.cpp \
         mainwindow.cpp \
-        modules/SyntaxTree/SyntaxTree.cpp
+        modules/SyntaxTree/SyntaxTree.cpp \
+        modules/SyntaxTree/syntaxtreewindow.cpp
 
 HEADERS += \
         AbstractModule.h \
@@ -41,10 +42,12 @@ HEADERS += \
         exceptions.h \
         mainwindow.h \
         modules/SyntaxTree/SyntaxTree.h \
+        modules/SyntaxTree/syntaxtreewindow.h \
         modules/modules.h
 
 FORMS += \
-        mainwindow.ui
+        mainwindow.ui \
+        modules/SyntaxTree/syntaxtreewindow.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

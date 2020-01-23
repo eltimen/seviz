@@ -3,6 +3,7 @@
 
 #include <QToolbar>
 #include <QFileDialog>
+#include <QDockWidget>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -16,7 +17,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     m_bookViewer = new EpubRenderer(ui->webEngineView);
 
-    initToolbar();
+    setupModules();
 }
 
 MainWindow::~MainWindow() {
@@ -25,11 +26,25 @@ MainWindow::~MainWindow() {
     delete ui;
 }
 
-void MainWindow::initToolbar() {
-    QToolBar* toolbar = ui->mainToolBar;
+void MainWindow::setupModules() {
     m_manager.forEachModule([&](AbstractModule* module) {
-        for (const Feature& f : module->getFeatures()) {
-            QAction* action = toolbar->addAction(f.m_icon, f.m_text);
+        // для каждой функции плагина
+        for (const Feature& f : module->features()) {
+            // добавление dock-окна
+            f.window->setParent(this);
+            f.window->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable);
+            addDockWidget(Qt::BottomDockWidgetArea, f.window);
+            f.window->hide();
+
+            // добавление кнопки на тулбар
+            QToolBar* toolbar = ui->mainToolBar;
+            QAction* action = toolbar->addAction(f.icon, f.text, [this, f](bool checked) {
+                if (checked) {
+                    f.window->show();
+                } else {
+                    f.window->hide();
+                }
+            });
             action->setCheckable(true);
         }
     });

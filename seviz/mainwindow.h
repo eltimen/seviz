@@ -24,7 +24,7 @@ private slots:
     void onAbout();
 
 private:
-    void initToolbar();
+    void setupModules();
 
     Ui::MainWindow *ui;
     Book* m_book = nullptr;

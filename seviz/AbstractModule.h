@@ -13,7 +13,7 @@ public:
     virtual ~AbstractModule();
 
     const QString& id();
-    virtual QList<Feature> getFeatures() = 0;
+    virtual QList<Feature> features() = 0;
 
 public slots:
     //virtual void featureTriggered(const QString& id) = 0;
