@@ -14,13 +14,38 @@ EpubRenderer::EpubRenderer(QWebEngineView* view) :
 }
 
 void EpubRenderer::open(const QString& opfPath) {
+    // TODO сделать функцию возвращающей массив глав (следовательно, синхронной)
+    // из-за ограничений js нельзя подождать за промисов без await.
+    // а async возвращает promise, который не дает передать управление в лямбду ниже и в ней сформировать chapters
+    // возможное решение: таймер или conditional variable
+
     close();
     QString cmd = QStringLiteral(R"(window.render.open("%1"))").arg(opfPath);
-    qDebug() << cmd;
+    //qDebug() << cmd;
+    m_view->page()->runJavaScript(cmd, [](const QVariant& v) { qDebug() << v.toString(); });
+}
+
+void EpubRenderer::showChapter(int index) {
+    QString cmd = QStringLiteral(R"(window.render.display(%1))").arg(index);
     m_view->page()->runJavaScript(cmd, [](const QVariant& v) { qDebug() << v.toString(); });
 }
 
 void EpubRenderer::close() {
     QString cmd = QStringLiteral(R"(window.render.close())");
     m_view->page()->runJavaScript(cmd, [](const QVariant& v) { qDebug() << v.toString(); });
+}
+
+void EpubRenderer::setChaptersList(const QVariant& objects) {
+    // QVariantList<QVariantMap>
+    qDebug() << objects.toList().at(0).toMap()["href"].toString();
+
+    QVector<Chapter> chapters;
+    int i = 1;
+    for (const QVariant& toc : objects.toList()) {
+        QVariantMap obj = toc.toMap();
+        Chapter ch(i, obj.value("label").toString().trimmed(), obj.value("href").toString());
+        chapters << ch;
+    }
+    emit bookLoaded(chapters);
+   
 }

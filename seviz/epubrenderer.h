@@ -3,6 +3,9 @@
 
 #include <QObject>
 #include <QWebEngineView>
+#include <QVariant>
+#include <QVector>
+#include "BookModels.h"
 
 class EpubRenderer : public QObject
 {
@@ -10,7 +13,9 @@ class EpubRenderer : public QObject
 public:
     explicit EpubRenderer(QWebEngineView*);
 
+    // открывает книгу. Внимание: работает асинхронно
     void open(const QString& opfPath);
+    void showChapter(int index);
     void close();
     // взять изменения dom?
     // reload
@@ -32,6 +37,11 @@ public slots:
         //if (loaded)
             //this->open("ivanhoe.epub");
     }
+
+    void setChaptersList(const QVariant&);
+    
+signals:
+    void bookLoaded(const QVector<Chapter> &chapters);
 
 private:
     QWebEngineView *m_view;

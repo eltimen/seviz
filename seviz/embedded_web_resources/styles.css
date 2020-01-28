@@ -24,23 +24,8 @@ body {
   color: #777;
 }
 
-#viewer.spreads {
-  width: 900px;
-  height: 600px;
-  box-shadow: 0 0 4px #ccc;
-  border-radius: 5px;
-  padding: 0;
-  position: relative;
-  margin: 10px auto;
-  background: white url('ajax-loader.gif') center center no-repeat;
-  top: calc(50vh - 400px);
-}
-
-#viewer.spreads .epub-view > iframe {
-    background: white;
-}
-
 #viewer.scrolled {
+  /* visibility: hidden; */
   overflow: hidden;
   width: 800px;
   margin: 0 auto;

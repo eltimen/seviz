@@ -4,6 +4,7 @@
 #include <QToolbar>
 #include <QFileDialog>
 #include <QDockWidget>
+#include <QComboBox>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -16,6 +17,11 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->aboutAction, &QAction::triggered, this, &MainWindow::onAbout);
 
     m_bookViewer = new EpubRenderer(ui->webEngineView);
+    connect(m_bookViewer, &EpubRenderer::bookLoaded, this, &MainWindow::onBookLoaded);
+
+    connect(ui->chapterComboBox, qOverload<int>(&QComboBox::currentIndexChanged), [this](int i) {
+        m_bookViewer->showChapter(i);
+    });
 
     setupModules();
 }
@@ -65,4 +71,12 @@ void MainWindow::onFileSave() {
 
 void MainWindow::onAbout() {
 
+}
+
+void MainWindow::onBookLoaded(const QVector<Chapter>& chapters) {
+    ui->chapterComboBox->setEnabled(true);
+    ui->chapterComboBox->clear();
+    for (const auto& c : chapters) {
+        ui->chapterComboBox->addItem(c.name);
+    }
 }

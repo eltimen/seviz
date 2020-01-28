@@ -1,88 +1,89 @@
 
 class Render {
     book;
-    rendition;
-    prev;
-    next; 
     alreadyOpened;
+    viewer;
+    chapters;
 
     constructor() {
         this.alreadyOpened = false;
-        this.next = document.getElementById("next");
-        this.next.addEventListener("click", function (e) {
-            this.rendition.next();
-            e.preventDefault();
-        }.bind(this), false);
-
-        this.prev = document.getElementById("prev");
-        this.prev.addEventListener("click", function (e) {
-            this.rendition.prev();
-            e.preventDefault();
-        }.bind(this), false);
+        this.viewer = document.getElementById("viewer");
     };
 
     open(path) {
-        console.log(path);
+        //console.log(path);
         document.getElementById("help").style.display = "none";
         this.book = ePub(path);
-        this.rendition = this.book.renderTo("viewer", {
-            flow: "scrolled-doc",
-            width: "100%"
-        });
-        this._setup();
-        this.rendition.display();
+        this.chapters = [];
         this.alreadyOpened = true;
+
+        this.book.loaded.navigation.then(function (toc) {
+
+            let processSubItems = (chapter) => {
+                chapter.subitems.forEach((el) => {
+                    this.chapters.push(el);
+                    processSubItems(el);
+                });
+            };
+
+            toc.forEach(function (chapter) {
+                this.chapters.push(chapter);
+                processSubItems(chapter);
+
+            }.bind(this));
+
+            //$select.appendChild(docfrag);
+
+            //$select.onchange = function () {
+            //    var index = $select.selectedIndex,
+            //        url = $select.options[index].ref;
+            //    display(url);
+            //    return false;
+            //};
+
+            this.book.opened.then(function () {
+                this.display(0);
+                window.core.setChaptersList(this.chapters);
+            }.bind(this));
+
+        }.bind(this));
+        
     };
 
+    // показывает элемент chapters по заданному индексу
+    display(i) {
+        // получаем html файл с нужной главой
+        var section = this.book.spine.get(this.chapters[i].href);
+        if (section) {
+            section.render().then(function (html) {
+                // собираем dom-дерево, содержащее только заданную главу
+                this.viewer.innerHTML = "";
+                let chapterDoc = new DOMParser().parseFromString(html, 'text/html');
+                // находим id начала этой главы и следующей.
+                // TODO реализовать загрузку данной главы из соседних html файлов. сейчас показывается только из начального html
+                let from = this.chapters[i].href.split('#')[1];
+                let to = i+1 < this.chapters.length ? this.chapters[i+1].href.split('#')[1] : null;
+                console.log('from: ' + from + ' to: ' + to);
+      
+                let currentElem = chapterDoc.getElementById(from);
+                while (currentElem != null && (currentElem.id != to || to == null)) {
+                    this.viewer.appendChild(currentElem.cloneNode(true));
+                    currentElem = currentElem.nextSibling;
+                }
+
+                //this.viewer.innerHTML = html;
+            }.bind(this));
+        }
+
+        return section;
+    }
+
     close() {
-        this.rendition.destroy();
+        if (this.book != undefined) {
+            this.rendition.destroy();
+        }
     }
 
-    getBookPageContent() {
-        return this.rendition.getContents()[0].content;
-    }
-
-    _setup() {
-        this.rendition.on("relocated", function (location) {
-            console.log(location);
-        }.bind(this));
-
-        this.rendition.on("rendered", function (section) {
-            var nextSection = section.next();
-            var prevSection = section.prev();
-
-            if (nextSection) {
-                let nextNav = this.book.navigation.get(nextSection.href);
-
-                let nextLabel;
-                if (nextNav) {
-                    nextLabel = nextNav.label;
-                } else {
-                    nextLabel = "next";
-                }
-
-                this.next.textContent = nextLabel + " >>";
-            } else {
-                this.next.textContent = "";
-            }
-
-            if (prevSection) {
-                let prevNav = this.book.navigation.get(prevSection.href);
-
-                let prevLabel;
-                if (prevNav) {
-                    prevLabel = prevNav.label;
-                } else {
-                    prevLabel = "previous";
-                }
-
-                this.prev.textContent = "<< " + prevLabel;
-            } else {
-                this.prev.textContent = "";
-            }
-
-        }.bind(this)); 
-    }
 }
 
 let render = new Render();
