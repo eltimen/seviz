@@ -37,6 +37,7 @@ SOURCES += \
 HEADERS += \
         AbstractModule.h \
         Book.h \
+        BookModels.h \
         ModuleManager.h \
         epubrenderer.h \
         exceptions.h \
