@@ -37,13 +37,13 @@ void EpubRenderer::close() {
 
 void EpubRenderer::setChaptersList(const QVariant& objects) {
     // QVariantList<QVariantMap>
-    qDebug() << objects.toList().at(0).toMap()["href"].toString();
+    //qDebug() << objects.toList().at(0).toMap()["href"].toString();
 
     QVector<Chapter> chapters;
     int i = 1;
     for (const QVariant& toc : objects.toList()) {
         QVariantMap obj = toc.toMap();
-        Chapter ch(i, obj.value("label").toString().trimmed(), obj.value("href").toString());
+        Chapter ch(i, obj.value("label").toString().trimmed());
         chapters << ch;
     }
     emit bookLoaded(chapters);

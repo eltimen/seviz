@@ -15,9 +15,6 @@ public:
     const QString& id();
     virtual QList<Feature> features() = 0;
 
-public slots:
-    //virtual void featureTriggered(const QString& id) = 0;
-
 protected:
     QString m_id;
 };
