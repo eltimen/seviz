@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include <QtGlobal>
 #include <QToolbar>
 #include <QFileDialog>
 #include <QDockWidget>
@@ -19,7 +20,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_bookViewer = new EpubRenderer(ui->webEngineView);
     connect(m_bookViewer, &EpubRenderer::bookLoaded, this, &MainWindow::onBookLoaded);
 
-    connect(ui->chapterComboBox, qOverload<int>(&QComboBox::currentIndexChanged), [this](int i) {
+    connect(ui->chapterComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int i) {
         m_bookViewer->showChapter(i);
     });
 
