@@ -1,6 +1,7 @@
 #pragma once
 #include <QObject>
 #include <QWebEngineView>
+#include <QTemporaryDir>
 #include "epubrenderer.h"
 
 class Book : public QObject
@@ -13,16 +14,17 @@ public:
 
     void open();
     bool hasUnsavedChanges();
-    // open - распаковать во временную папку и отрендерить рендером
-    // save - забрать dom с рендера и упаковать содержимое временной папки в epub в epub
-    // close - сохранить?, затем убрать из рендера
+    // open - СЂР°СЃРїР°РєРѕРІР°С‚СЊ РІРѕ РІСЂРµРјРµРЅРЅСѓСЋ РїР°РїРєСѓ Рё РѕС‚СЂРµРЅРґРµСЂРёС‚СЊ СЂРµРЅРґРµСЂРѕРј
+    // save - Р·Р°Р±СЂР°С‚СЊ dom СЃ СЂРµРЅРґРµСЂР° Рё СѓРїР°РєРѕРІР°С‚СЊ СЃРѕРґРµСЂР¶РёРјРѕРµ РІСЂРµРјРµРЅРЅРѕР№ РїР°РїРєРё РІ epub РІ epub
+    // close - СЃРѕС…СЂР°РЅРёС‚СЊ?, Р·Р°С‚РµРј СѓР±СЂР°С‚СЊ РёР· СЂРµРЅРґРµСЂР°
 
-    // getExtraContent(key) // у каждого плагина свое хранилище. нужно ли общее?
+    // getExtraContent(key) // Сѓ РєР°Р¶РґРѕРіРѕ РїР»Р°РіРёРЅР° СЃРІРѕРµ С…СЂР°РЅРёР»РёС‰Рµ. РЅСѓР¶РЅРѕ Р»Рё РѕР±С‰РµРµ?
     // setExtraContent(key, value);
 
     // getRenderer
 
 private:
+    QTemporaryDir m_tempDir;
     EpubRenderer* m_renderer;
     QString m_epubPath;
 };

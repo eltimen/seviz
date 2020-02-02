@@ -1,5 +1,9 @@
 #include "Book.h"
-#include <exception>
+#include <QRegularExpression>
+#include <JLCompress.h>
+#include "exceptions.h"
+
+#pragma warning(disable:4129)
 
 Book::Book(const QString& epubPath, EpubRenderer* view) :
     QObject(nullptr),
@@ -13,10 +17,20 @@ Book::~Book()
 }
 
 void Book::open() {
-    // ðàñïàêîâàòü âî âðåìåííóþ ïàïêó
-    // ïåðåäàòü opf â epub.js
-    m_renderer->open(m_epubPath); //TODO
-    // åñëè îøèáêà - áðîñèòü exception
+    // Ñ€Ð°ÑÐ¿Ð°ÐºÐ¾Ð²ÐºÐ° Ð²Ð¾ Ð²Ñ€ÐµÐ¼ÐµÐ½Ð½ÑƒÑŽ Ð¿Ð°Ð¿ÐºÑƒ
+    if (m_tempDir.isValid()) {
+        QStringList files = JlCompress::extractDir(m_epubPath, m_tempDir.path());
+        if (!files.empty()) {
+            // TODO Ð²Ð·ÑÑ‚ÑŒ Ð¿ÑƒÑ‚ÑŒ Ðº opf Ð¸Ð· META_INF/container.xml. Ð¿Ð¾ÐºÐ° Ð±ÐµÑ€ÐµÐ¼ Ð¿ÐµÑ€Ð²Ñ‹Ð¹ Ð¿Ð¾Ð¿Ð°Ð²ÑˆÐ¸Ð¹ÑÑ opf Ð¸Ð· epub
+            QString opf = files.filter(QRegularExpression(".\.opf$"))[0];
+            m_renderer->open(opf);
+        } else {
+            throw InvalidEpubException();
+        }
+
+    } else {
+        throw CantUnpackEpubException(m_tempDir.errorString());
+    }
 }
 
 bool Book::hasUnsavedChanges() {

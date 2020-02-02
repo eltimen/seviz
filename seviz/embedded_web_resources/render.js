@@ -11,7 +11,7 @@ class Render {
     };
 
     open(path) {
-        //console.log(path);
+        console.log(path);
         document.getElementById("help").style.display = "none";
         this.book = ePub(path);
         this.chapters = [];
