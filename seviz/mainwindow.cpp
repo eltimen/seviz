@@ -9,7 +9,8 @@
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow),
+    m_manager(*m_bookViewer)
 {
     ui->setupUi(this);
     

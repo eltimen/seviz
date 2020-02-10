@@ -3,8 +3,9 @@
 #include <iterator>
 #include "modules/modules.h"
 
-ModuleManager::ModuleManager() {
-    for (AbstractModule* m : getSevizModulePointers()) {
+ModuleManager::ModuleManager(EpubRenderer& render) : m_render(render) {
+    for (AbstractModule* m : registrar()) {
+        m->m_engine = this;
         if (!m_container.contains(m->id())) {
             m_container.insert(m->id(), m);
         } else {
@@ -19,6 +20,10 @@ ModuleManager::~ModuleManager() {
     destroy();
 }
 
+void ModuleManager::bookOpened(Book* book) {
+    m_book = book;
+}
+
 void ModuleManager::forEachModule(std::function<void(AbstractModule*)> functor) {
     for (AbstractModule* i : m_container) {
         functor(i);
@@ -30,4 +35,8 @@ void ModuleManager::destroy() {
         delete i;
     }
     m_container.clear();
+}
+
+const Book& ModuleManager::getBook() {
+    return *m_book;
 }

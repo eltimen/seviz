@@ -59,6 +59,7 @@ SOURCES += \
         3rdparty/zlib/zutil.c \
         AbstractModule.cpp \
         Book.cpp \
+        DomChapter.cpp \
         ModuleManager.cpp \
         epubrenderer.cpp \
         main.cpp \
@@ -73,6 +74,8 @@ HEADERS += \
         AbstractModule.h \
         Book.h \
         BookModels.h \
+        DomChapter.h \
+        EventHandler.h \
         ModuleManager.h \
         epubrenderer.h \
         exceptions.h \

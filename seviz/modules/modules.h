@@ -1,18 +1,21 @@
 #pragma once
-#include <list>
+#include <vector>
+
+class AbstractModule;
 
 /*
-    Для добавления модуля нужно в этом файле:
-    1. Заинклудить header класса модуля
-    2. В функции ниже добавить создание объекта класса модуля (обязательно через new!)
+    Р”Р»СЏ РґРѕР±Р°РІР»РµРЅРёСЏ РјРѕРґСѓР»СЏ РЅСѓР¶РЅРѕ РІ СЌС‚РѕРј С„Р°Р№Р»Рµ:
+    1. Р—Р°РёРЅРєР»СѓРґРёС‚СЊ header РєР»Р°СЃСЃР° РјРѕРґСѓР»СЏ:    #include "MyModule/MyModule.h"
+    2. Р”РѕРїРёСЃР°С‚СЊ РІ registrar: new MyModule(),
 */
+
+// TODO СЃРґРµР»Р°С‚СЊ Р·Р°РіСЂСѓР·РєСѓ РїР»Р°РіРёРЅРѕРІ РёР· dll РІ РѕРїСЂРµРґРµР»РµРЅРЅРѕР№ РїР°РїРєРµ, Р±РµР· РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РІ РґР°РЅРЅРѕРј С„Р°Р№Р»Рµ
 
 #include "SyntaxTree/SyntaxTree.h"
 
-class AbstractModule;
-std::list<AbstractModule*> getSevizModulePointers() {
+std::vector<AbstractModule*> registrar() {
     return
     {
-        new SyntaxTree()
+        new SyntaxTree(),
     };
-}
+};
