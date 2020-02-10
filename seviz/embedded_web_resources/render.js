@@ -50,28 +50,33 @@ class Render {
         
     };
 
-    // показывает элемент chapters по заданному индексу
+    // РїРѕРєР°Р·С‹РІР°РµС‚ СЌР»РµРјРµРЅС‚ chapters РїРѕ Р·Р°РґР°РЅРЅРѕРјСѓ РёРЅРґРµРєСЃСѓ
     display(i) {
-        // получаем html файл с нужной главой
+        // РїРѕР»СѓС‡Р°РµРј html С„Р°Р№Р» СЃ РЅСѓР¶РЅРѕР№ РіР»Р°РІРѕР№
         var section = this.book.spine.get(this.chapters[i].href);
         if (section) {
             section.render().then(function (html) {
-                // собираем dom-дерево, содержащее только заданную главу
+                // СЃРѕР±РёСЂР°РµРј dom-РґРµСЂРµРІРѕ, СЃРѕРґРµСЂР¶Р°С‰РµРµ С‚РѕР»СЊРєРѕ Р·Р°РґР°РЅРЅСѓСЋ РіР»Р°РІСѓ
                 this.viewer.innerHTML = "";
                 let chapterDoc = new DOMParser().parseFromString(html, 'text/html');
-                // находим id начала этой главы и следующей.
-                // TODO реализовать загрузку данной главы из соседних html файлов. сейчас показывается только из начального html
+                // РЅР°С…РѕРґРёРј id РЅР°С‡Р°Р»Р° СЌС‚РѕР№ РіР»Р°РІС‹ Рё СЃР»РµРґСѓСЋС‰РµР№.
+                // TODO СЂРµР°Р»РёР·РѕРІР°С‚СЊ Р·Р°РіСЂСѓР·РєСѓ РґР°РЅРЅРѕР№ РіР»Р°РІС‹ РёР· СЃРѕСЃРµРґРЅРёС… html С„Р°Р№Р»РѕРІ. СЃРµР№С‡Р°СЃ РїРѕРєР°Р·С‹РІР°РµС‚СЃСЏ С‚РѕР»СЊРєРѕ РёР· РЅР°С‡Р°Р»СЊРЅРѕРіРѕ html
                 let from = this.chapters[i].href.split('#')[1];
                 let to = i+1 < this.chapters.length ? this.chapters[i+1].href.split('#')[1] : null;
                 console.log('from: ' + from + ' to: ' + to);
-      
-                let currentElem = chapterDoc.getElementById(from);
-                while (currentElem != null && (currentElem.id != to || to == null)) {
-                    this.viewer.appendChild(currentElem.cloneNode(true));
-                    currentElem = currentElem.nextSibling;
-                }
 
-                //this.viewer.innerHTML = html;
+                // РїСЂРѕРІРµСЂСЏРµРј, С‡С‚Рѕ СЃСЃС‹Р»РєР° РЅР° РіР»Р°РІСѓ РЅРµ СЃРѕРґРµСЂР¶РёС‚ РІ СЃРµР±Рµ СЃРµР»РµРєС‚РѕСЂ СЌР»РµРјРµРЅС‚Р° РёР· html-С„Р°Р№Р»Р° СЃРµРєС†РёРё
+                if (from == null && to == null) {
+                    this.viewer.innerHTML = html;
+                } else {
+                    // РёРЅР°С‡Рµ РІС‹СЂРµР·Р°РµРј РіР»Р°РІСѓ РёР· РѕСЃС‚Р°Р»СЊРЅС‹С… СЌР»РµРјРµРЅС‚РѕРІ СЃС‚СЂР°РЅРёС†С‹
+                    let currentElem = chapterDoc.getElementById(from);
+                    while (currentElem != null && (currentElem.id != to || to == null)) {
+                        this.viewer.appendChild(currentElem.cloneNode(true));
+                        currentElem = currentElem.nextSibling;
+                        if (currentElem == null) console.log('currentElem = null'); // debug
+                    }
+                }
             }.bind(this));
         }
 
