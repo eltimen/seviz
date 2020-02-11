@@ -5,10 +5,11 @@
 
 #pragma warning(disable:4129)
 
-Book::Book(const QString& epubPath, EpubRenderer* view) :
+Book::Book(const QString& epubPath, EpubRenderer* view, ModuleManager& moduleManager) :
     QObject(nullptr),
     m_renderer(view),
-    m_epubPath(epubPath)
+    m_epubPath(epubPath),
+    m_moduleManager(moduleManager)
 {
 }
 
@@ -31,8 +32,4 @@ void Book::open() {
     } else {
         throw CantUnpackEpubException(m_tempDir.errorString());
     }
-}
-
-bool Book::hasUnsavedChanges() {
-	return false;
 }

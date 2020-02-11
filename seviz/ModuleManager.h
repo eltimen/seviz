@@ -5,9 +5,11 @@
 #include <memory>
 #include <functional>
 #include "AbstractModule.h"
-#include "Book.h"
 #include "BookModels.h"
+#include "epubrenderer.h"
 #include "exceptions.h"
+
+class Book;
 
 class ModuleManager : public QObject
 {

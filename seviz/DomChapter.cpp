@@ -1,7 +1,7 @@
 #include "DomChapter.h"
 
-DomChapter::DomChapter(QObject *parent)
-	: QObject(parent)
+DomChapter::DomChapter(const Chapter& chapter)
+	: QObject(nullptr)
 {
 }
 

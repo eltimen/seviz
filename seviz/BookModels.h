@@ -30,24 +30,20 @@ struct Chapter {
 	QList<Scene> scenes;
 };
 
-class Section {
+class Section : public QList<Paragraph> {
 	int id;
 	QString name;
-	QList<Paragraph> paragraphs;
 };
 
-class Paragraph {
+class Paragraph : public QList<Sentence> {
 	int id;
 	QString text;
-	QList<Sentence> sentences;
 };
 
-class Sentence {
+class Sentence : public QList<Word> {
 	int id;
-
 	int idWordStart;
 	int idWordEnd;
-	QList<Word> words;
 };
 
 class Word {
@@ -55,16 +51,14 @@ class Word {
 	QString text;
 };
 
-class Scene {
+class Scene : public QList<Fragment> {
 	int id;
 	int idParagraphStart;
 	int idParagraphEnd;
-	QList<Fragment> fragments;
 };
 
 class Fragment {
 	int id;
-	Position positionStart;
-	Position positionEnd;
+	QPair<Position, Position> positions; // границы по предложениям
 };
 

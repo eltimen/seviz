@@ -62,7 +62,7 @@ void MainWindow::onFileOpen() {
     QString path = QFileDialog::getOpenFileName(this, "Открыть книгу", ".", "Файл EPUB (*.epub)");
     if (!path.isEmpty()) {
         delete m_book;
-        m_book = new Book(path, m_bookViewer);
+        m_book = new Book(path, m_bookViewer, m_manager); 
         m_book->open();
     }
 }

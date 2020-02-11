@@ -6,6 +6,7 @@
 #include <QVariant>
 #include <QVector>
 #include "BookModels.h"
+#include "DomChapter.h"
 
 class EpubRenderer : public QObject
 {
@@ -17,18 +18,15 @@ public:
     void open(const QString& opfPath);
     void showChapter(int index);
     void close();
-    // взять изменения dom?
-    // reload
-    
-    // [[deprecated("При использовании возможны конфликты с JS/CSS других плагинов.")]] ?
-    // запустить js на странице
-    // добавить css на страницу
 
-    // геттеры элементов модели по их позиции
-    // зарегистрировать обработчик
-    // снять регистрацию обработчика
-    // сигнал для сбора данных для показа элемента модели
-    
+    void updateChapterView(const DomChapter& dom);
+    DomChapter generateDomChapter();
+
+    // int addHandler(enum ElementType elem, enum EventType on, std::function<void()>& slot);
+    void removeHandler(int i);
+    QPair<Position, Position> selectedTextPos();
+    QString selectedText();
+   
 public slots:
     void setPageLoadedState(bool loaded) { 
         // conditional variable?
