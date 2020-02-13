@@ -9,6 +9,7 @@ EpubRenderer::EpubRenderer(QWebEngineView* view) :
     m_webchannel(new QWebChannel(this))
 {
     m_webchannel->registerObject(QStringLiteral("core"), this);
+    m_view->setContextMenuPolicy(Qt::NoContextMenu);
     m_view->page()->setWebChannel(m_webchannel);
     m_view->setUrl(QUrl("file:///embedded_web_resources/index.html"));
 }

@@ -13,6 +13,7 @@ class Render {
     open(path) {
         console.log(path);
         document.getElementById("help").style.display = "none";
+        document.getElementById("viewer").style.visibility = "visible";
         this.book = ePub(path);
         this.chapters = [];
         this.alreadyOpened = true;
@@ -72,10 +73,17 @@ class Render {
                     // иначе вырезаем главу из остальных элементов страницы
                     let currentElem = chapterDoc.getElementById(from);
                     while (currentElem != null && (currentElem.id != to || to == null)) {
+                        // показываем элемент
                         this.viewer.appendChild(currentElem.cloneNode(true));
                         currentElem = currentElem.nextSibling;
                         if (currentElem == null) console.log('currentElem = null'); // debug
                     }
+                }
+
+                // блокируем все ссылки
+                let lnks = this.viewer.getElementsByTagName("a");
+                for (let i = 0; i < lnks.length; i++) {
+                    lnks[i].onclick = function () { return false; };
                 }
             }.bind(this));
         }

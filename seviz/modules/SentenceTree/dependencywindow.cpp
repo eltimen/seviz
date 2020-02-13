@@ -7,6 +7,7 @@ DependencyWindow::DependencyWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->webEngineView->setHtml("TODO");
+    ui->webEngineView->setContextMenuPolicy(Qt::NoContextMenu);
 }
 
 DependencyWindow::~DependencyWindow()
