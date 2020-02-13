@@ -64,6 +64,8 @@ SOURCES += \
         epubrenderer.cpp \
         main.cpp \
         mainwindow.cpp \
+        modules/EngineTest/EngineTest.cpp \
+        modules/EngineTest/enginetestwidget.cpp \
         modules/SentenceTree/SentenceTree.cpp \
         modules/SentenceTree/constituencywindow.cpp \
         modules/SentenceTree/dependencywindow.cpp \
@@ -82,6 +84,8 @@ HEADERS += \
         epubrenderer.h \
         exceptions.h \
         mainwindow.h \
+        modules/EngineTest/EngineTest.h \
+        modules/EngineTest/enginetestwidget.h \
         modules/SentenceTree/SentenceTree.h \
         modules/SentenceTree/constituencywindow.h \
         modules/SentenceTree/dependencywindow.h \
@@ -90,6 +94,7 @@ HEADERS += \
 
 FORMS += \
         mainwindow.ui \
+        modules/EngineTest/enginetestwidget.ui \
         modules/SentenceTree/constituencywindow.ui \
         modules/SentenceTree/dependencywindow.ui \
         modules/SentenceTree/framenetwindow.ui
