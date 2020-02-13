@@ -64,8 +64,10 @@ SOURCES += \
         epubrenderer.cpp \
         main.cpp \
         mainwindow.cpp \
-        modules/SyntaxTree/SyntaxTree.cpp \
-        modules/SyntaxTree/syntaxtreewindow.cpp
+        modules/SentenceTree/SentenceTree.cpp \
+        modules/SentenceTree/constituencywindow.cpp \
+        modules/SentenceTree/dependencywindow.cpp \
+        modules/SentenceTree/framenetwindow.cpp 
 
 HEADERS += \
         3rdparty/quazip/quazip/quagzipfile.h \ #for moc
@@ -80,13 +82,17 @@ HEADERS += \
         epubrenderer.h \
         exceptions.h \
         mainwindow.h \
-        modules/SyntaxTree/SyntaxTree.h \
-        modules/SyntaxTree/syntaxtreewindow.h \
+        modules/SentenceTree/SentenceTree.h \
+        modules/SentenceTree/constituencywindow.h \
+        modules/SentenceTree/dependencywindow.h \
+        modules/SentenceTree/framenetwindow.h \
         modules/modules.h
 
 FORMS += \
         mainwindow.ui \
-        modules/SyntaxTree/syntaxtreewindow.ui
+        modules/SentenceTree/constituencywindow.ui \
+        modules/SentenceTree/dependencywindow.ui \
+        modules/SentenceTree/framenetwindow.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

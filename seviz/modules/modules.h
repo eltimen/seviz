@@ -11,11 +11,11 @@ class AbstractModule;
 
 // TODO сделать загрузку плагинов из dll в определенной папке, без необходимости в данном файле
 
-#include "SyntaxTree/SyntaxTree.h"
+#include "SentenceTree/SentenceTree.h"
 
 std::vector<AbstractModule*> registrar() {
     return
     {
-        new SyntaxTree(),
+        new SentenceTree(),
     };
 };

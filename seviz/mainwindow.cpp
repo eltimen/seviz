@@ -41,12 +41,13 @@ void MainWindow::setupModules() {
             // добавление dock-окна
             f.window->setParent(this);
             f.window->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable);
+            f.window->setWindowTitle(f.name);
             addDockWidget(Qt::BottomDockWidgetArea, f.window);
             f.window->hide();
 
             // добавление кнопки на тулбар
             QToolBar* toolbar = ui->mainToolBar;
-            QAction* action = toolbar->addAction(f.icon, f.text, [this, f](bool checked) {
+            QAction* action = toolbar->addAction(f.icon, f.name, [this, f](bool checked) {
                 if (checked) {
                     f.window->show();
                 } else {

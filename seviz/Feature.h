@@ -11,20 +11,18 @@ struct Feature {
 public:
 	Feature() = delete;
 
-	Feature(const QString& id,
+	Feature(const QString& name,
 		const QIcon& icon,
-		const QString& tooltipText,
 		QDockWidget* window,
 		AbstractModule* owner,
 		bool affectsView = false) :
-		id(id), icon(icon), text(tooltipText), window(window), owner(owner), affectsView(affectsView) 
+		name(name), icon(icon), window(window), owner(owner), affectsView(affectsView) 
 	{}
 
 	~Feature() = default;
 
-	QString id;
+	QString name;
 	QIcon icon;
-	QString text;
 
 	AbstractModule* owner;
 
