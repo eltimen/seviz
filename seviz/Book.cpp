@@ -24,7 +24,7 @@ void Book::open() {
         if (!files.empty()) {
             // TODO взять путь к opf из META_INF/container.xml. пока берем первый попавшийся opf из epub
             QString opf = files.filter(QRegularExpression(".\.opf$"))[0];
-            m_renderer->open(opf);
+            m_chapters = m_renderer->open(opf);
         } else {
             throw InvalidEpubException();
         }
@@ -32,4 +32,12 @@ void Book::open() {
     } else {
         throw CantUnpackEpubException(m_tempDir.errorString());
     }
+}
+
+QStringList Book::getChapterTitles() {
+    QStringList ret;
+    for (const auto& c : m_chapters) {
+        ret << c.name;
+    }
+    return ret;
 }

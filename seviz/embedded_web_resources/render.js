@@ -53,6 +53,7 @@ class Render {
 
     // показывает элемент chapters по заданному индексу
     display(i) {
+        console.log(i);
         // получаем html файл с нужной главой
         var section = this.book.spine.get(this.chapters[i].href);
         if (section) {
@@ -93,7 +94,7 @@ class Render {
 
     close() {
         if (this.book != undefined) {
-            this.rendition.destroy();
+            //this.rendition.destroy();
         }
     }
 

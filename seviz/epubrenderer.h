@@ -1,6 +1,7 @@
 #ifndef EPUBRENDERER_H
 #define EPUBRENDERER_H
 
+#include <QEventLoop>
 #include <QObject>
 #include <QWebEngineView>
 #include <QVariant>
@@ -14,8 +15,7 @@ class EpubRenderer : public QObject
 public:
     explicit EpubRenderer(QWebEngineView*);
 
-    // открывает книгу. Внимание: работает асинхронно!
-    void open(const QString& opfPath);
+    QVector<Chapter> open(const QString& opfPath);
     void showChapter(int index);
     void close();
 
@@ -36,13 +36,13 @@ public slots:
     }
 
     void setChaptersList(const QVariant&);
-    
-signals:
-    void bookLoaded(const QVector<Chapter> &chapters);
 
 private:
     QWebEngineView *m_view;
     QWebChannel* m_webchannel;
+    QEventLoop m_loop;
+
+    QVector<Chapter> m_chapterTitles;
 };
 
 #endif // EPUBRENDERER_H

@@ -19,7 +19,6 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->aboutAction, &QAction::triggered, this, &MainWindow::onAbout);
 
     m_bookViewer = new EpubRenderer(ui->webEngineView);
-    connect(m_bookViewer, &EpubRenderer::bookLoaded, this, &MainWindow::onBookLoaded);
 
     connect(ui->chapterComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int i) {
         m_bookViewer->showChapter(i);
@@ -67,6 +66,9 @@ void MainWindow::onFileOpen() {
         delete m_book;
         m_book = new Book(path, m_bookViewer, m_manager); 
         m_book->open();
+        ui->chapterComboBox->setEnabled(true);
+        ui->chapterComboBox->clear();
+        ui->chapterComboBox->addItems(m_book->getChapterTitles());
     }
 }
 
@@ -76,12 +78,4 @@ void MainWindow::onFileSave() {
 
 void MainWindow::onAbout() {
 
-}
-
-void MainWindow::onBookLoaded(const QVector<Chapter>& chapters) {
-    ui->chapterComboBox->setEnabled(true);
-    ui->chapterComboBox->clear();
-    for (const auto& c : chapters) {
-        ui->chapterComboBox->addItem(c.name);
-    }
 }

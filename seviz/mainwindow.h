@@ -22,7 +22,6 @@ private slots:
     void onFileOpen();
     void onFileSave();
     void onAbout();
-    void onBookLoaded(const QVector<Chapter>&);
 
 private:
     void setupModules();

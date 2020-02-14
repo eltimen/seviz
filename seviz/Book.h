@@ -18,10 +18,9 @@ public:
 
     void open();
     void save();
-
-    int getCurrentChapterNumber();
-
-    Chapter& getChapter();
+    QStringList getChapterTitles();
+    
+    Chapter& getCurrentChapter();
     Section& getSection(const Position& pos);
     Paragraph& getParagraph(const Position& pos);
     Sentence& getSentence(const Position& pos);
@@ -35,4 +34,6 @@ private:
     EpubRenderer* m_renderer;
     QString m_epubPath;
     ModuleManager& m_moduleManager;
+
+    QVector<Chapter> m_chapters;
 };
