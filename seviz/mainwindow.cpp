@@ -40,7 +40,7 @@ void MainWindow::setupModules() {
         for (const Feature& f : module->features()) {
             // добавление dock-окна
             f.window->setParent(this);
-            f.window->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable);
+            f.window->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetClosable);
             f.window->setWindowTitle(f.name);
             addDockWidget(Qt::BottomDockWidgetArea, f.window);
             f.window->hide();
