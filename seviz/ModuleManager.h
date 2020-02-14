@@ -25,6 +25,7 @@ public:
     void forEachModule(std::function<void(AbstractModule*)> functor);
 
     // методы для модулей
+    AbstractModule* getModule(const QString& id);
     AbstractModule* getModule(const QString& id, int minVersion);
     const Book& getBook();
     void triggerRerendering(const Position& from, const Position& to);

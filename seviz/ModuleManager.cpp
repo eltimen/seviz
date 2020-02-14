@@ -47,6 +47,15 @@ void ModuleManager::destroy() {
     m_container.clear();
 }
 
+AbstractModule* ModuleManager::getModule(const QString& id) {
+    return m_container.value(id, nullptr);
+}
+
+AbstractModule* ModuleManager::getModule(const QString& id, int minVersion) {
+    AbstractModule* m = m_container.value(id, nullptr);
+    return m->version() >= minVersion ? m : nullptr;
+}
+
 const Book& ModuleManager::getBook() {
     return *m_book;
 }
