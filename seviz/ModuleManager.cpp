@@ -24,6 +24,16 @@ void ModuleManager::bookOpened(Book* book) {
     m_book = book;
 }
 
+void ModuleManager::featureEnabled(const Feature& feature) {
+    qDebug() << "enabled " + feature.name;
+    // TODO restore handlers & hotkeys
+}
+
+void ModuleManager::featureDisabled(const Feature& feature) {
+    qDebug() << "disabled " + feature.name;
+    // TODO disable handlers & hotkeys
+}
+
 void ModuleManager::forEachModule(std::function<void(AbstractModule*)> functor) {
     for (AbstractModule* i : m_container) {
         functor(i);

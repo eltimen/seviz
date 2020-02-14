@@ -49,9 +49,11 @@ void MainWindow::setupModules() {
             QToolBar* toolbar = ui->mainToolBar;
             QAction* action = toolbar->addAction(f.icon, f.name, [this, f](bool checked) {
                 if (checked) {
+                    m_manager.featureEnabled(f);
                     f.window->show();
                 } else {
                     f.window->hide();
+                    m_manager.featureDisabled(f);
                 }
             });
             action->setCheckable(true);
