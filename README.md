@@ -8,6 +8,9 @@
  * dependency tree
  * framenet
  
- ## Прототип
- См. ветку experimental
+# Сборка
+Рекомендуется использовать:
+* IDE: `Qt Creator`
+* Компилятор: `MSVS 2019`
+* ОС: MS Windows 7 и выше
  
