@@ -58,3 +58,4 @@ seviz/msvc_make.bat
 seviz/seviz.vcxproj.filters
 seviz/seviz.vcxproj
 seviz/seviz.sln
+seviz/cpp.hint

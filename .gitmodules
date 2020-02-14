@@ -1,0 +1,6 @@
+[submodule "seviz/3rdparty/quazip"]
+	path = seviz/3rdparty/quazip
+	url = https://github.com/stachenov/quazip.git
+[submodule "seviz/3rdparty/zlib"]
+	path = seviz/3rdparty/zlib
+	url = https://github.com/madler/zlib.git
