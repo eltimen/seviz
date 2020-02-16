@@ -37,6 +37,8 @@ public slots:
 
     void setChaptersList(const QVariant&);
 
+    //void setParagraphs(const QVariant&);
+
 private:
     QWebEngineView *m_view;
     QWebChannel* m_webchannel;

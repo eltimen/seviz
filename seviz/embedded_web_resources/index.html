@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
@@ -6,6 +6,7 @@
     <script type="text/javascript" src="qrc:///qtwebchannel/qwebchannel.js"></script>
     <script src="./adapter.js"></script>
     <script src="./3rdparty/epub.js"></script>
+    <script src="./3rdparty/splitter.js"></script> <!-- https://github.com/azu/sentence-splitter -->
     <link rel="stylesheet" type="text/css" href="styles.css">
 </head>
 
@@ -14,8 +15,6 @@
     <div id="help"> <h2>Чтобы начать работу, откройте файл с книгой (Файл->Открыть)</h2></div>
     <div id="viewer" class="scrolled"></div>
     <div id="chapter-view" class="scrolled"></div>
-
-
     <script src="render.js"></script>
     <script>
         window.core.setPageLoadedState(true);

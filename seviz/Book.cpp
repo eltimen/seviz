@@ -37,7 +37,7 @@ void Book::open() {
 QStringList Book::getChapterTitles() {
     QStringList ret;
     for (const auto& c : m_chapters) {
-        ret << c.name;
+        ret << c.name();
     }
     return ret;
 }

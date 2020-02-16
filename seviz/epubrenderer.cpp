@@ -8,6 +8,8 @@ EpubRenderer::EpubRenderer(QWebEngineView* view) :
     m_view(view),
     m_webchannel(new QWebChannel(this))
 {
+    m_view->page()->settings()->setAttribute(QWebEngineSettings::LocalContentCanAccessRemoteUrls, true);
+    m_view->page()->settings()->setAttribute(QWebEngineSettings::LocalContentCanAccessFileUrls, true);
     m_webchannel->registerObject(QStringLiteral("core"), this);
     m_view->setContextMenuPolicy(Qt::NoContextMenu);
     m_view->page()->setWebChannel(m_webchannel);
@@ -36,7 +38,7 @@ void EpubRenderer::close() {
 void EpubRenderer::setChaptersList(const QVariant& objects) {
     // QVariantList<QVariantMap>
     //qDebug() << objects.toList().at(0).toMap()["href"].toString();
-
+    m_chapterTitles.clear();
     int i = 1;
     for (const QVariant& toc : objects.toList()) {
         QVariantMap obj = toc.toMap();

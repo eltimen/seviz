@@ -3,7 +3,7 @@
 #include <QList>
 #include <QString>
 
-struct Chapter;
+class Chapter;
 class Section;
 class Paragraph;
 class Sentence;
@@ -13,21 +13,29 @@ class Scene;
 class Fragment;
 
 class Position {
-	int idChapter;
+	//int idChapter;
 	int idSection;
 	int idParagraph;
 	int idSentence;
 	int idWord;
 };
 
-struct Chapter {
+class Chapter {
+public:
 	Chapter(int id, const QString& name) :
-		id(id), name(name) {}
+		m_id(id), m_name(name) {}
 
-	int id;
-	QString name;
+	int id() const { return m_id; }
+	const QString& name() const { return m_name; } 
+
+	bool isInitialized() const { return sections.size() > 0; }
+
 	QList<Section> sections;
 	QList<Scene> scenes;
+
+private:
+	int m_id;
+	QString m_name;
 };
 
 class Section : public QList<Paragraph> {

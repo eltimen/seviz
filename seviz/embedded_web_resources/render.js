@@ -1,3 +1,39 @@
+//import { split, Syntax } from "sentence-splitter";
+
+function markParagraphs(viewer) {
+    let outParagraphs = [];
+    pars = viewer.getElementsByTagName("p");
+    for (let i = 0; i < pars.length; ++i) {
+        /*
+            "paragraphs": [ { "id": 1, "sentences": [ { "id": 1, "words": [{1,"word1"}, {2,"."}] } ] } ] }
+        */
+
+        pars[i].setAttribute("id", i + 1);         
+        let rawSplitData = splitter.split(pars[i].textContent);
+        let parInnerHtml = "";
+        let sentArr = [];
+        // собираем абзац как набор маркированных предложений
+        let sentId = 1;
+        rawSplitData.forEach(el => {
+            if (el.type == "Sentence") {
+                let wordsArr = [];
+                let sentHtml = "<sentence id\"" + String(sentId) + "\">";
+                let words = el.raw.match(/([\w]+|\.|,|"|'|:|”|“|!|\(|\)|;)/g);
+                for (let wordId = 0; wordId < words.length; ++wordId) {
+                    wordsArr.push({ id: wordId + 1, text: words[wordId] });
+                    sentHtml += "<word id=\"" + String(wordId + 1) + "\">" + words[wordId] + "</word> ";
+                }
+                sentHtml += "</sentence> ";
+                sentArr.push({ id: sentId, words: wordsArr });
+                parInnerHtml += sentHtml;
+                sentId++;
+            } 
+        });
+        outParagraphs.push({ id: i + 1, sentences: sentArr });
+        pars[i].innerHTML = parInnerHtml;
+    }
+    console.log(outParagraphs);
+};
 
 class Render {
     book;
@@ -86,6 +122,9 @@ class Render {
                 for (let i = 0; i < lnks.length; i++) {
                     lnks[i].onclick = function () { return false; };
                 }
+
+                // инициализируем модель
+                markParagraphs(this.viewer);
             }.bind(this));
         }
 
