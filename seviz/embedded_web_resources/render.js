@@ -79,7 +79,6 @@ class Render {
             //};
 
             this.book.opened.then(function () {
-                this.display(0);
                 window.core.setChaptersList(this.chapters);
             }.bind(this));
 
