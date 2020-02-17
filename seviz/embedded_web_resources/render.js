@@ -1,6 +1,8 @@
 //import { split, Syntax } from "sentence-splitter";
 
 function markParagraphs(viewer) {
+    // TODO кешировать результат для каждой главы
+    // TODO реакция на некорректный символ в предложении. необходимо отбросить его и продолжить работу
     let outParagraphs = [];
     pars = viewer.getElementsByTagName("p");
     for (let i = 0; i < pars.length; ++i) {
@@ -98,6 +100,7 @@ class Render {
                 this.viewer.innerHTML = "";
                 let chapterDoc = new DOMParser().parseFromString(html, 'text/html');
                 // находим id начала этой главы и следующей.
+                // TODO поменять способ итерации на учитывающий дочерние узлы
                 // TODO реализовать загрузку данной главы из соседних html файлов. сейчас показывается только из начального html
                 let from = this.chapters[i].href.split('#')[1];
                 let to = i+1 < this.chapters.length ? this.chapters[i+1].href.split('#')[1] : null;
