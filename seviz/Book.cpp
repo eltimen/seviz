@@ -48,6 +48,59 @@ QStringList Book::getChapterTitles() {
     return ret;
 }
 
+const QList<Chapter>& Book::chapters() const {
+    return m_chapters;
+}
+
+const Chapter& Book::getCurrentChapter() const {
+    return m_chapters[m_currentChapterIndex];
+}
+
+const Section& Book::getSection(const Position& pos) const {
+    if (pos.chapterIndex() < m_chapters.size()) {
+        const Chapter& ch = m_chapters[pos.chapterIndex()];
+
+        if (!ch.isInitialized()) {
+            throw std::logic_error("chapter isn't initialized. user need open chapter first");
+        }
+
+        if (pos.sectionIndex() < ch.sections.size()) {                  
+                return ch.sections[pos.sectionIndex()];
+        } else {
+            throw std::out_of_range("incorrect section id");
+        }
+    } else {
+        throw std::out_of_range("invalid chapter id");
+    }
+}
+
+const Paragraph& Book::getParagraph(const Position& pos) const {
+    const Section& sect = getSection(pos);
+    if (pos.paragraphIndex() < sect.size()) {
+        return sect[pos.paragraphIndex()];
+    } else {
+        throw std::out_of_range("invalid paragraph id");
+    }
+}
+
+const Sentence& Book::getSentence(const Position& pos) const {
+    const Paragraph& par = getParagraph(pos);
+    if (pos.sentenceIndex() < par.size()) {
+        return par[pos.sentenceIndex()];
+    } else {
+        throw std::out_of_range("invalid sentence id");
+    }
+}
+
+const Word& Book::getWord(const Position& pos) const {
+    const Sentence& sent = getSentence(pos);
+    if (pos.wordIndex() < sent.size()) {
+        return sent[pos.wordIndex()];
+    } else {
+        throw std::out_of_range("invalid word id");
+    }
+}
+
 void Book::setModelForChapter(int chapterIndex, const QList<Section>& data) {
     m_chapters[chapterIndex].sections = data;
 }

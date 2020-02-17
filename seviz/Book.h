@@ -21,11 +21,12 @@ public:
     void save();
     QStringList getChapterTitles();
     
-    Chapter& getCurrentChapter();
-    Section& getSection(const Position& pos);
-    Paragraph& getParagraph(const Position& pos);
-    Sentence& getSentence(const Position& pos);
-    Word& getWord(const Position& pos);
+    const QList<Chapter>& chapters() const;
+    const Chapter& getCurrentChapter() const;
+    const Section& getSection(const Position& pos) const;
+    const Paragraph& getParagraph(const Position& pos) const;
+    const Sentence& getSentence(const Position& pos) const;
+    const Word& getWord(const Position& pos) const;
 
     void setModelForChapter(int chapterIndex, const QList<Section>& data);
 
@@ -39,5 +40,5 @@ private:
     ModuleManager& m_moduleManager;
 
     int m_currentChapterIndex = -1;
-    QVector<Chapter> m_chapters;
+    QList<Chapter> m_chapters;
 };

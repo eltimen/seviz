@@ -13,11 +13,35 @@ class Scene;
 class Fragment;
 
 class Position {
-	//int idChapter;
-	int idSection;
-	int idParagraph;
-	int idSentence;
-	int idWord;
+public:
+	Position(int idChapter, int idSection = -1, int idParagraph = -1, int idSentence = -1, int idWord = -1) :
+		m_idChapter(idChapter), 
+		m_idSection(idSection), 
+		m_idParagraph(idParagraph), 
+		m_idSentence(idSentence), 
+		m_idWord(idWord) 
+	{
+		if (idChapter < 1 && idChapter != -1 ||
+			idSection < 1 && idSection != -1 ||
+			idParagraph < 1 && idParagraph != -1 ||
+			idSentence < 1 && idSection != -1 ||
+			idWord < 1 && idWord != -1)
+
+			throw std::invalid_argument("id must be >=1");
+	}
+
+	int chapterIndex() const { return m_idChapter - 1; }
+	int sectionIndex() const { return m_idSection - 1; }
+	int paragraphIndex() const { return m_idParagraph - 1; }
+	int sentenceIndex() const { return m_idSentence - 1; }
+	int wordIndex() const { return m_idWord - 1; }
+
+private:
+	int m_idChapter;
+	int m_idSection;
+	int m_idParagraph;
+	int m_idSentence;
+	int m_idWord;
 };
 
 class Chapter {

@@ -17,7 +17,7 @@ EpubRenderer::EpubRenderer(QWebEngineView* view) :
     m_view->setUrl(QUrl("file:///embedded_web_resources/index.html"));
 }
 
-QVector<Chapter> EpubRenderer::open(Book* book, const QString& opfPath) {
+QList<Chapter> EpubRenderer::open(Book* book, const QString& opfPath) {
     // TODO добавить обработку ошибок
     m_book = book;
     close();

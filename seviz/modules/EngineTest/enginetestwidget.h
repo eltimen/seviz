@@ -2,6 +2,7 @@
 #define ENGINETESTWIDGET_H
 
 #include <QWidget>
+#include "ModuleManager.h"
 
 namespace Ui {
 class EngineTestWidget;
@@ -9,6 +10,8 @@ class EngineTestWidget;
 
 class EngineTestWidget : public QWidget
 {
+    friend class EngineTest;
+
     Q_OBJECT
 
 public:
@@ -17,6 +20,7 @@ public:
 
 private:
     Ui::EngineTestWidget *ui;
+    ModuleManager* m_engine = nullptr;
 };
 
 #endif // ENGINETESTWIDGET_H

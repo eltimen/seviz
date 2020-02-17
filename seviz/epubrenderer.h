@@ -17,7 +17,7 @@ class EpubRenderer : public QObject
 public:
     explicit EpubRenderer(QWebEngineView*);
 
-    QVector<Chapter> open(Book* book, const QString& opfPath);
+    QList<Chapter> open(Book* book, const QString& opfPath);
     void showChapter(int index);
     void close();
 
@@ -40,7 +40,7 @@ private:
     QEventLoop m_loop;
     Book* m_book = nullptr;
 
-    QVector<Chapter> m_chapterTitles;
+    QList<Chapter> m_chapterTitles;
 };
 
 #endif // EPUBRENDERER_H
