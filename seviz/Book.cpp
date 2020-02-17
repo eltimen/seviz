@@ -35,6 +35,11 @@ void Book::open() {
     }
 }
 
+void Book::showChapter(int index) {
+    m_currentChapterIndex = index;
+    m_renderer->showChapter(index);
+}
+
 QStringList Book::getChapterTitles() {
     QStringList ret;
     for (const auto& c : m_chapters) {

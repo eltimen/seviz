@@ -17,7 +17,7 @@ public:
     ~Book();
 
     void open();
-    void showChapter(int chapterIndex);
+    void showChapter(int index);
     void save();
     QStringList getChapterTitles();
     

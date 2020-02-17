@@ -19,11 +19,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->aboutAction, &QAction::triggered, this, &MainWindow::onAbout);
 
     m_bookViewer = new EpubRenderer(ui->webEngineView);
-
-    connect(ui->chapterComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int i) {
-        if (i >= 0)
-            m_bookViewer->showChapter(i);
-    });
+    connect(ui->chapterComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::onChapterChanged); 
 
     setupModules();
 }
@@ -67,6 +63,7 @@ void MainWindow::onFileOpen() {
         delete m_book;
         m_book = new Book(path, m_bookViewer, m_manager); 
         m_book->open();
+        ui->mainToolBar->setEnabled(true);
         ui->chapterComboBox->setEnabled(true);
         ui->chapterComboBox->clear();
         ui->chapterComboBox->addItems(m_book->getChapterTitles());
@@ -79,4 +76,9 @@ void MainWindow::onFileSave() {
 
 void MainWindow::onAbout() {
 
+}
+
+void MainWindow::onChapterChanged(int index) {
+    if (index >= 0)
+        m_book->showChapter(index);
 }

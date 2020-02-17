@@ -23,6 +23,8 @@ private slots:
     void onFileSave();
     void onAbout();
 
+    void onChapterChanged(int index);
+
 private:
     void setupModules();
 
