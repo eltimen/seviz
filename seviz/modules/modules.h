@@ -14,10 +14,10 @@ class AbstractModule;
 #include "SentenceTree/SentenceTree.h"
 #include "EngineTest/EngineTest.h"
 
-std::vector<AbstractModule*> registrar() {
+std::vector<AbstractModule*> ModuleManager::registrar() {
     return
     {
-        new SentenceTree(),
-        new EngineTest(),
+        new SentenceTree(this),
+        new EngineTest(this),
     };
 };

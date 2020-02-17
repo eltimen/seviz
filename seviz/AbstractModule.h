@@ -8,13 +8,14 @@
 #include "EventHandler.h"
 #include "DomChapter.h"
 
+class ModuleManager;
+
 class AbstractModule : public QObject
 {
     Q_OBJECT
 
-    friend class ModuleManager;
 public:
-    AbstractModule(const QString& id);
+    AbstractModule(ModuleManager* engine, const QString& id);
     virtual ~AbstractModule();
 
     virtual const QString& id();
@@ -27,7 +28,9 @@ public:
 public slots:
     virtual void render(const Position& from, const Position& to, DomChapter& dom, const QVector<Feature*>& activeFeatures);
 
+protected:
+    ModuleManager* m_engine = nullptr;
+
 private:
     QString m_id;
-    ModuleManager* m_engine;
 };

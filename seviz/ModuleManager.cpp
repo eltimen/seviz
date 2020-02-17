@@ -5,7 +5,6 @@
 
 ModuleManager::ModuleManager(EpubRenderer& render) : m_render(render) {
     for (AbstractModule* m : registrar()) {
-        m->m_engine = this;
         if (!m_container.contains(m->id())) {
             m_container.insert(m->id(), m);
         } else {

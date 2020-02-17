@@ -1,7 +1,7 @@
 #include "SentenceTree.h"
 
-SentenceTree::SentenceTree() : 
-    AbstractModule("SentenceTree"),
+SentenceTree::SentenceTree(ModuleManager* engine) : 
+    AbstractModule(engine, "SentenceTree"),
     m_constituency("Дерево составляющих", QIcon(), new QDockWidget(), this),
     m_dependency("Дерево зависимостей", QIcon(), new QDockWidget(), this),
     m_framenet("Дерево FrameNet", QIcon(), new QDockWidget(), this)

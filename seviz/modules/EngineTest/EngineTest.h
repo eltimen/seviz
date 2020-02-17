@@ -10,7 +10,7 @@ class EngineTest : public AbstractModule
     Q_OBJECT
 
 public:
-    EngineTest();
+    EngineTest(ModuleManager* engine);
     ~EngineTest();
 
     virtual QList<Feature> features() override;

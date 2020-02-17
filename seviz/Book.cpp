@@ -18,6 +18,7 @@ Book::~Book()
 }
 
 void Book::open() {
+    m_moduleManager.bookOpened(this);
     // распаковка во временную папку
     if (m_tempDir.isValid()) {
         QStringList files = JlCompress::extractDir(m_epubPath, m_tempDir.path());

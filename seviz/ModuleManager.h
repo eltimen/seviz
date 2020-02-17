@@ -40,4 +40,5 @@ private:
     Book* m_book = nullptr;
 
     void destroy();
+    std::vector<AbstractModule*> registrar();
 };

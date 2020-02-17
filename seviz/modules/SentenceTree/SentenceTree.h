@@ -12,7 +12,7 @@ class SentenceTree : public AbstractModule
     Q_OBJECT
 
 public:
-    SentenceTree();
+    SentenceTree(ModuleManager* engine);
     ~SentenceTree();
 
     virtual QList<Feature> features() override;
