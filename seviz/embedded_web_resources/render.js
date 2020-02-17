@@ -5,7 +5,7 @@ function markParagraphs(viewer) {
     pars = viewer.getElementsByTagName("p");
     for (let i = 0; i < pars.length; ++i) {
         /*
-            "paragraphs": [ { "id": 1, "sentences": [ { "id": 1, "words": [{1,"word1"}, {2,"."}] } ] } ] }
+            "paragraphs": [ { "id": 1, "sentences": [ { "id": 1, "text": [{1,"word1"}, {2,"."}] } ] } ] }
         */
 
         pars[i].setAttribute("id", i + 1);         
@@ -33,6 +33,7 @@ function markParagraphs(viewer) {
         pars[i].innerHTML = parInnerHtml;
     }
     console.log(outParagraphs);
+    return outParagraphs;
 };
 
 class Render {
@@ -123,7 +124,8 @@ class Render {
                 }
 
                 // инициализируем модель
-                markParagraphs(this.viewer);
+                let model = markParagraphs(this.viewer);
+                window.core.setModelDataForChapter(i, model);
             }.bind(this));
         }
 

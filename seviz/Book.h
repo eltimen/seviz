@@ -17,6 +17,7 @@ public:
     ~Book();
 
     void open();
+    void showChapter(int chapterIndex);
     void save();
     QStringList getChapterTitles();
     
@@ -25,6 +26,8 @@ public:
     Paragraph& getParagraph(const Position& pos);
     Sentence& getSentence(const Position& pos);
     Word& getWord(const Position& pos);
+
+    void setModelForChapter(int chapterIndex, const QList<Section>& data);
 
 private:
     void initModel();
@@ -35,5 +38,6 @@ private:
     QString m_epubPath;
     ModuleManager& m_moduleManager;
 
+    int m_currentChapterIndex = -1;
     QVector<Chapter> m_chapters;
 };

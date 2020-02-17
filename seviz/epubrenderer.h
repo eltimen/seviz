@@ -9,13 +9,15 @@
 #include "BookModels.h"
 #include "DomChapter.h"
 
+class Book;
+
 class EpubRenderer : public QObject
 {
     Q_OBJECT
 public:
     explicit EpubRenderer(QWebEngineView*);
 
-    QVector<Chapter> open(const QString& opfPath);
+    QVector<Chapter> open(Book* book, const QString& opfPath);
     void showChapter(int index);
     void close();
 
@@ -28,21 +30,15 @@ public:
     QString selectedText();
    
 public slots:
-    void setPageLoadedState(bool loaded) { 
-        // conditional variable?
-        qDebug() << "page loaded: " << loaded;
-        //if (loaded)
-            //this->open("ivanhoe.epub");
-    }
-
+    // функции, доступные из js
     void setChaptersList(const QVariant&);
-
-    //void setParagraphs(const QVariant&);
+    void setModelDataForChapter(int chapterIndex, const QVariant& paragraphs);
 
 private:
     QWebEngineView *m_view;
     QWebChannel* m_webchannel;
     QEventLoop m_loop;
+    Book* m_book = nullptr;
 
     QVector<Chapter> m_chapterTitles;
 };

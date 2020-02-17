@@ -24,7 +24,7 @@ void Book::open() {
         if (!files.empty()) {
             // TODO взять путь к opf из META_INF/container.xml. пока берем первый попавшийся opf из epub
             QString opf = files.filter(QRegularExpression(".\.opf$"))[0];
-            m_chapters = m_renderer->open(opf);
+            m_chapters = m_renderer->open(this, opf);
         } else {
             throw InvalidEpubException();
         }
@@ -40,4 +40,8 @@ QStringList Book::getChapterTitles() {
         ret << c.name();
     }
     return ret;
+}
+
+void Book::setModelForChapter(int chapterIndex, const QList<Section>& data) {
+    m_chapters[chapterIndex].sections = data;
 }

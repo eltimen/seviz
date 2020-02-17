@@ -39,24 +39,46 @@ private:
 };
 
 class Section : public QList<Paragraph> {
-	int id;
-	QString name;
+public:
+	//Section(int id, const QString& name, const QList<Paragraph>& content) : 
+	//	m_id(id), m_name(name), QList<Paragraph>(content) {}
+	Section(int id, const QList<Paragraph>& content) : 
+		m_id(id), QList<Paragraph>(content) {}
+
+	int id() const { return m_id; }
+	//const QString& name() const { return m_name; }
+private:
+	int m_id;
+	//QString m_name;
 };
 
 class Paragraph : public QList<Sentence> {
-	int id;
-	QString text;
+public:
+	Paragraph(int id, const QList<Sentence>& content) :
+		m_id(id), QList<Sentence>(content) {}
+	int id() const { return m_id; }
+private:
+	int m_id;
 };
 
 class Sentence : public QList<Word> {
-	int id;
-	int idWordStart;
-	int idWordEnd;
+	int m_id;
+public:
+	Sentence(int id, const QList<Word>& content) :
+		m_id(id), QList<Word>(content) {}
+	int id() const { return m_id; }
 };
 
 class Word {
-	int id;
-	QString text;
+	int m_id;
+	QString m_text;
+
+public:
+	Word(int id, const QString& text) :
+		m_id(id), m_text(text) {}
+
+	int id() const { return m_id; }
+	const QString& text() const { return m_text; }
 };
 
 class Scene : public QList<Fragment> {
