@@ -18,7 +18,7 @@ function markParagraphs(viewer) {
             if (el.type == "Sentence") {
                 let wordsArr = [];
                 let sentHtml = "<sentence id\"" + String(sentId) + "\">";
-                let words = el.raw.match(/([\w]+|\.|,|"|'|:|”|“|!|\(|\)|;)/g);
+                let words = el.raw.match(/([\w]+|\.|,|"|'|:|”|“|!|\(|\)|;|‘|’)/g);
                 for (let wordId = 0; wordId < words.length; ++wordId) {
                     wordsArr.push({ id: wordId + 1, text: words[wordId] });
                     sentHtml += "<word id=\"" + String(wordId + 1) + "\">" + words[wordId] + "</word> ";

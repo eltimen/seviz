@@ -416,6 +416,7 @@ var PairMaker = /** @class */ (function () {
         this.pairs = (_a = {},
             _a["\""] = "\"",
             _a["“"] = "”",
+            _a["‘"] = "’",
             _a["\u300C"] = "\u300D",
             _a["\uFF08"] = "\uFF09",
             _a["("] = ")",
