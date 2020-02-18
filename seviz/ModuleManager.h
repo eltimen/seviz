@@ -1,6 +1,6 @@
 #pragma once
 #include <QObject>
-#include <QHash>
+#include <QMap>
 #include <QList>
 #include <memory>
 #include <functional>
@@ -35,7 +35,7 @@ public:
     Position mouseHoverElement(enum ElementType elem);
     
 private:
-    QHash<QString,AbstractModule*> m_container;
+    QMap<QString,AbstractModule*> m_container;
     EpubRenderer& m_render;
     Book* m_book = nullptr;
 
