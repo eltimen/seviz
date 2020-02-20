@@ -1,10 +1,12 @@
 #include "enginetestwidget.h"
 #include "ui_enginetestwidget.h"
 #include "Book.h"
+#include "EngineTest.h"
 
-EngineTestWidget::EngineTestWidget(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::EngineTestWidget)
+EngineTestWidget::EngineTestWidget(EngineTest& facade) :
+    QWidget(nullptr),
+    ui(new Ui::EngineTestWidget),
+    m_main(facade)
 {
     ui->setupUi(this);
 
@@ -24,11 +26,18 @@ EngineTestWidget::EngineTestWidget(QWidget *parent) :
         } catch (const std::exception& e) {
             ui->resultLabel->setText(e.what());
         }
-        
+    });
+
+    connect(ui->customDataSaveButton, &QPushButton::clicked, [this]() {
+        m_main.data = ui->lineEdit->text();
     });
 }
 
 EngineTestWidget::~EngineTestWidget()
 {
     delete ui;
+}
+
+void EngineTestWidget::setText(const QString& str) {
+    ui->lineEdit->setText(str);
 }

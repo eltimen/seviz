@@ -15,12 +15,16 @@ class EngineTestWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit EngineTestWidget(QWidget *parent = nullptr);
+    explicit EngineTestWidget(EngineTest& facade);
     ~EngineTestWidget();
+
+    void setText(const QString& str);
 
 private:
     Ui::EngineTestWidget *ui;
     ModuleManager* m_engine = nullptr;
+    EngineTest& m_main;
+
 };
 
 #endif // ENGINETESTWIDGET_H
