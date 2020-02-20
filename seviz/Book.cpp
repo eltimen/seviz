@@ -66,6 +66,13 @@ void Book::save() {
             throw IOException("не удалось создать директорию для " + m->id());
         }
     });
+
+    QString tmpPath = m_epubPath + "_";
+    if (!JlCompress::compressDir(tmpPath, m_epubDir.path()) ||
+        !QFile::remove(m_epubPath) ||
+        !QFile::rename(tmpPath, m_epubPath)) {
+        throw IOException("не удалось сохранить epub");
+    }
 }
 
 QStringList Book::getChapterTitles() {

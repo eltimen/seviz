@@ -64,6 +64,7 @@ void MainWindow::onFileOpen() {
         m_book = new Book(path, m_bookViewer, m_manager); 
         m_book->open();
         ui->mainToolBar->setEnabled(true);
+        ui->fileSaveAction->setEnabled(true);
         ui->chapterComboBox->setEnabled(true);
         ui->chapterComboBox->clear();
         ui->chapterComboBox->addItems(m_book->getChapterTitles());
@@ -71,7 +72,7 @@ void MainWindow::onFileOpen() {
 }
 
 void MainWindow::onFileSave() {
-
+    m_book->save();
 }
 
 void MainWindow::onAbout() {

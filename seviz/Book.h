@@ -31,8 +31,6 @@ public:
     void setModelForChapter(int chapterIndex, const QList<Section>& data);
 
 private:
-    void prepareModuleDirectoriesAndLoad();
-
     QTemporaryDir m_epubDir;
     EpubRenderer* m_renderer;
     QString m_epubPath;

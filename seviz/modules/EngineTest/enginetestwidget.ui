@@ -138,7 +138,7 @@
       <item>
        <widget class="QPushButton" name="customDataSaveButton">
         <property name="text">
-         <string>Сохранить</string>
+         <string>Ок</string>
         </property>
        </widget>
       </item>
