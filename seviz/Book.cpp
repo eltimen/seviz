@@ -27,11 +27,17 @@ void Book::open() {
             QString opf = files.filter(QRegularExpression(".\.opf$"))[0];
             m_chapters = m_renderer->open(this, opf);
             m_moduleManager.bookOpened(this);
-            prepareModuleDirectoriesAndLoad();
+
+            m_moduleManager.forEachModule([this](AbstractModule* m) {
+                // если есть папка с именем плагина - вызвать load и предать эту папку
+                QDir dir(m_epubDir.path());
+                if (dir.cd("seviz") && dir.cd(m->id())) {
+                    m->load(dir);
+                }
+            });
         } else {
             throw InvalidEpubException();
         }
-
     } else {
         throw IOException(m_epubDir.errorString());
     }
@@ -40,6 +46,26 @@ void Book::open() {
 void Book::showChapter(int index) {
     m_currentChapterIndex = index;
     m_renderer->showChapter(index);
+}
+
+void Book::save() {
+    QDir dir(m_epubDir.path());
+    dir.mkdir("seviz");
+    dir.cd("seviz");
+
+    m_moduleManager.forEachModule([this, &dir](AbstractModule* m) {
+        if (dir.cd(m->id())) {
+            m->save(dir);
+            qDebug() << dir.path() + " save exist";
+            dir.cdUp();
+        } else if (dir.mkdir(m->id()) && dir.cd(m->id())) {
+            m->save(dir);
+            qDebug() << dir.path() + " save new folder";
+            dir.cdUp();
+        } else {
+            throw IOException("не удалось создать директорию для " + m->id());
+        }
+    });
 }
 
 QStringList Book::getChapterTitles() {
@@ -105,25 +131,4 @@ const Word& Book::getWord(const Position& pos) const {
 
 void Book::setModelForChapter(int chapterIndex, const QList<Section>& data) {
     m_chapters[chapterIndex].sections = data;
-}
-
-void Book::prepareModuleDirectoriesAndLoad() {
-    m_moduleManager.forEachModule([this](AbstractModule* m) {
-        QDir dir(m_epubDir.path());
-        dir.mkdir("seviz");
-        dir.cd("seviz");
-        if (dir.mkdir(m->id())) {
-                // закомментировано: если папки не было, то модулю грузить нечего
-                dir.cd(m->id());
-                // m->load(dir);
-                qDebug() << dir.path() + " created";
-        } else {
-            // проверка, что такая папка есть, а не произошла ошибка при создании
-            if (dir.cd(m->id())) {
-                m->load(dir); 
-            } else {
-                throw IOException("не удалось создать директорию для " + m->id());
-            }
-        }
-    });
 }
