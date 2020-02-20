@@ -21,7 +21,9 @@ int AbstractModule::version() {
 
 #pragma warning(disable:4100)
 
-void AbstractModule::load(QDir& moduleDir) {}
+void AbstractModule::load(QDir& moduleDir) {
+    qDebug() << moduleDir.path() + " load existing";
+}
 
 void AbstractModule::save(QDir& moduleDir) {}
 

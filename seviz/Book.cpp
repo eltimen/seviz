@@ -1,6 +1,7 @@
 #include "Book.h"
 #include <QRegularExpression>
 #include <JLCompress.h>
+#include <QDir>
 #include "exceptions.h"
 
 #pragma warning(disable:4129)
@@ -18,20 +19,21 @@ Book::~Book()
 }
 
 void Book::open() {
-    m_moduleManager.bookOpened(this);
     // распаковка во временную папку
-    if (m_tempDir.isValid()) {
-        QStringList files = JlCompress::extractDir(m_epubPath, m_tempDir.path());
+    if (m_epubDir.isValid()) {
+        QStringList files = JlCompress::extractDir(m_epubPath, m_epubDir.path());
         if (!files.empty()) {
             // TODO взять путь к opf из META_INF/container.xml. пока берем первый попавшийся opf из epub
             QString opf = files.filter(QRegularExpression(".\.opf$"))[0];
             m_chapters = m_renderer->open(this, opf);
+            m_moduleManager.bookOpened(this);
+            prepareModuleDirectoriesAndLoad();
         } else {
             throw InvalidEpubException();
         }
 
     } else {
-        throw CantUnpackEpubException(m_tempDir.errorString());
+        throw IOException(m_epubDir.errorString());
     }
 }
 
@@ -103,4 +105,25 @@ const Word& Book::getWord(const Position& pos) const {
 
 void Book::setModelForChapter(int chapterIndex, const QList<Section>& data) {
     m_chapters[chapterIndex].sections = data;
+}
+
+void Book::prepareModuleDirectoriesAndLoad() {
+    m_moduleManager.forEachModule([this](AbstractModule* m) {
+        QDir dir(m_epubDir.path());
+        dir.mkdir("seviz");
+        dir.cd("seviz");
+        if (dir.mkdir(m->id())) {
+                // закомментировано: если папки не было, то модулю грузить нечего
+                dir.cd(m->id());
+                // m->load(dir);
+                qDebug() << dir.path() + " created";
+        } else {
+            // проверка, что такая папка есть, а не произошла ошибка при создании
+            if (dir.cd(m->id())) {
+                m->load(dir); 
+            } else {
+                throw IOException("не удалось создать директорию для " + m->id());
+            }
+        }
+    });
 }

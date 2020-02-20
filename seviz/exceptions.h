@@ -1,5 +1,6 @@
 #pragma once
 #include <exception>
+#include <string>
 #include <QString>
 
 class qt_info_exception : std::exception {
@@ -16,7 +17,8 @@ public:
         m_descr(description) {}
     
 
-    QString getDescription() { return m_descr; }
+    QString description() const { return m_descr; }
+
 private:
     QString m_descr;
 };
@@ -27,8 +29,11 @@ class DuplicateModulesException : public qt_info_exception {
     }
 };
 
-class CantUnpackEpubException : qt_info_exception {
+class IOException : qt_info_exception {
     using qt_info_exception::qt_info_exception;
+    const char* what() const override {
+        return description().prepend("Ошибка при записи на диск: ").toLocal8Bit();
+    }
 };
 
 class InvalidEpubException : qt_info_exception {
