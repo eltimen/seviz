@@ -14,7 +14,7 @@ public:
     ~EngineTest();
 
     virtual QList<Feature> features() override;
-    void load(QDir& dir) override;
+    void load(QDir* dir) override;
     void save(QDir& dir) override;
 
     QString data;

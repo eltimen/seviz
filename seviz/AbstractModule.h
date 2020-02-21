@@ -22,7 +22,7 @@ public:
     virtual int version();
     virtual QList<Feature> features() = 0;
 
-    virtual void load(QDir& moduleDir);
+    virtual void load(QDir* moduleDir);
     virtual void save(QDir& moduleDir);
 
 public slots:

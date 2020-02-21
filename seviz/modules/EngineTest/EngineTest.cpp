@@ -18,13 +18,15 @@ QList<Feature> EngineTest::features() {
     };
 }
 
-void EngineTest::load(QDir& dir) {
-    QFile file(dir.filePath("data.txt"));
-    if (file.open(QIODevice::ReadOnly)) {
-        data = QString(file.readLine());
-        m_widget.setText(data);
-    }
-    file.close();
+void EngineTest::load(QDir* dir) {
+    if (dir) {
+        QFile file(dir->filePath("data.txt"));
+        if (file.open(QIODevice::ReadOnly)) {
+            data = QString(file.readLine());
+            m_widget.setText(data);
+        }
+        file.close();
+    }   
 }
 
 void EngineTest::save(QDir& dir) {

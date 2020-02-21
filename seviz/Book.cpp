@@ -29,10 +29,13 @@ void Book::open() {
             m_moduleManager.bookOpened(this);
 
             m_moduleManager.forEachModule([this](AbstractModule* m) {
-                // если есть папка с именем плагина - вызвать load и предать эту папку
+                // если есть папка с именем плагина - вызвать load и передать эту папку
                 QDir dir(m_epubDir.path());
                 if (dir.cd("seviz") && dir.cd(m->id())) {
-                    m->load(dir);
+                    m->load(&dir);
+                } else {
+                    // если папки нет - передаем NULL, чтобы плагин понял, что загружена новая книга
+                    m->load(nullptr);
                 }
             });
         } else {
