@@ -7,6 +7,7 @@ EngineTest::EngineTest(ModuleManager* engine) :
 {
     m_widget.m_engine = m_engine;
     m_feat.window->setWidget(&m_widget);
+    m_feat.dockLocation = Qt::RightDockWidgetArea;
 }
 
 EngineTest::~EngineTest() {

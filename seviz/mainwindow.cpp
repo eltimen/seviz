@@ -38,7 +38,7 @@ void MainWindow::setupModules() {
             f.window->setParent(this);
             f.window->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetClosable);
             f.window->setWindowTitle(f.name);
-            addDockWidget(Qt::BottomDockWidgetArea, f.window);
+            addDockWidget(f.dockLocation, f.window);
             f.window->hide();
 
             // добавление кнопки на тулбар

@@ -15,8 +15,9 @@ public:
 		const QIcon& icon,
 		QDockWidget* window,
 		AbstractModule* owner,
-		bool affectsView = false) :
-		name(name), icon(icon), window(window), owner(owner), affectsView(affectsView) 
+		bool affectsView = false,
+		Qt::DockWidgetArea dockLocation = Qt::BottomDockWidgetArea) :
+		name(name), icon(icon), window(window), owner(owner), affectsView(affectsView), dockLocation(dockLocation)
 	{}
 
 	~Feature() = default;
@@ -27,5 +28,6 @@ public:
 	AbstractModule* owner;
 
 	QDockWidget* window = nullptr;
+	Qt::DockWidgetArea dockLocation;
 	bool affectsView = false;
 };

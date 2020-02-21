@@ -24,7 +24,7 @@ int AbstractModule::version() {
 void AbstractModule::load(QDir* moduleDir) {
     qDebug() << (moduleDir ? moduleDir->path() + " load existing" : "loading empty module dir");
 }
-}
+
 
 void AbstractModule::save(QDir& moduleDir) {}
 
