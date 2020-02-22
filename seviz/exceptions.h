@@ -25,17 +25,27 @@ private:
 
 class DuplicateModulesException : public qt_info_exception {
     const char* what() const override {
-        return "Найдены модули с одинаковыми ID";
+        return "РќР°Р№РґРµРЅС‹ РјРѕРґСѓР»Рё СЃ РѕРґРёРЅР°РєРѕРІС‹РјРё ID";
     }
 };
 
 class IOException : qt_info_exception {
     using qt_info_exception::qt_info_exception;
     const char* what() const override {
-        return description().prepend("Ошибка при записи на диск: ").toLocal8Bit();
+        return description().prepend("РћС€РёР±РєР° РїСЂРё Р·Р°РїРёСЃРё РЅР° РґРёСЃРє: ").toLocal8Bit();
     }
 };
 
 class InvalidEpubException : qt_info_exception {
     using qt_info_exception::qt_info_exception;
+};
+
+class ModuleConflictException : qt_info_exception {
+public:
+    ModuleConflictException(const QString& module1, const QString& module2) :
+        qt_info_exception(module1 + " Рё " + module2) {}
+
+    const char* what() const override {
+        return QString("РњРѕРґСѓР»Рё " + description() + "РЅРµ СЃРѕРІРјРµСЃС‚РёРјС‹ РґСЂСѓРі СЃ РґСЂСѓРіРѕРј").toLocal8Bit();
+    }
 };

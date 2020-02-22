@@ -22,6 +22,14 @@ public:
 
 	~Feature() = default;
 
+	inline bool operator== (const Feature& other) {
+		return name == other.name && owner == other.owner;
+	}
+
+	inline friend bool operator< (const Feature& first, const Feature& second) {
+		return first.name < second.name && first.owner < second.owner;
+	}
+
 	QString name;
 	QIcon icon;
 

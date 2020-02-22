@@ -6,11 +6,12 @@
 #include <QFileDialog>
 #include <QDockWidget>
 #include <QComboBox>
+#include <QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    m_manager(*m_bookViewer)
+    m_manager(*m_bookViewer, this)
 {
     ui->setupUi(this);
     
@@ -44,13 +45,17 @@ void MainWindow::setupModules() {
             // добавление кнопки на тулбар
             QToolBar* toolbar = ui->mainToolBar;
             QAction* action = toolbar->addAction(f.icon, f.name, [this, f](bool checked) {
-                if (checked) {
-                    m_manager.featureEnabled(f);
-                    f.window->show();
-                } else {
-                    f.window->hide();
-                    m_manager.featureDisabled(f);
-                }
+                try {
+                    if (checked) {
+                        m_manager.featureEnabled(f);
+                        f.window->show();
+                    } else {
+                        f.window->hide();
+                        m_manager.featureDisabled(f);
+                    }
+                } catch (std::exception & e) {
+                    QMessageBox::warning(this, "Ошибка", e.what());
+                } 
             });
             action->setCheckable(true);
         }

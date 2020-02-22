@@ -1,4 +1,5 @@
 #include "EngineTest.h"
+#include <QMessageBox>
 
 EngineTest::EngineTest(ModuleManager* engine) :
     AbstractModule(engine, "EngineTest"),
@@ -8,6 +9,9 @@ EngineTest::EngineTest(ModuleManager* engine) :
     m_widget.m_engine = m_engine;
     m_feat.window->setWidget(&m_widget);
     m_feat.dockLocation = Qt::RightDockWidgetArea;
+    m_engine->registerHotkey(QKeySequence("Shift+A"), m_feat, [this]() {
+        QMessageBox::information(m_feat.window, "Хоткей", "Сработал хоткей"); 
+    });
 }
 
 EngineTest::~EngineTest() {
