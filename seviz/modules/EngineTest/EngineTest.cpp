@@ -9,9 +9,7 @@ EngineTest::EngineTest(ModuleManager* engine) :
     m_widget.m_engine = m_engine;
     m_feat.window->setWidget(&m_widget);
     m_feat.dockLocation = Qt::RightDockWidgetArea;
-    m_engine->registerHotkey(QKeySequence("Shift+A"), m_feat, [this]() {
-        QMessageBox::information(m_feat.window, "Хоткей", "Сработал хоткей"); 
-    });
+    m_engine->registerHotkey(QKeySequence("Shift+A"), m_feat, VOIDSLOT(EngineTest::handler));
 }
 
 EngineTest::~EngineTest() {
@@ -40,6 +38,10 @@ void EngineTest::save(QDir& dir) {
         file.write(data.toLocal8Bit());
     }
     file.close();
+}
+
+void EngineTest::handler() {
+    QMessageBox::information(m_feat.window, "Хоткей", "Сработал хоткей");
 }
 
 

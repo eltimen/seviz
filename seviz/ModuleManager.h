@@ -12,6 +12,9 @@
 class MainWindow;
 class Book;
 
+// макросы для передачи слотов как колбеков в методы register...
+#define VOIDSLOT(x) [this](){x();}
+
 class ModuleManager : public QObject
 {
     Q_OBJECT
@@ -31,7 +34,9 @@ public:
     const Book& getBook();
     void triggerRerendering(const Position& from, const Position& to);
     //void registerHandler(enum ElementType elem, enum EventType onEvent, const Feature& feature, std::function<void()>& slot);
+
     void registerHotkey(const QKeySequence& hotkey, const Feature& feature, const std::function<void()>& slot);
+
     QPair<Position, Position> selectedTextPos();
     Position mouseHoverElement(enum ElementType elem);
     
@@ -45,4 +50,5 @@ private:
 
     void destroy();
     std::vector<AbstractModule*> registrar();
+
 };

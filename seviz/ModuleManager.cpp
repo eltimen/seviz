@@ -51,33 +51,10 @@ const Book& ModuleManager::getBook() {
     return *m_book;
 }
 
-void ModuleManager::registerHotkey(const QKeySequence& hotkey, const Feature& feature, const std::function<void()>& slot) {
-    // проверка, что это сочетание клавиш не активно сейчас
-    bool hotkeyFree = true;
-    for (decltype(m_hotkeys)::iterator it = m_hotkeys.begin(); it != m_hotkeys.end() && hotkeyFree; ++it) {
-        if ((*it)->isEnabled()) {
-            hotkeyFree = false;
-        }
-    }
-
-    if (hotkeyFree) {
-        qDebug() << feature.window->parentWidget();
-        QShortcut* sh = new QShortcut(hotkey, m_window, nullptr, nullptr, Qt::ApplicationShortcut);
-        sh->setEnabled(false);
-        qDebug() << "inactive";
-        connect(sh, &QShortcut::activated, slot);
-        m_hotkeys.insert(feature, sh);
-    } else {
-        // TODO exception
-    }
-   
-}
-
 void ModuleManager::featureEnabled(const Feature& feature) {
     // activating hotkeys for feature
     for (auto& i : m_hotkeys.values(feature)) {
         i->setEnabled(true);
-        qDebug() << "active";
     }
 
     // TODO activate handlers
@@ -86,8 +63,21 @@ void ModuleManager::featureEnabled(const Feature& feature) {
 void ModuleManager::featureDisabled(const Feature& feature) {
     for (auto& i : m_hotkeys.values(feature)) {
         i->setEnabled(false);
-        qDebug() << "inactive";
     }
 
-    // TODO disable handlers & hotkeys
+    // TODO disable handlers
+}
+
+void ModuleManager::registerHotkey(const QKeySequence& hotkey, const Feature& feature, const std::function<void()>& slot) {
+    // РїСЂРѕРІРµСЂРєР°, С‡С‚Рѕ СЌС‚Рѕ СЃРѕС‡РµС‚Р°РЅРёРµ РєР»Р°РІРёС€ РЅРµ Р°РєС‚РёРІРЅРѕ СЃРµР№С‡Р°СЃ
+    for (decltype(m_hotkeys)::iterator it = m_hotkeys.begin(); it != m_hotkeys.end(); ++it) {
+        if ((*it)->isEnabled()) {
+            throw ModuleConflictException(it.key().owner->id(), feature.owner->id());
+        }
+    }
+
+    QShortcut* sh = new QShortcut(hotkey, m_window, nullptr, nullptr, Qt::ApplicationShortcut);
+    sh->setEnabled(false);
+    connect(sh, &QShortcut::activated, slot);
+    m_hotkeys.insert(feature, sh);
 }

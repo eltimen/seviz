@@ -19,6 +19,9 @@ public:
 
     QString data;
 
+private slots:
+    void handler();
+
 private:
     Feature m_feat;
     EngineTestWidget m_widget;
