@@ -1,4 +1,16 @@
-//import { split, Syntax } from "sentence-splitter";
+function addListenerMulti(el, s, fn) {
+    s.split(' ').forEach(e => el.addEventListener(e, fn, false));
+}
+
+function setupHandlers(viewer) {
+    var elements = viewer.getElementsByTagName('p');
+    for (var i = 0, len = elements.length; i < len; i++) {
+        addListenerMulti(elements[i], 'click contextmenu dblclick mousedown mouseenter mouseleave mousemove mouseout mouseover mouseup', (event) => {
+            //console.log(event);
+            core.processEvent(JSON.stringify(event, ["type", "altKey", "ctrlKey", "shiftKey", "path", "id", "tagName"]));
+        });
+    }
+}
 
 function markParagraphs(viewer) {
     // TODO кешировать результат для каждой главы
@@ -19,7 +31,7 @@ function markParagraphs(viewer) {
         rawSplitData.forEach(el => {
             if (el.type == "Sentence") {
                 let wordsArr = [];
-                let sentHtml = "<sentence id\"" + String(sentId) + "\">";
+                let sentHtml = "<sentence id=\"" + String(sentId) + "\">";
                 let words = el.raw.match(/([\w]+|\.|,|"|'|:|”|“|!|\(|\)|;|‘|’)/g);
                 for (let wordId = 0; wordId < words.length; ++wordId) {
                     wordsArr.push({ id: wordId + 1, text: words[wordId] });
@@ -129,6 +141,8 @@ class Render {
                 // инициализируем модель
                 let model = markParagraphs(this.viewer);
                 window.core.setModelDataForChapter(i, model);
+
+                setupHandlers(this.viewer);
             }.bind(this));
         }
 

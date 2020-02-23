@@ -67,3 +67,34 @@ void EpubRenderer::setModelDataForChapter(int chapterIndex, const QVariant& data
     qDebug() << "model " << chapterIndex;
     m_book->setModelForChapter(chapterIndex, QList<Section> {Section(1, paragraphs)});
 }
+
+void EpubRenderer::processEvent(const QByteArray& mouseEvent) {
+    QJsonDocument event = QJsonDocument::fromJson(mouseEvent);
+    // {"altKey":false,"ctrlKey":false,"path":[{"id":"1","tagName":"SENTENCE"},{"id":"2","tagName":"P"},{"id":"viewer","tagName":"DIV"},{"id":"","tagName":"BODY"},{"id":"","tagName":"HTML"},{},{}],"shiftKey":false,"type":"mouseover"}
+   
+    QJsonArray path = event["path"].toArray();
+    int wordId = -1;
+    int sentId = -1;
+    int parId = -1;
+    for (const auto& el : path) {
+        const QString& tag = el.toObject()["tagName"].toString();
+        int id = el.toObject()["id"].toInt();
+        if (tag == "WORD") {
+            wordId = id;
+        } else if (tag == "SENTENCE") {
+            sentId = id;
+        } else if (tag == "P") {
+            parId = id;
+        } else {
+            break;
+        }
+    }
+
+    Position pos(m_book->getCurrentChapter().id(), 1, parId, sentId, wordId);
+    QString type = event["type"].toString();
+    bool alt = event["altKey"].toBool();
+    bool shift = event["shiftKey"].toBool();
+    bool ctrl = event["ctrlKey"].toBool();
+    qDebug() << alt;
+}
+
