@@ -29,8 +29,7 @@ public:
     void forEachModule(std::function<void(AbstractModule*)> functor);
 
     // методы для модулей
-    AbstractModule* getModule(const QString& id);
-    AbstractModule* getModule(const QString& id, int minVersion);
+    AbstractModule* getModule(const QString& id, int minVersion = 0);
     const Book& getBook();
     void triggerRerendering(const Position& from, const Position& to);
     //void registerHandler(enum ElementType elem, enum EventType onEvent, const Feature& feature, std::function<void()>& slot);
@@ -47,6 +46,8 @@ private:
     Book* m_book = nullptr;
 
     QMultiMap<Feature, QShortcut*> m_hotkeys;
+
+    const Feature* getConflictFeature(const Feature& f);
 
     void destroy();
     std::vector<AbstractModule*> registrar();

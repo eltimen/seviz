@@ -3,7 +3,7 @@
 #include <string>
 #include <QString>
 
-class qt_info_exception : std::exception {
+class qt_info_exception  {
 public:
     qt_info_exception() {}
 
@@ -19,33 +19,35 @@ public:
 
     QString description() const { return m_descr; }
 
+    virtual QString what() const { return QString(); }
+
 private:
     QString m_descr;
 };
 
 class DuplicateModulesException : public qt_info_exception {
-    const char* what() const override {
+    QString what() const override {
         return "Найдены модули с одинаковыми ID";
     }
 };
 
-class IOException : qt_info_exception {
+class IOException : public qt_info_exception {
     using qt_info_exception::qt_info_exception;
-    const char* what() const override {
-        return description().prepend("Ошибка при записи на диск: ").toLocal8Bit();
+    QString what() const override {
+        return description().prepend("Ошибка при записи на диск: ");
     }
 };
 
-class InvalidEpubException : qt_info_exception {
+class InvalidEpubException : public qt_info_exception {
     using qt_info_exception::qt_info_exception;
 };
 
-class ModuleConflictException : qt_info_exception {
+class ModuleConflictException : public qt_info_exception {
 public:
     ModuleConflictException(const QString& module1, const QString& module2) :
         qt_info_exception(module1 + " и " + module2) {}
 
-    const char* what() const override {
-        return QString("Модули " + description() + "не совместимы друг с другом").toLocal8Bit();
+    QString what() const override {
+        return QString("Модули " + description() + " не совместимы друг с другом");
     }
 };

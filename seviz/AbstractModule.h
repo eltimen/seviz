@@ -5,7 +5,6 @@
 #include <QDir>
 #include "Feature.h"
 #include "BookModels.h"
-#include "EventHandler.h"
 #include "DomChapter.h"
 
 class ModuleManager;

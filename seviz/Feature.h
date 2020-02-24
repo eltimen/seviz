@@ -22,7 +22,7 @@ public:
 
 	~Feature() = default;
 
-	inline bool operator== (const Feature& other) {
+	inline bool operator== (const Feature& other) const {
 		return name == other.name && owner == other.owner;
 	}
 

@@ -31,15 +31,29 @@ void ModuleManager::forEachModule(std::function<void(AbstractModule*)> functor) 
     }
 }
 
+const Feature* ModuleManager::getConflictFeature(const Feature& f) {
+    // для каждого хоткея
+    for (decltype(m_hotkeys)::iterator it = m_hotkeys.begin(); it != m_hotkeys.end(); ++it) {
+        // если это хоткей от другой feature, он сейчас активирован и является хоткеем этого модуля
+        if (!(it.key() == f) && it.value()->isEnabled()) {
+            for (const auto& i : m_hotkeys.values(f)) {
+                if (i->key() == it.value()->key()) {
+                    return &it.key();
+                }
+            }
+        }
+    }
+
+    // TODO аналогично для обработчиков
+
+    return nullptr;
+}
+
 void ModuleManager::destroy() {
     for (AbstractModule* i : m_container) {
         delete i;
     }
     m_container.clear();
-}
-
-AbstractModule* ModuleManager::getModule(const QString& id) {
-    return m_container.value(id, nullptr);
 }
 
 AbstractModule* ModuleManager::getModule(const QString& id, int minVersion) {
@@ -52,7 +66,11 @@ const Book& ModuleManager::getBook() {
 }
 
 void ModuleManager::featureEnabled(const Feature& feature) {
-    // activating hotkeys for feature
+    const Feature* bad = getConflictFeature(feature);
+    if (bad) {
+        throw ModuleConflictException(bad->owner->id(), feature.owner->id());
+    }
+
     for (auto& i : m_hotkeys.values(feature)) {
         i->setEnabled(true);
     }
@@ -76,8 +94,12 @@ void ModuleManager::registerHotkey(const QKeySequence& hotkey, const Feature& fe
         }
     }
 
+void ModuleManager::registerHotkey(const QKeySequence& hotkey, const Feature& feature, const std::function<void()>& slot) {
+    // TODO проверить, что модуль не регистрирует один и тот же хоткей дважды
+
     QShortcut* sh = new QShortcut(hotkey, m_window, nullptr, nullptr, Qt::ApplicationShortcut);
     sh->setEnabled(false);
     connect(sh, &QShortcut::activated, slot);
     m_hotkeys.insert(feature, sh);
 }
+
