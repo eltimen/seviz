@@ -7,6 +7,7 @@
 #include <QDockWidget>
 #include <QComboBox>
 #include <QMessageBox>
+#include <QSignalBlocker>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -44,7 +45,7 @@ void MainWindow::setupModules() {
 
             // добавление кнопки на тулбар
             QToolBar* toolbar = ui->mainToolBar;
-            QAction* action = toolbar->addAction(f.icon, f.name, [this, f](bool checked) {
+            QAction* action = toolbar->addAction(f.icon, f.name, [this, f, action](bool checked) {
                 try {
                     if (checked) {
                         m_manager.featureEnabled(f);
@@ -53,7 +54,9 @@ void MainWindow::setupModules() {
                         f.window->hide();
                         m_manager.featureDisabled(f);
                     }
-                } catch (std::exception & e) {
+                } catch (const ModuleConflictException& e) {
+                    QSignalBlocker blocker(action);
+                    action->setChecked(false);
                     QMessageBox::warning(this, "Ошибка", e.what());
                 } 
             });

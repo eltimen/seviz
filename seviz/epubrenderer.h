@@ -3,10 +3,12 @@
 
 #include <QEventLoop>
 #include <QObject>
+#include <QFlags> 
 #include <QWebEngineView>
 #include <QVariant>
 #include <QVector>
 #include "BookModels.h"
+#include "EventModels.h"
 #include "DomChapter.h"
 
 class Book;
@@ -24,8 +26,9 @@ public:
     void updateChapterView(const DomChapter& dom);
     DomChapter generateDomChapter();
 
-    // int addHandler(enum ElementType elem, enum EventType on, std::function<void()>& slot);
-    void removeHandler(int i);
+    void addHandler(const Handler& h);
+    void removeHandler(const Handler& h);
+
     QPair<Position, Position> selectedTextPos();
     QString selectedText();
    
@@ -33,6 +36,7 @@ public slots:
     // функции, доступные из js
     void setChaptersList(const QVariant&);
     void setModelDataForChapter(int chapterIndex, const QVariant& paragraphs);
+    void processEvent(const QByteArray& mouseEvent);
 
 private:
     QWebEngineView *m_view;
@@ -40,7 +44,11 @@ private:
     QEventLoop m_loop;
     Book* m_book = nullptr;
 
+    QMultiHash<QString, Handler> m_handlers;
+
     QList<Chapter> m_chapterTitles;
+
+    QString eventToString(EventType);
 };
 
 #endif // EPUBRENDERER_H

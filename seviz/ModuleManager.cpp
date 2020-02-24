@@ -75,7 +75,10 @@ void ModuleManager::featureEnabled(const Feature& feature) {
         i->setEnabled(true);
     }
 
-    // TODO activate handlers
+    for (auto& h : m_handlers.values(feature)) {
+        m_render.addHandler(h.first);
+        h.second = true;
+    }
 }
 
 void ModuleManager::featureDisabled(const Feature& feature) {
@@ -83,16 +86,23 @@ void ModuleManager::featureDisabled(const Feature& feature) {
         i->setEnabled(false);
     }
 
-    // TODO disable handlers
+    for (auto& h : m_handlers.values(feature)) {
+        m_render.removeHandler(h.first);
+        h.second = false;
+    }
 }
 
-void ModuleManager::registerHotkey(const QKeySequence& hotkey, const Feature& feature, const std::function<void()>& slot) {
-    // проверка, что это сочетание клавиш не активно сейчас
-    for (decltype(m_hotkeys)::iterator it = m_hotkeys.begin(); it != m_hotkeys.end(); ++it) {
-        if ((*it)->isEnabled()) {
+void ModuleManager::registerHandler(EventType onEvent, ElementType onElements, Button withKey, const Feature& feature, const std::function<void(const Position&)>& slot) {
+    Handler h(onEvent, onElements, withKey, slot);
+
+    for (decltype(m_handlers)::iterator it = m_handlers.begin(); it != m_handlers.end(); ++it) {
+        if (it->second && it->first == h) {
             throw ModuleConflictException(it.key().owner->id(), feature.owner->id());
         }
     }
+
+    m_handlers.insert(feature, qMakePair(h, false));
+}
 
 void ModuleManager::registerHotkey(const QKeySequence& hotkey, const Feature& feature, const std::function<void()>& slot) {
     // TODO проверить, что модуль не регистрирует один и тот же хоткей дважды

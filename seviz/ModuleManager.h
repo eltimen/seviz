@@ -5,6 +5,7 @@
 #include <QShortcut>
 #include <functional>
 #include "AbstractModule.h"
+#include "EventModels.h"
 #include "BookModels.h"
 #include "epubrenderer.h"
 #include "exceptions.h"
@@ -31,9 +32,10 @@ public:
     // методы для модулей
     AbstractModule* getModule(const QString& id, int minVersion = 0);
     const Book& getBook();
-    void triggerRerendering(const Position& from, const Position& to);
-    //void registerHandler(enum ElementType elem, enum EventType onEvent, const Feature& feature, std::function<void()>& slot);
 
+    void triggerRerendering(const Position& from, const Position& to);
+
+    void registerHandler(EventType onEvent, ElementType onElements, Button withKey, const Feature& feature, const std::function<void(const Position&)>& slot);
     void registerHotkey(const QKeySequence& hotkey, const Feature& feature, const std::function<void()>& slot);
 
     QPair<Position, Position> selectedTextPos();
@@ -45,11 +47,11 @@ private:
     MainWindow* m_window;
     Book* m_book = nullptr;
 
+    QMultiMap<Feature, QPair<Handler, bool>> m_handlers;
     QMultiMap<Feature, QShortcut*> m_hotkeys;
 
     const Feature* getConflictFeature(const Feature& f);
 
     void destroy();
     std::vector<AbstractModule*> registrar();
-
 };

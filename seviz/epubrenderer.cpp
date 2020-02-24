@@ -3,6 +3,9 @@
 
 #include <QWebChannel>
 #include <QWebEngineSettings>
+#include <QJsonDocument>
+#include <QJsonArray>
+#include <QJsonObject>
 
 EpubRenderer::EpubRenderer(QWebEngineView* view) :
     QObject(nullptr), //parent 
@@ -37,6 +40,21 @@ void EpubRenderer::close() {
     m_view->page()->runJavaScript(cmd);
 }
 
+void EpubRenderer::addHandler(const Handler& h) {
+    // TODO hover (блокировать ли повторные события?)
+    // TODO разобраться с конфликтами между видами элементов
+    m_handlers.insert(eventToString(h.onEvent), h);
+}
+
+void EpubRenderer::removeHandler(const Handler& h) {
+    QString key = eventToString(h.onEvent);
+    for (const auto& i : m_handlers.values(key)) {
+        if (i == h) {
+            m_handlers.remove(key, i);
+        }
+    }
+}
+
 void EpubRenderer::setChaptersList(const QVariant& objects) {
     // QVariantList<QVariantMap>
     //qDebug() << objects.toList().at(0).toMap()["href"].toString();
@@ -69,10 +87,10 @@ void EpubRenderer::setModelDataForChapter(int chapterIndex, const QVariant& data
 }
 
 void EpubRenderer::processEvent(const QByteArray& mouseEvent) {
-    QJsonDocument event = QJsonDocument::fromJson(mouseEvent);
+    QJsonDocument eventData = QJsonDocument::fromJson(mouseEvent);
     // {"altKey":false,"ctrlKey":false,"path":[{"id":"1","tagName":"SENTENCE"},{"id":"2","tagName":"P"},{"id":"viewer","tagName":"DIV"},{"id":"","tagName":"BODY"},{"id":"","tagName":"HTML"},{},{}],"shiftKey":false,"type":"mouseover"}
    
-    QJsonArray path = event["path"].toArray();
+    QJsonArray path = eventData["path"].toArray();
     int wordId = -1;
     int sentId = -1;
     int parId = -1;
@@ -91,10 +109,27 @@ void EpubRenderer::processEvent(const QByteArray& mouseEvent) {
     }
 
     Position pos(m_book->getCurrentChapter().id(), 1, parId, sentId, wordId);
-    QString type = event["type"].toString();
-    bool alt = event["altKey"].toBool();
-    bool shift = event["shiftKey"].toBool();
-    bool ctrl = event["ctrlKey"].toBool();
-    qDebug() << alt;
+    QString type = eventData["type"].toString();
+    bool alt = eventData["altKey"].toBool();
+    bool shift = eventData["shiftKey"].toBool();
+    bool ctrl = eventData["ctrlKey"].toBool();
+    
+    for (const auto& h : m_handlers.values(type)) {
+        if ((alt && h.modifierKey == ALT) && (shift && h.modifierKey == SHIFT) && (ctrl && h.modifierKey == CTRL) &&
+            pos.hasElement(h.onElements)) {
+            h.slot(pos);
+        }
+
+    }
+}
+
+QString EpubRenderer::eventToString(EventType e) {
+    switch (e) {
+    case EventType::MOUSE_LCLICK:   return "click";
+    case EventType::MOUSE_RCLICK:   return "contextmenu"; 
+    case EventType::MOUSE_DBLCLICK: return "dblclick"; 
+    default:
+        return "error!";
+    };
 }
 

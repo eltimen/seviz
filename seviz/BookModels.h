@@ -3,6 +3,8 @@
 #include <QList>
 #include <QString>
 
+#include "EventModels.h"
+
 class Chapter;
 class Section;
 class Paragraph;
@@ -35,6 +37,18 @@ public:
     int paragraphIndex() const { return m_idParagraph - 1; }
     int sentenceIndex() const { return m_idSentence - 1; }
     int wordIndex() const { return m_idWord - 1; }
+
+    bool hasElement(ElementType type) {
+        if (type == ElementType::PARAGRAPH) {
+            return paragraphIndex() != -1;
+        } else if (type == ElementType::SENTENCE) {
+            return sentenceIndex() != -1;
+        } else if (type == ElementType::WORD) {
+            return wordIndex() != -1;
+        } else {
+            return true;
+        }
+    }
 
 private:
     int m_idChapter;
