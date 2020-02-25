@@ -17,8 +17,8 @@ public:
     AbstractModule(ModuleManager* engine, const QString& id);
     virtual ~AbstractModule();
 
-    virtual const QString& id();
-    virtual int version();
+    virtual const QString& id() const;
+    virtual int version() const;
     virtual QList<Feature> features() = 0;
 
     virtual void load(QDir* moduleDir);

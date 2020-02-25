@@ -35,31 +35,27 @@ MainWindow::~MainWindow() {
 void MainWindow::setupModules() {
     m_manager.forEachModule([&](AbstractModule* module) {
         // для каждой функции плагина
-        for (const Feature& f : module->features()) {
+        for (Feature& f : module->features()) {
             // добавление dock-окна
-            f.window->setParent(this);
-            f.window->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetClosable);
-            f.window->setWindowTitle(f.name);
-            addDockWidget(f.dockLocation, f.window);
-            f.window->hide();
+            f.window()->setParent(this);
+            f.window()->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetClosable);
+            f.window()->setWindowTitle(f.name());
+            addDockWidget(f.dockLocation(), f.window());
+            f.window()->hide();
 
             // добавление кнопки на тулбар
             QToolBar* toolbar = ui->mainToolBar;
-            QAction* action = toolbar->addAction(f.icon, f.name, [this, f, action](bool checked) {
-                try {
-                    if (checked) {
-                        m_manager.featureEnabled(f);
-                        f.window->show();
-                    } else {
-                        f.window->hide();
-                        m_manager.featureDisabled(f);
-                    }
-                } catch (const ModuleConflictException& e) {
-                    QSignalBlocker blocker(action);
-                    action->setChecked(false);
-                    QMessageBox::warning(this, "Ошибка", e.what());
-                } 
+            QAction* action = toolbar->addAction(f.icon(), f.name(), [this, f] (bool checked) mutable {
+                if (checked) {
+                    // TODO сделать неактивными все фичи, конфликтующие с включенной
+                    m_manager.featureEnabled(f);
+                    f.window()->show();
+                } else {
+                    f.window()->hide();
+                    m_manager.featureDisabled(f);
+                }
             });
+            m_actions.insert(f, action);
             action->setCheckable(true);
         }
     });

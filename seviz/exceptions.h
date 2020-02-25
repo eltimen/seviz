@@ -41,13 +41,3 @@ class IOException : public qt_info_exception {
 class InvalidEpubException : public qt_info_exception {
     using qt_info_exception::qt_info_exception;
 };
-
-class ModuleConflictException : public qt_info_exception {
-public:
-    ModuleConflictException(const QString& module1, const QString& module2) :
-        qt_info_exception(module1 + " и " + module2) {}
-
-    QString what() const override {
-        return QString("Модули " + description() + " не совместимы друг с другом");
-    }
-};

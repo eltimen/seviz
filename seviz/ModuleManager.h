@@ -25,7 +25,7 @@ public:
     ~ModuleManager();
 
     void bookOpened(Book* book);
-    void featureEnabled(const Feature& feature);
+    QList<Feature*> featureEnabled(const Feature& feature);
     void featureDisabled(const Feature& feature);
     void forEachModule(std::function<void(AbstractModule*)> functor);
 
@@ -50,7 +50,8 @@ private:
     QMultiMap<Feature, QPair<Handler, bool>> m_handlers;
     QMultiMap<Feature, QShortcut*> m_hotkeys;
 
-    const Feature* getConflictFeature(const Feature& f);
+    // возвращает функции, которые имеют конфликтующие обработчики или хоткеи с указанной
+    QList<Feature*> getConflictFeaturesFor(const Feature& f);
 
     void destroy();
     std::vector<AbstractModule*> registrar();

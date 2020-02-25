@@ -11,11 +11,11 @@ AbstractModule::AbstractModule(ModuleManager* engine, const QString& id) :
 AbstractModule::~AbstractModule() {
 }
 
-const QString& AbstractModule::id() {
+const QString& AbstractModule::id() const {
     return m_id;
 }
 
-int AbstractModule::version() {
+int AbstractModule::version() const {
     return 0;
 }
 

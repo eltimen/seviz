@@ -31,6 +31,8 @@ private:
     Book* m_book = nullptr;
     EpubRenderer* m_bookViewer = nullptr;
     ModuleManager m_manager;
+
+    QMap<Feature, QAction*> m_actions;
 };
 
 #endif // MAINWINDOW_H

@@ -31,22 +31,16 @@ void ModuleManager::forEachModule(std::function<void(AbstractModule*)> functor) 
     }
 }
 
-const Feature* ModuleManager::getConflictFeature(const Feature& f) {
-    // для каждого хоткея
+QList<Feature*> ModuleManager::getConflictFeaturesFor(const Feature& f) {
+    // для каждого хоткея из f
     for (decltype(m_hotkeys)::iterator it = m_hotkeys.begin(); it != m_hotkeys.end(); ++it) {
-        // если это хоткей от другой feature, он сейчас активирован и является хоткеем этого модуля
-        if (!(it.key() == f) && it.value()->isEnabled()) {
-            for (const auto& i : m_hotkeys.values(f)) {
-                if (i->key() == it.value()->key()) {
-                    return &it.key();
-                }
-            }
-        }
+        // ищем его среди относящихся к другой функции
+        // TODO
     }
 
     // TODO аналогично для обработчиков
 
-    return nullptr;
+    return {};
 }
 
 void ModuleManager::destroy() {
@@ -65,11 +59,8 @@ const Book& ModuleManager::getBook() {
     return *m_book;
 }
 
-void ModuleManager::featureEnabled(const Feature& feature) {
-    const Feature* bad = getConflictFeature(feature);
-    if (bad) {
-        throw ModuleConflictException(bad->owner->id(), feature.owner->id());
-    }
+QList<Feature*> ModuleManager::featureEnabled(const Feature& feature) {
+    QList<Feature*> conflicts = getConflictFeaturesFor(feature);
 
     for (auto& i : m_hotkeys.values(feature)) {
         i->setEnabled(true);
@@ -79,6 +70,8 @@ void ModuleManager::featureEnabled(const Feature& feature) {
         m_render.addHandler(h.first);
         h.second = true;
     }
+
+    return conflicts;
 }
 
 void ModuleManager::featureDisabled(const Feature& feature) {
@@ -95,11 +88,7 @@ void ModuleManager::featureDisabled(const Feature& feature) {
 void ModuleManager::registerHandler(EventType onEvent, ElementType onElements, Button withKey, const Feature& feature, const std::function<void(const Position&)>& slot) {
     Handler h(onEvent, onElements, withKey, slot);
 
-    for (decltype(m_handlers)::iterator it = m_handlers.begin(); it != m_handlers.end(); ++it) {
-        if (it->second && it->first == h) {
-            throw ModuleConflictException(it.key().owner->id(), feature.owner->id());
-        }
-    }
+    // TODO проверка
 
     m_handlers.insert(feature, qMakePair(h, false));
 }
