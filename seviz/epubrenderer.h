@@ -17,7 +17,8 @@ class EpubRenderer : public QObject
 {
     Q_OBJECT
 public:
-    explicit EpubRenderer(QWebEngineView*);
+    explicit EpubRenderer();
+    void setWidget(QWebEngineView* widget);
 
     QList<Chapter> open(Book* book, const QString& opfPath);
     void showChapter(int index);

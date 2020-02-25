@@ -7,11 +7,16 @@
 #include <QJsonArray>
 #include <QJsonObject>
 
-EpubRenderer::EpubRenderer(QWebEngineView* view) :
+EpubRenderer::EpubRenderer() :
     QObject(nullptr), //parent 
-    m_view(view),
     m_webchannel(new QWebChannel(this))
 {
+    // нужно вызвать setupUi перед передачей виджета, поэтому конструктор без параметров
+}
+
+void EpubRenderer::setWidget(QWebEngineView* widget) {
+    m_view = widget;
+
     m_view->page()->settings()->setAttribute(QWebEngineSettings::LocalContentCanAccessRemoteUrls, true);
     m_view->page()->settings()->setAttribute(QWebEngineSettings::LocalContentCanAccessFileUrls, true);
     m_webchannel->registerObject(QStringLiteral("core"), this);
@@ -64,6 +69,7 @@ void EpubRenderer::setChaptersList(const QVariant& objects) {
         QVariantMap obj = toc.toMap();
         Chapter ch(i, obj.value("label").toString().trimmed());
         m_chapterTitles <<ch;
+        ++i;
     }
     m_loop.exit(0);   
 }
@@ -96,7 +102,7 @@ void EpubRenderer::processEvent(const QByteArray& mouseEvent) {
     int parId = -1;
     for (const auto& el : path) {
         const QString& tag = el.toObject()["tagName"].toString();
-        int id = el.toObject()["id"].toInt();
+        int id = el.toObject()["id"].toString().toInt();
         if (tag == "WORD") {
             wordId = id;
         } else if (tag == "SENTENCE") {
@@ -115,11 +121,13 @@ void EpubRenderer::processEvent(const QByteArray& mouseEvent) {
     bool ctrl = eventData["ctrlKey"].toBool();
     
     for (const auto& h : m_handlers.values(type)) {
-        if ((alt && h.modifierKey == ALT) && (shift && h.modifierKey == SHIFT) && (ctrl && h.modifierKey == CTRL) &&
-            pos.hasElement(h.onElements)) {
+        if ((alt == (h.modifierKey == ALT)) && 
+            (shift == (h.modifierKey == SHIFT)) && 
+            (ctrl == (h.modifierKey == CTRL)) &&
+            pos.hasElement(h.onElements)) 
+        {
             h.slot(pos);
         }
-
     }
 }
 
@@ -129,6 +137,7 @@ QString EpubRenderer::eventToString(EventType e) {
     case EventType::MOUSE_RCLICK:   return "contextmenu"; 
     case EventType::MOUSE_DBLCLICK: return "dblclick"; 
     default:
+        assert(false);
         return "error!";
     };
 }

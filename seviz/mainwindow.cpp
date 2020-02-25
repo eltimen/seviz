@@ -9,18 +9,18 @@
 #include <QMessageBox>
 #include <QSignalBlocker>
 
-MainWindow::MainWindow(QWidget *parent) :
+MainWindow::MainWindow(QWidget* parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
+    m_bookViewer(new EpubRenderer()),
     m_manager(*m_bookViewer, this)
 {
     ui->setupUi(this);
+    m_bookViewer->setWidget(ui->webEngineView);
     
     connect(ui->fileOpenAction, &QAction::triggered, this, &MainWindow::onFileOpen);
     connect(ui->fileSaveAction, &QAction::triggered, this, &MainWindow::onFileSave);
     connect(ui->aboutAction, &QAction::triggered, this, &MainWindow::onAbout);
-
-    m_bookViewer = new EpubRenderer(ui->webEngineView);
     connect(ui->chapterComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::onChapterChanged); 
 
     setupModules();
