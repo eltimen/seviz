@@ -1,6 +1,7 @@
 #include "Book.h"
 #include <QRegularExpression>
 #include <JLCompress.h>
+#include <QDir>
 #include "exceptions.h"
 
 #pragma warning(disable:4129)
@@ -18,26 +19,63 @@ Book::~Book()
 }
 
 void Book::open() {
-    m_moduleManager.bookOpened(this);
     // распаковка во временную папку
-    if (m_tempDir.isValid()) {
-        QStringList files = JlCompress::extractDir(m_epubPath, m_tempDir.path());
+    if (m_epubDir.isValid()) {
+        QStringList files = JlCompress::extractDir(m_epubPath, m_epubDir.path());
         if (!files.empty()) {
             // TODO взять путь к opf из META_INF/container.xml. пока берем первый попавшийся opf из epub
             QString opf = files.filter(QRegularExpression(".\.opf$"))[0];
             m_chapters = m_renderer->open(this, opf);
+            m_moduleManager.bookOpened(this);
+
+            m_moduleManager.forEachModule([this](AbstractModule* m) {
+                // если есть папка с именем плагина - вызвать load и передать эту папку
+                QDir dir(m_epubDir.path());
+                if (dir.cd("seviz") && dir.cd(m->id())) {
+                    m->load(&dir);
+                } else {
+                    // если папки нет - передаем NULL, чтобы плагин понял, что загружена новая книга
+                    m->load(nullptr);
+                }
+            });
         } else {
             throw InvalidEpubException();
         }
-
     } else {
-        throw CantUnpackEpubException(m_tempDir.errorString());
+        throw IOException(m_epubDir.errorString());
     }
 }
 
 void Book::showChapter(int index) {
     m_currentChapterIndex = index;
     m_renderer->showChapter(index);
+}
+
+void Book::save() {
+    QDir dir(m_epubDir.path());
+    dir.mkdir("seviz");
+    dir.cd("seviz");
+
+    m_moduleManager.forEachModule([this, &dir](AbstractModule* m) {
+        if (dir.cd(m->id())) {
+            m->save(dir);
+            qDebug() << dir.path() + " save exist";
+            dir.cdUp();
+        } else if (dir.mkdir(m->id()) && dir.cd(m->id())) {
+            m->save(dir);
+            qDebug() << dir.path() + " save new folder";
+            dir.cdUp();
+        } else {
+            throw IOException("не удалось создать директорию для " + m->id());
+        }
+    });
+
+    QString tmpPath = m_epubPath + "_";
+    if (!JlCompress::compressDir(tmpPath, m_epubDir.path()) ||
+        !QFile::remove(m_epubPath) ||
+        !QFile::rename(tmpPath, m_epubPath)) {
+        throw IOException("не удалось сохранить epub");
+    }
 }
 
 QStringList Book::getChapterTitles() {

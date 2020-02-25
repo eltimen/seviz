@@ -11,17 +11,20 @@ AbstractModule::AbstractModule(ModuleManager* engine, const QString& id) :
 AbstractModule::~AbstractModule() {
 }
 
-const QString& AbstractModule::id() {
+const QString& AbstractModule::id() const {
     return m_id;
 }
 
-int AbstractModule::version() {
+int AbstractModule::version() const {
     return 0;
 }
 
 #pragma warning(disable:4100)
 
-void AbstractModule::load(QDir& moduleDir) {}
+void AbstractModule::load(QDir* moduleDir) {
+    qDebug() << (moduleDir ? moduleDir->path() + " load existing" : "loading empty module dir");
+}
+
 
 void AbstractModule::save(QDir& moduleDir) {}
 

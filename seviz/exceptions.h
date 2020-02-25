@@ -1,8 +1,9 @@
 #pragma once
 #include <exception>
+#include <string>
 #include <QString>
 
-class qt_info_exception : std::exception {
+class qt_info_exception  {
 public:
     qt_info_exception() {}
 
@@ -16,21 +17,27 @@ public:
         m_descr(description) {}
     
 
-    QString getDescription() { return m_descr; }
+    QString description() const { return m_descr; }
+
+    virtual QString what() const { return QString(); }
+
 private:
     QString m_descr;
 };
 
 class DuplicateModulesException : public qt_info_exception {
-    const char* what() const override {
-        return "Найдены модули с одинаковыми ID";
+    QString what() const override {
+        return "РќР°Р№РґРµРЅС‹ РјРѕРґСѓР»Рё СЃ РѕРґРёРЅР°РєРѕРІС‹РјРё ID";
     }
 };
 
-class CantUnpackEpubException : qt_info_exception {
+class IOException : public qt_info_exception {
     using qt_info_exception::qt_info_exception;
+    QString what() const override {
+        return description().prepend("РћС€РёР±РєР° РїСЂРё Р·Р°РїРёСЃРё РЅР° РґРёСЃРє: ");
+    }
 };
 
-class InvalidEpubException : qt_info_exception {
+class InvalidEpubException : public qt_info_exception {
     using qt_info_exception::qt_info_exception;
 };

@@ -1,7 +1,6 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <memory>
 #include <QMainWindow>
 #include "Book.h"
 #include "ModuleManager.h"
@@ -32,6 +31,8 @@ private:
     Book* m_book = nullptr;
     EpubRenderer* m_bookViewer = nullptr;
     ModuleManager m_manager;
+
+    QMap<Feature, QAction*> m_actions;
 };
 
 #endif // MAINWINDOW_H

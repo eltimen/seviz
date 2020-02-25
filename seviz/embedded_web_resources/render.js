@@ -1,4 +1,51 @@
-//import { split, Syntax } from "sentence-splitter";
+function addListenerMulti(el, s, fn) {
+    s.split(' ').forEach(e => el.addEventListener(e, fn, false));
+} 
+
+function getSelectedElements(allowPartialSelection) {
+    let selection = getSelection();
+    let allInsideParent = getSelection().getRangeAt(0).commonAncestorContainer.getElementsByTagName('*');
+    let allSelected = [];
+
+    for (let i = 0, el; el = allInsideParent[i]; ++i) {
+        // true - allow partial contain
+        if (selection.containsNode(el, allowPartialSelection)) {
+            allSelected.push(el);
+        }
+    }
+
+    return allSelected;
+}
+
+function makePos(node) {
+    let pos = {};
+    pos.word = Number(node.id);
+    pos.sentence = Number(node.parentElement.id);
+    pos.paragraph = Number(selected[0].parentElement.parentElement.id);
+    return pos;
+}
+
+function getSelectionBorders() {
+    // TODO устранить Uncaught TypeError когда выделена только часть слова: с'ло'во
+    // TODO реакция, когда выделено, например, название главы - это не текст
+
+    let selected = getSelectedElements(true);
+    if (selected.length > 0) {
+        return [makePos(selected[0]), makePos(selected[selected.length - 1])];
+    }
+
+    return [];
+}
+
+function setupHandlers(viewer) {
+    var elements = viewer.getElementsByTagName('p');
+    for (var i = 0, len = elements.length; i < len; i++) {
+        addListenerMulti(elements[i], 'click contextmenu dblclick mousedown mouseenter mouseleave mousemove mouseout mouseover mouseup', (event) => {
+            //console.log(event);
+            core.processEvent(JSON.stringify(event, ["type", "altKey", "ctrlKey", "shiftKey", "path", "id", "tagName"]));
+        });
+    }
+}
 
 function markParagraphs(viewer) {
     // TODO кешировать результат для каждой главы
@@ -19,7 +66,7 @@ function markParagraphs(viewer) {
         rawSplitData.forEach(el => {
             if (el.type == "Sentence") {
                 let wordsArr = [];
-                let sentHtml = "<sentence id\"" + String(sentId) + "\">";
+                let sentHtml = "<sentence id=\"" + String(sentId) + "\">";
                 let words = el.raw.match(/([\w]+|\.|,|"|'|:|”|“|!|\(|\)|;|‘|’)/g);
                 for (let wordId = 0; wordId < words.length; ++wordId) {
                     wordsArr.push({ id: wordId + 1, text: words[wordId] });
@@ -34,7 +81,6 @@ function markParagraphs(viewer) {
         outParagraphs.push({ id: i + 1, sentences: sentArr });
         pars[i].innerHTML = parInnerHtml;
     }
-    console.log(outParagraphs);
     return outParagraphs;
 };
 
@@ -129,6 +175,8 @@ class Render {
                 // инициализируем модель
                 let model = markParagraphs(this.viewer);
                 window.core.setModelDataForChapter(i, model);
+
+                setupHandlers(this.viewer);
             }.bind(this));
         }
 

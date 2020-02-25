@@ -79,7 +79,7 @@ HEADERS += \
         Book.h \
         BookModels.h \
         DomChapter.h \
-        EventHandler.h \
+        EventModels.h \
         ModuleManager.h \
         epubrenderer.h \
         exceptions.h \
