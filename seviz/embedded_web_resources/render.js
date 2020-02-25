@@ -1,5 +1,40 @@
 function addListenerMulti(el, s, fn) {
     s.split(' ').forEach(e => el.addEventListener(e, fn, false));
+} 
+
+function getSelectedElements(allowPartialSelection) {
+    let selection = getSelection();
+    let allInsideParent = getSelection().getRangeAt(0).commonAncestorContainer.getElementsByTagName('*');
+    let allSelected = [];
+
+    for (let i = 0, el; el = allInsideParent[i]; ++i) {
+        // true - allow partial contain
+        if (selection.containsNode(el, allowPartialSelection)) {
+            allSelected.push(el);
+        }
+    }
+
+    return allSelected;
+}
+
+function makePos(node) {
+    let pos = {};
+    pos.word = Number(node.id);
+    pos.sentence = Number(node.parentElement.id);
+    pos.paragraph = Number(selected[0].parentElement.parentElement.id);
+    return pos;
+}
+
+function getSelectionBorders() {
+    // TODO устранить Uncaught TypeError когда выделена только часть слова: с'ло'во
+    // TODO реакция, когда выделено, например, название главы - это не текст
+
+    let selected = getSelectedElements(true);
+    if (selected.length > 0) {
+        return [makePos(selected[0]), makePos(selected[selected.length - 1])];
+    }
+
+    return [];
 }
 
 function setupHandlers(viewer) {
@@ -46,7 +81,6 @@ function markParagraphs(viewer) {
         outParagraphs.push({ id: i + 1, sentences: sentArr });
         pars[i].innerHTML = parInnerHtml;
     }
-    console.log(outParagraphs);
     return outParagraphs;
 };
 
