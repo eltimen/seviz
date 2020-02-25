@@ -161,13 +161,13 @@
    <item row="3" column="0">
     <widget class="QGroupBox" name="groupBox_3">
      <property name="title">
-      <string>Горячие клавиши</string>
+      <string>Горячие клавиши и обработчики</string>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
        <widget class="QLabel" name="label_5">
         <property name="text">
-         <string>Shift+A</string>
+         <string>Нажмите Shift+A или кликните на слово в тексте</string>
         </property>
        </widget>
       </item>

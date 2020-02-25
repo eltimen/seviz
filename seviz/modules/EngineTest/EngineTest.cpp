@@ -1,5 +1,6 @@
 #include "EngineTest.h"
 #include <QMessageBox>
+#include "Book.h"
 
 EngineTest::EngineTest(ModuleManager* engine) :
     AbstractModule(engine, "EngineTest"),
@@ -10,6 +11,10 @@ EngineTest::EngineTest(ModuleManager* engine) :
     m_feat.window()->setWidget(&m_widget);
     m_feat.setDockLocation(Qt::RightDockWidgetArea);
     m_engine->registerHotkey(QKeySequence("Shift+A"), m_feat, VOIDSLOT(EngineTest::handler));
+    m_engine->registerHandler(EventType::MOUSE_LCLICK, ElementType::WORD, NONE, m_feat, [this](const Position& pos) {
+        Word w = m_engine->getBook().getWord(pos);
+        QMessageBox::information(m_feat.window(), "Обработчик", w.text());
+    });
 }
 
 EngineTest::~EngineTest() {
