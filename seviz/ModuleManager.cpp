@@ -102,3 +102,7 @@ void ModuleManager::registerHotkey(const QKeySequence& hotkey, const Feature& fe
     m_hotkeys.insert(feature, sh);
 }
 
+QPair<Position, Position> ModuleManager::selectedTextPos() {
+    return m_render.selectedTextPos();
+}
+

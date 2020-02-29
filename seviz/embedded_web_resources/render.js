@@ -33,7 +33,6 @@ function makePos(node) {
     let pos = {};
     pos.word = Number(node.id);
     pos.sentence = Number(node.parentElement.id);
-    console.log(node.parentElement);
     pos.paragraph = Number(node.parentElement.parentElement.id);
     return pos;
 }

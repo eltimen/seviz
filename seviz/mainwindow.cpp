@@ -30,7 +30,9 @@ MainWindow::MainWindow(QWidget* parent) :
 MainWindow::~MainWindow() {
     delete m_book;
     delete m_bookViewer;
-    delete ui;
+    try {
+        delete ui;
+    } catch (EmptySelectionException) {}
 }
 
 void MainWindow::setupModules() {

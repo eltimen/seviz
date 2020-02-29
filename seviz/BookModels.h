@@ -32,19 +32,27 @@ public:
             throw std::invalid_argument("id must be >=1");
     }
 
+    Position() : Position(-1) {}
+
     int chapterIndex() const { return m_idChapter - 1; }
     int sectionIndex() const { return m_idSection - 1; }
     int paragraphIndex() const { return m_idParagraph - 1; }
     int sentenceIndex() const { return m_idSentence - 1; }
     int wordIndex() const { return m_idWord - 1; }
 
+    int chapterId() const { return m_idChapter; }
+    int sectionId() const { return m_idSection; }
+    int paragraphId() const { return m_idParagraph; }
+    int sentenceId() const { return m_idSentence; }
+    int wordId() const { return m_idWord; }
+
     bool hasElement(ElementType type) {
         if (type == ElementType::PARAGRAPH) {
-            return paragraphIndex() != -1;
+            return paragraphId() != -1;
         } else if (type == ElementType::SENTENCE) {
-            return sentenceIndex() != -1;
+            return sentenceId() != -1;
         } else if (type == ElementType::WORD) {
-            return wordIndex() != -1;
+            return wordId() != -1;
         } else {
             return true;
         }

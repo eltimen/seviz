@@ -60,6 +60,32 @@ void EpubRenderer::removeHandler(const Handler& h) {
     }
 }
 
+QPair<Position, Position> EpubRenderer::selectedTextPos() {
+    QPair<Position, Position> ret;
+    bool retIsEmpty = true;
+    QEventLoop loop;
+
+    m_view->page()->runJavaScript(R"(getSelectionBorders())", [&](const QVariant& pair) {
+        QVariantList list = pair.toList();
+        if (!list.isEmpty()) {
+            QVariantMap first = list[0].toMap();
+            QVariantMap second = list[1].toMap();
+            Position firstPos(m_book->getCurrentChapter().id(), 1, first["paragraph"].toInt(), first["sentence"].toInt(), first["word"].toInt());
+            Position secondPos(m_book->getCurrentChapter().id(), 1, second["paragraph"].toInt(), second["sentence"].toInt(), second["word"].toInt());
+            ret = qMakePair(firstPos, secondPos);
+            retIsEmpty = false;
+        } 
+        loop.exit(0);
+    });
+    loop.exec();
+
+    if (retIsEmpty) {
+        throw EmptySelectionException();
+    }
+
+    return ret;
+}
+
 void EpubRenderer::setChaptersList(const QVariant& objects) {
     // QVariantList<QVariantMap>
     //qDebug() << objects.toList().at(0).toMap()["href"].toString();
