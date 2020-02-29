@@ -17,6 +17,7 @@ MainWindow::MainWindow(QWidget* parent) :
 {
     ui->setupUi(this);
     m_bookViewer->setWidget(ui->webEngineView);
+    ui->mainToolBar->setContextMenuPolicy(Qt::NoContextMenu);
     
     connect(ui->fileOpenAction, &QAction::triggered, this, &MainWindow::onFileOpen);
     connect(ui->fileSaveAction, &QAction::triggered, this, &MainWindow::onFileSave);
