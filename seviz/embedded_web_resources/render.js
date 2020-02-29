@@ -4,13 +4,25 @@ function addListenerMulti(el, s, fn) {
 
 function getSelectedElements(allowPartialSelection) {
     let selection = getSelection();
-    let allInsideParent = getSelection().getRangeAt(0).commonAncestorContainer.getElementsByTagName('*');
     let allSelected = [];
 
-    for (let i = 0, el; el = allInsideParent[i]; ++i) {
-        // true - allow partial contain
-        if (selection.containsNode(el, allowPartialSelection)) {
-            allSelected.push(el);
+    if (selection.type == 'Range') {
+        let container = selection.getRangeAt(0).commonAncestorContainer;
+
+        let allInsideParent;
+        if (container.nodeName == "#text") {
+            allInsideParent = container.parentElement;
+        } else {
+            allInsideParent = container.getElementsByTagName('word');
+        }
+
+        for (let i = 0, el; el = allInsideParent[i]; ++i) {
+            // true - allow partial contain
+            if (selection.containsNode(el, allowPartialSelection)) {
+                //if (el.tagName == "WORD" && el.parentElement.tagName == "SENTENCE" && el.parentElement.parentElement.tagName == "P") {
+                allSelected.push(el);
+                //}
+            }
         }
     }
 
@@ -21,19 +33,17 @@ function makePos(node) {
     let pos = {};
     pos.word = Number(node.id);
     pos.sentence = Number(node.parentElement.id);
-    pos.paragraph = Number(selected[0].parentElement.parentElement.id);
+    console.log(node.parentElement);
+    pos.paragraph = Number(node.parentElement.parentElement.id);
     return pos;
 }
 
 function getSelectionBorders() {
-    // TODO устранить Uncaught TypeError когда выделена только часть слова: с'ло'во
-    // TODO реакция, когда выделено, например, название главы - это не текст
-
+    // TODO реакция, когда выделено, например, название главы - это не текст. сейчас в этом случае берет самый первый элемент word
     let selected = getSelectedElements(true);
     if (selected.length > 0) {
         return [makePos(selected[0]), makePos(selected[selected.length - 1])];
     }
-
     return [];
 }
 
