@@ -11,7 +11,7 @@ function getSelectedElements(allowPartialSelection) {
 
         let allInsideParent;
         if (container.nodeName == "#text") {
-            allInsideParent = container.parentElement;
+            allInsideParent = [container.parentElement];
         } else {
             allInsideParent = container.getElementsByTagName('word');
         }
