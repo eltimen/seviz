@@ -60,6 +60,48 @@ void EpubRenderer::removeHandler(const Handler& h) {
     }
 }
 
+QPair<Position, Position> EpubRenderer::selectedTextPos() {
+    QPair<Position, Position> ret;
+    bool retIsEmpty = true;
+    QEventLoop loop;
+
+    m_view->page()->runJavaScript(R"(getSelectionBorders())", [&](const QVariant& pair) {
+        QVariantList list = pair.toList();
+        if (!list.isEmpty()) {
+            QVariantMap first = list[0].toMap();
+            QVariantMap second = list[1].toMap();
+            Position firstPos(m_book->getCurrentChapter().id(), 1, first["paragraph"].toInt(), first["sentence"].toInt(), first["word"].toInt());
+            Position secondPos(m_book->getCurrentChapter().id(), 1, second["paragraph"].toInt(), second["sentence"].toInt(), second["word"].toInt());
+            ret = qMakePair(firstPos, secondPos);
+            retIsEmpty = false;
+        } 
+        loop.exit(0);
+    });
+    loop.exec();
+
+    if (retIsEmpty) {
+        throw EmptySelectionException();
+    }
+
+    return ret;
+}
+
+Position EpubRenderer::mouseHoverElement() {
+    Position ret;
+    QEventLoop loop;
+
+    m_view->page()->runJavaScript(R"(mouseHoverElement())", [&](const QVariant& pos) {
+        QVariantMap map = pos.toMap();
+        if (!map.isEmpty()) {
+            ret = Position(m_book->getCurrentChapter().id(), 1, map["paragraph"].toInt(), map["sentence"].toInt(), map["word"].toInt());
+        }
+        loop.exit(0);
+    });
+    loop.exec();
+
+    return ret;
+}
+
 void EpubRenderer::setChaptersList(const QVariant& objects) {
     // QVariantList<QVariantMap>
     //qDebug() << objects.toList().at(0).toMap()["href"].toString();
@@ -136,6 +178,12 @@ QString EpubRenderer::eventToString(EventType e) {
     case EventType::MOUSE_LCLICK:   return "click";
     case EventType::MOUSE_RCLICK:   return "contextmenu"; 
     case EventType::MOUSE_DBLCLICK: return "dblclick"; 
+    case EventType::MOUSE_AUXCLICK: return "auxclick";
+    case EventType::MOUSE_UP:       return "mouseup";
+    case EventType::MOUSE_DOWN:     return "mousedown";
+    case EventType::MOUSE_MOVE:     return "mousemove";
+    case EventType::MOUSE_OVER:     return "mouseover";
+    case EventType::MOUSE_OUT:      return "mouseout";
     default:
         assert(false);
         return "error!";

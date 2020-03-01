@@ -10,8 +10,10 @@ EngineTest::EngineTest(ModuleManager* engine) :
     m_widget.m_engine = m_engine;
     m_feat.window()->setWidget(&m_widget);
     m_feat.setDockLocation(Qt::RightDockWidgetArea);
+
     m_engine->registerHotkey(QKeySequence("Shift+A"), m_feat, VOIDSLOT(EngineTest::handler));
-    m_engine->registerHandler(EventType::MOUSE_LCLICK, ElementType::WORD, NONE, m_feat, [this](const Position& pos) {
+
+    m_engine->registerHandler(EventType::MOUSE_OVER, ElementType::WORD, CTRL, m_feat, [this](const Position& pos) {
         Word w = m_engine->getBook().getWord(pos);
         QMessageBox::information(m_feat.window(), "Обработчик", w.text());
     });
@@ -46,7 +48,9 @@ void EngineTest::save(QDir& dir) {
 }
 
 void EngineTest::handler() {
-    QMessageBox::information(m_feat.window(), "Хоткей", "Сработал хоткей");
+    Position hover = m_engine->mouseHoverElement();
+    QString hoverText = QStringLiteral("par %1 sent %2 word %3").arg(QString::number(hover.paragraphId()), QString::number(hover.sentenceId()), QString::number(hover.wordId()));
+    QMessageBox::information(m_feat.window(), "Элемент под курсором", hoverText);
 }
 
 

@@ -17,11 +17,14 @@ MainWindow::MainWindow(QWidget* parent) :
 {
     ui->setupUi(this);
     m_bookViewer->setWidget(ui->webEngineView);
+    ui->mainToolBar->setContextMenuPolicy(Qt::NoContextMenu);
     
     connect(ui->fileOpenAction, &QAction::triggered, this, &MainWindow::onFileOpen);
     connect(ui->fileSaveAction, &QAction::triggered, this, &MainWindow::onFileSave);
     connect(ui->aboutAction, &QAction::triggered, this, &MainWindow::onAbout);
     connect(ui->chapterComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::onChapterChanged); 
+
+    connect(ui->webEngineView, &QWebEngineView::loadFinished, [this](bool ok) {ui->fileMenu->setEnabled(ok); });
 
     setupModules();
 }
@@ -29,7 +32,9 @@ MainWindow::MainWindow(QWidget* parent) :
 MainWindow::~MainWindow() {
     delete m_book;
     delete m_bookViewer;
-    delete ui;
+    try {
+        delete ui;
+    } catch (EmptySelectionException) {}
 }
 
 void MainWindow::setupModules() {

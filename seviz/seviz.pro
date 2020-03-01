@@ -67,9 +67,7 @@ SOURCES += \
         modules/EngineTest/EngineTest.cpp \
         modules/EngineTest/enginetestwidget.cpp \
         modules/SentenceTree/SentenceTree.cpp \
-        modules/SentenceTree/constituencywindow.cpp \
-        modules/SentenceTree/dependencywindow.cpp \
-        modules/SentenceTree/framenetwindow.cpp 
+        modules/SentenceTree/stwindow.cpp
 
 HEADERS += \
         3rdparty/quazip/quazip/quagzipfile.h \ #for moc
@@ -87,19 +85,18 @@ HEADERS += \
         modules/EngineTest/EngineTest.h \
         modules/EngineTest/enginetestwidget.h \
         modules/SentenceTree/SentenceTree.h \
-        modules/SentenceTree/constituencywindow.h \
-        modules/SentenceTree/dependencywindow.h \
-        modules/SentenceTree/framenetwindow.h \
+        modules/SentenceTree/stwindow.h \
         modules/modules.h
 
 FORMS += \
         mainwindow.ui \
         modules/EngineTest/enginetestwidget.ui \
-        modules/SentenceTree/constituencywindow.ui \
-        modules/SentenceTree/dependencywindow.ui \
-        modules/SentenceTree/framenetwindow.ui
+        modules/SentenceTree/stwindow.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+RESOURCES += \
+    modules/SentenceTree/sentencetree.qrc

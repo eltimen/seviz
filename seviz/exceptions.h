@@ -41,3 +41,5 @@ class IOException : public qt_info_exception {
 class InvalidEpubException : public qt_info_exception {
     using qt_info_exception::qt_info_exception;
 };
+
+class EmptySelectionException {};

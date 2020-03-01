@@ -2,45 +2,74 @@ function addListenerMulti(el, s, fn) {
     s.split(' ').forEach(e => el.addEventListener(e, fn, false));
 } 
 
+function makePos(node) {
+    let pos = {};
+    if (node.tagName == "WORD") {
+        pos.word = Number(node.id);
+        pos.sentence = Number(node.parentElement.id);
+        pos.paragraph = Number(node.parentElement.parentElement.id);
+    } else if (node.tagName == "SENTENCE") {
+        pos.word = -1;
+        pos.sentence = Number(node.id);
+        pos.paragraph = Number(node.parentElement.id);
+    } else if (node.tagName == "P") {
+        pos.word = -1;
+        pos.sentence = -1;
+        pos.paragraph = Number(node.id);
+    } 
+    
+    return pos;
+}
+
+function mouseHoverElement() {
+    let hoverElements = document.querySelectorAll(":hover");
+    let last = hoverElements[hoverElements.length - 1];
+    if (last) {
+        return makePos(last);
+    }
+    return {};
+}
+
 function getSelectedElements(allowPartialSelection) {
     let selection = getSelection();
-    let allInsideParent = getSelection().getRangeAt(0).commonAncestorContainer.getElementsByTagName('*');
     let allSelected = [];
 
-    for (let i = 0, el; el = allInsideParent[i]; ++i) {
-        // true - allow partial contain
-        if (selection.containsNode(el, allowPartialSelection)) {
-            allSelected.push(el);
+    if (selection.type == 'Range') {
+        let container = selection.getRangeAt(0).commonAncestorContainer;
+
+        let allInsideParent;
+        if (container.nodeName == "#text") {
+            allInsideParent = [container.parentElement];
+        } else {
+            allInsideParent = container.getElementsByTagName('word');
+        }
+
+        for (let i = 0, el; el = allInsideParent[i]; ++i) {
+            // true - allow partial contain
+            if (selection.containsNode(el, allowPartialSelection)) {
+                //if (el.tagName == "WORD" && el.parentElement.tagName == "SENTENCE" && el.parentElement.parentElement.tagName == "P") {
+                allSelected.push(el);
+                //}
+            }
         }
     }
 
     return allSelected;
 }
 
-function makePos(node) {
-    let pos = {};
-    pos.word = Number(node.id);
-    pos.sentence = Number(node.parentElement.id);
-    pos.paragraph = Number(selected[0].parentElement.parentElement.id);
-    return pos;
-}
-
 function getSelectionBorders() {
-    // TODO устранить Uncaught TypeError когда выделена только часть слова: с'ло'во
-    // TODO реакция, когда выделено, например, название главы - это не текст
-
+    // TODO реакция, когда выделено, например, название главы - это не текст. сейчас в этом случае берет самый первый элемент word
     let selected = getSelectedElements(true);
     if (selected.length > 0) {
         return [makePos(selected[0]), makePos(selected[selected.length - 1])];
     }
-
     return [];
 }
 
 function setupHandlers(viewer) {
     var elements = viewer.getElementsByTagName('p');
     for (var i = 0, len = elements.length; i < len; i++) {
-        addListenerMulti(elements[i], 'click contextmenu dblclick mousedown mouseenter mouseleave mousemove mouseout mouseover mouseup', (event) => {
+        addListenerMulti(elements[i], 'auxclick click contextmenu dblclick mousedown mousemove mouseover mouseout mouseup', (event) => {
             //console.log(event);
             core.processEvent(JSON.stringify(event, ["type", "altKey", "ctrlKey", "shiftKey", "path", "id", "tagName"]));
         });

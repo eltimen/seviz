@@ -23,14 +23,18 @@ public:
         m_idSentence(idSentence), 
         m_idWord(idWord) 
     {
-        if (!(idChapter == -1   || idChapter >= 1  )||
-            !(idSection != -1   || idSection < 1   )||
-            !(idParagraph != -1 || idParagraph < 1 )||
-            !(idSection != -1   || idSentence < 1  )||
-            !(idWord != -1      || idWord < 1	   ))
+        if (!(idChapter == -1   || idChapter >= 1   )||
+            !(idSection == -1   || idSection >= 1   )||
+            !(idParagraph == -1 || idParagraph >= 1 )||
+            !(idSentence == -1  || idSentence >= 1  )||
+            !(idWord == -1      || idWord >= 1	    ))
 
             throw std::invalid_argument("id must be >=1");
     }
+
+    Position() : Position(-1) {}
+
+    bool isEmpty() const { return m_idChapter == -1; }
 
     int chapterIndex() const { return m_idChapter - 1; }
     int sectionIndex() const { return m_idSection - 1; }
@@ -38,13 +42,19 @@ public:
     int sentenceIndex() const { return m_idSentence - 1; }
     int wordIndex() const { return m_idWord - 1; }
 
+    int chapterId() const { return m_idChapter; }
+    int sectionId() const { return m_idSection; }
+    int paragraphId() const { return m_idParagraph; }
+    int sentenceId() const { return m_idSentence; }
+    int wordId() const { return m_idWord; }
+
     bool hasElement(ElementType type) {
         if (type == ElementType::PARAGRAPH) {
-            return paragraphIndex() != -1;
+            return paragraphId() != -1;
         } else if (type == ElementType::SENTENCE) {
-            return sentenceIndex() != -1;
+            return sentenceId() != -1;
         } else if (type == ElementType::WORD) {
-            return wordIndex() != -1;
+            return wordId() != -1;
         } else {
             return true;
         }
