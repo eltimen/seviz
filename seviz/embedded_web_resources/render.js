@@ -69,7 +69,7 @@ function getSelectionBorders() {
 function setupHandlers(viewer) {
     var elements = viewer.getElementsByTagName('p');
     for (var i = 0, len = elements.length; i < len; i++) {
-        addListenerMulti(elements[i], 'click contextmenu dblclick mousedown mouseenter mouseleave mousemove mouseout mouseover mouseup', (event) => {
+        addListenerMulti(elements[i], 'auxclick click contextmenu dblclick mousedown mousemove mouseover mouseout mouseup', (event) => {
             //console.log(event);
             core.processEvent(JSON.stringify(event, ["type", "altKey", "ctrlKey", "shiftKey", "path", "id", "tagName"]));
         });

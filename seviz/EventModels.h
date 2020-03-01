@@ -13,10 +13,12 @@ enum class EventType {
     MOUSE_LCLICK,
     MOUSE_RCLICK,
     MOUSE_DBLCLICK,
-    //MOUSE_HOVER
-    //MOUSE_LEFT_UP,
-    //MOUSE_LEFT_DOWN,
-    //MOUSE_MOVE
+    MOUSE_AUXCLICK,
+    MOUSE_UP,
+    MOUSE_DOWN,
+    MOUSE_MOVE, 
+    MOUSE_OVER,
+    MOUSE_OUT, 
 };
 
 enum class ElementType {

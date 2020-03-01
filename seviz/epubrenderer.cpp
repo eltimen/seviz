@@ -178,6 +178,12 @@ QString EpubRenderer::eventToString(EventType e) {
     case EventType::MOUSE_LCLICK:   return "click";
     case EventType::MOUSE_RCLICK:   return "contextmenu"; 
     case EventType::MOUSE_DBLCLICK: return "dblclick"; 
+    case EventType::MOUSE_AUXCLICK: return "auxclick";
+    case EventType::MOUSE_UP:       return "mouseup";
+    case EventType::MOUSE_DOWN:     return "mousedown";
+    case EventType::MOUSE_MOVE:     return "mousemove";
+    case EventType::MOUSE_OVER:     return "mouseover";
+    case EventType::MOUSE_OUT:      return "mouseout";
     default:
         assert(false);
         return "error!";
