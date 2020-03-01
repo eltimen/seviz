@@ -2,6 +2,34 @@ function addListenerMulti(el, s, fn) {
     s.split(' ').forEach(e => el.addEventListener(e, fn, false));
 } 
 
+function makePos(node) {
+    let pos = {};
+    if (node.tagName == "WORD") {
+        pos.word = Number(node.id);
+        pos.sentence = Number(node.parentElement.id);
+        pos.paragraph = Number(node.parentElement.parentElement.id);
+    } else if (node.tagName == "SENTENCE") {
+        pos.word = -1;
+        pos.sentence = Number(node.id);
+        pos.paragraph = Number(node.parentElement.id);
+    } else if (node.tagName == "P") {
+        pos.word = -1;
+        pos.sentence = -1;
+        pos.paragraph = Number(node.id);
+    } 
+    
+    return pos;
+}
+
+function mouseHoverElement() {
+    let hoverElements = document.querySelectorAll(":hover");
+    let last = hoverElements[hoverElements.length - 1];
+    if (last) {
+        return makePos(last);
+    }
+    return {};
+}
+
 function getSelectedElements(allowPartialSelection) {
     let selection = getSelection();
     let allSelected = [];
@@ -27,14 +55,6 @@ function getSelectedElements(allowPartialSelection) {
     }
 
     return allSelected;
-}
-
-function makePos(node) {
-    let pos = {};
-    pos.word = Number(node.id);
-    pos.sentence = Number(node.parentElement.id);
-    pos.paragraph = Number(node.parentElement.parentElement.id);
-    return pos;
 }
 
 function getSelectionBorders() {

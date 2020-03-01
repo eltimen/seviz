@@ -31,7 +31,7 @@ public:
     void removeHandler(const Handler& h);
 
     QPair<Position, Position> selectedTextPos();
-    QString selectedText();
+    Position mouseHoverElement();
    
 public slots:
     // функции, доступные из js

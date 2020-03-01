@@ -106,3 +106,7 @@ QPair<Position, Position> ModuleManager::selectedTextPos() {
     return m_render.selectedTextPos();
 }
 
+Position ModuleManager::mouseHoverElement() {
+    return m_render.mouseHoverElement();
+}
+

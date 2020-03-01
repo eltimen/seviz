@@ -39,7 +39,7 @@ public:
     void registerHotkey(const QKeySequence& hotkey, const Feature& feature, const std::function<void()>& slot);
 
     QPair<Position, Position> selectedTextPos();
-    Position mouseHoverElement(ElementType elem);
+    Position mouseHoverElement();
     
 private:
     QMap<QString,AbstractModule*> m_container;

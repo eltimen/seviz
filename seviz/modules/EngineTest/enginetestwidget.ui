@@ -194,6 +194,13 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QLabel" name="label_6">
+        <property name="text">
+         <string>Нажмите Shift+A, чтобы увидеть позицию элемента под курсором</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>

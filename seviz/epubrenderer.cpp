@@ -86,6 +86,22 @@ QPair<Position, Position> EpubRenderer::selectedTextPos() {
     return ret;
 }
 
+Position EpubRenderer::mouseHoverElement() {
+    Position ret;
+    QEventLoop loop;
+
+    m_view->page()->runJavaScript(R"(mouseHoverElement())", [&](const QVariant& pos) {
+        QVariantMap map = pos.toMap();
+        if (!map.isEmpty()) {
+            ret = Position(m_book->getCurrentChapter().id(), 1, map["paragraph"].toInt(), map["sentence"].toInt(), map["word"].toInt());
+        }
+        loop.exit(0);
+    });
+    loop.exec();
+
+    return ret;
+}
+
 void EpubRenderer::setChaptersList(const QVariant& objects) {
     // QVariantList<QVariantMap>
     //qDebug() << objects.toList().at(0).toMap()["href"].toString();
