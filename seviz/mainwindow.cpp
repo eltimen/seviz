@@ -24,6 +24,8 @@ MainWindow::MainWindow(QWidget* parent) :
     connect(ui->aboutAction, &QAction::triggered, this, &MainWindow::onAbout);
     connect(ui->chapterComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::onChapterChanged); 
 
+    connect(ui->webEngineView, &QWebEngineView::loadFinished, [this](bool ok) {ui->fileMenu->setEnabled(ok); });
+
     setupModules();
 }
 
