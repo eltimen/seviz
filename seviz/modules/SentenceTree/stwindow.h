@@ -2,6 +2,7 @@
 #define STWINDOW_H
 
 #include <QWidget>
+#include <QWebEngineView>
 
 namespace Ui {
 class STWindow;
@@ -17,6 +18,8 @@ public:
 
 private:
     Ui::STWindow *ui;
+
+    QWebChannel* m_webchannel;
 };
 
 #endif // STWINDOW_H
