@@ -4,6 +4,9 @@
 #include <QWidget>
 #include <QWebEngineView>
 
+class Sentence;
+struct SentenceData;
+
 namespace Ui {
 class STWindow;
 }
@@ -15,6 +18,8 @@ class STWindow : public QWidget
 public:
     explicit STWindow(QWidget *parent = nullptr);
     ~STWindow();
+
+    void showSentence(const Sentence& sent, const SentenceData& data);
 
 private:
     Ui::STWindow *ui;

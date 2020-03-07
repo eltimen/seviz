@@ -3,6 +3,7 @@
 
 #include <QWebEngineSettings>
 #include <QWebChannel>
+#include "BookModels.h"
 
 STWindow::STWindow(QWidget *parent) :
     QWidget(parent),
@@ -22,4 +23,8 @@ STWindow::STWindow(QWidget *parent) :
 STWindow::~STWindow()
 {
     delete ui;
+}
+
+void STWindow::showSentence(const Sentence& sent, const SentenceData& data) {
+    ui->idLabel->setText(QStringLiteral("ID: %1").arg(sent.id()));
 }

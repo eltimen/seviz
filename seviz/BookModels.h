@@ -34,6 +34,15 @@ public:
 
     Position() : Position(-1) {}
 
+    bool operator<(const Position& o) const {
+        return m_idChapter   < o.m_idChapter &&
+               m_idSection   < o.m_idSection &&
+               m_idChapter   < o.m_idChapter &&
+               m_idParagraph < o.m_idParagraph &&
+               m_idSentence  < o.m_idSentence &&
+               m_idWord      < o.m_idWord;
+    }
+
     bool isEmpty() const { return m_idChapter == -1; }
 
     int chapterIndex() const { return m_idChapter - 1; }
@@ -112,8 +121,10 @@ private:
 class Sentence : public QList<Word> {
     int m_id;
 public:
+    Sentence() : Sentence(-1, {}) {};
     Sentence(int id, const QList<Word>& content) :
         m_id(id), QList<Word>(content) {}
+
     int id() const { return m_id; }
 };
 

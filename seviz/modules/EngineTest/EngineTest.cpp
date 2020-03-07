@@ -13,7 +13,7 @@ EngineTest::EngineTest(ModuleManager* engine) :
 
     m_engine->registerHotkey(QKeySequence("Shift+A"), m_feat, VOIDSLOT(EngineTest::handler));
 
-    m_engine->registerHandler(EventType::MOUSE_OVER, ElementType::WORD, CTRL, m_feat, [this](const Position& pos) {
+    m_engine->registerHandler(EventType::MOUSE_OVER, ElementType::WORD, ALT, m_feat, [this](const Position& pos) {
         Word w = m_engine->getBook().getWord(pos);
         QMessageBox::information(m_feat.window(), "Обработчик", w.text());
     });

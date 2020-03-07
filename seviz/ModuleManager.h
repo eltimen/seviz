@@ -15,6 +15,7 @@ class Book;
 
 // макросы для передачи слотов как колбеков в методы register...
 #define VOIDSLOT(x) [this](){x();}
+#define POSSLOT(x) [this](const Position& pos){x(pos);}
 
 class ModuleManager : public QObject
 {
