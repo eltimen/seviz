@@ -37,10 +37,17 @@ public:
     bool operator<(const Position& o) const {
         return m_idChapter   < o.m_idChapter &&
                m_idSection   < o.m_idSection &&
-               m_idChapter   < o.m_idChapter &&
-               m_idParagraph < o.m_idParagraph &&
+               m_idSection   < o.m_idParagraph &&
                m_idSentence  < o.m_idSentence &&
                m_idWord      < o.m_idWord;
+    }
+
+    bool hasSameLevelWith(const Position& o) const {
+        return (m_idChapter == -1)   == (o.m_idChapter == -1)   &&
+               (m_idSection == -1)   == (o.m_idSection == -1)   &&
+               (m_idParagraph == -1) == (o.m_idParagraph == -1) &&
+               (m_idSentence == -1)  == (o.m_idSentence == -1)  &&
+               (m_idWord == -1)      == (o.m_idWord == -1);
     }
 
     bool isEmpty() const { return m_idChapter == -1; }
@@ -68,6 +75,9 @@ public:
             return true;
         }
     }
+
+    // QString cssSelector() const { return QStringLiteral("#%1 #%2 #%3").arg(paragraphId(), sentenceId(), wordId()); }
+
 
 private:
     int m_idChapter;
@@ -135,6 +145,10 @@ class Word {
 public:
     Word(int id, const QString& text) :
         m_id(id), m_text(text) {}
+
+    bool operator< (const Word& o) const {
+        return m_id < o.m_id;
+    }
 
     int id() const { return m_id; }
     const QString& text() const { return m_text; }

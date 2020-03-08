@@ -47,6 +47,7 @@ private:
     EpubRenderer& m_render;
     MainWindow* m_window;
     Book* m_book = nullptr;
+    QMultiMap<const AbstractModule*, Feature*> m_enabledFeatures;
 
     QMultiMap<Feature, QPair<Handler, bool>> m_handlers;
     QMultiMap<Feature, QShortcut*> m_hotkeys;
