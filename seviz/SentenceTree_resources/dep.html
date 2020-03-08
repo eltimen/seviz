@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -94,12 +94,13 @@
         };
 
         var docData = {
-            "messages": [],
+            //"messages": [],
             "source_files": ["ann", "txt"],
-            "modifications": [],
-            "normalizations": [],
-            "ctime": 1351154734.5055847,
-            "text": "He visited the office where a fire had recently ocurrred",
+            //"modifications": [],
+            //"normalizations": [],
+            //"ctime": 1351154734.5055847,
+            "text": "Наведите курсор мыши на предложение при нажатом Ctrl, чтобы просмотреть его дерево",
+            
             "entities": [
                 ["N1", "NP", [[0, 2]]], //TODO, name text-bound annotations Tn to be coherent with standoff brat format http://brat.nlplab.org/standoff.html
                 ["N2", "NP", [[20, 21]]],
@@ -108,10 +109,11 @@
             "relations": [
                 ["R1", "nsubj", [["From", "N2"], ["To", "N1"]]]
             ]
+            
         };
 
         var options = {
-            assetsPath: "3rdparty/static/",
+            assetsPath: "./3rdparty/static/",
             webFontURLs: [//
                 'fonts/Astloch-Bold.ttf',
                 'fonts/PT_Sans-Caption-Web-Regular.ttf',
@@ -123,7 +125,7 @@
             showTooltip: true
         };
         
-        function rerender() {
+        function render() {
             var brat = new BratFrontendEditor(document.getElementById("brat"), collData, docData, options);
             brat.dispatcher.on('sglclick', function (data) {
                 console.log(data)
@@ -131,7 +133,7 @@
         }
 
         function window_onload() {
-            rerender();
+            render();
         }
 
 

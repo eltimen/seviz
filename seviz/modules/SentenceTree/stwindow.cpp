@@ -4,6 +4,8 @@
 #include <QWebEngineSettings>
 #include <QWebChannel>
 #include "BookModels.h"
+#include "SentenceTree.h"
+#include "dependency.h"
 
 STWindow::STWindow(QWidget *parent) :
     QWidget(parent),
@@ -26,5 +28,23 @@ STWindow::~STWindow()
 }
 
 void STWindow::showSentence(const Sentence& sent, const SentenceData& data) {
+    m_sentenceText.clear();
+    for (const Word& w : sent) {
+        m_sentenceText.append(w.text() + " ");
+    }
+
     ui->idLabel->setText(QStringLiteral("ID: %1").arg(sent.id()));
+
+    renderDependencies(data.dependency);
+}
+
+void STWindow::renderDependencies(const DependencyTree& tree) {
+    QString docData = QStringLiteral(R"(
+        { 
+            "source_files": ["ann", "txt"],
+            "text": "%1"
+        }       
+    )").arg(m_sentenceText);
+
+    ui->dependencyView->page()->runJavaScript("docData=" + docData + "; render();");
 }

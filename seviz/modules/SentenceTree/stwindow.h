@@ -6,6 +6,7 @@
 
 class Sentence;
 struct SentenceData;
+class DependencyTree;
 
 namespace Ui {
 class STWindow;
@@ -23,8 +24,11 @@ public:
 
 private:
     Ui::STWindow *ui;
-
     QWebChannel* m_webchannel;
+
+    QString m_sentenceText;
+
+    void renderDependencies(const DependencyTree& tree);
 };
 
 #endif // STWINDOW_H

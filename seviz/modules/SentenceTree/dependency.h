@@ -20,7 +20,6 @@ enum DependencyRelation {
 class DependencyTree {
 public:
     DependencyTree(const Sentence& sent);
-
    
     void insert(int from, int to, DependencyRelation type);
     void remove(int from, int to);
