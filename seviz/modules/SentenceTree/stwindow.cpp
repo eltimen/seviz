@@ -24,6 +24,7 @@ STWindow::STWindow(QWidget *parent) :
 
 STWindow::~STWindow()
 {
+    m_webchannel->deregisterObject(this);
     delete ui;
 }
 
