@@ -16,6 +16,7 @@ public:
     virtual QList<Feature> features() override;
     void load(QDir* dir) override;
     void save(QDir& dir) override;
+    void render(const Position& from, const Position& to, DomChapter& dom, const QVector<Feature*>& activeFeatures) override;
 
     QString data;
 

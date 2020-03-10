@@ -5,7 +5,7 @@
 EngineTest::EngineTest(ModuleManager* engine) :
     AbstractModule(engine, "EngineTest"),
     m_widget(*this),
-    m_feat("Тесты движка", QIcon(), new QDockWidget(), this)
+    m_feat("Тесты движка", QIcon(), new QDockWidget(), this, true)
 {
     m_widget.m_engine = m_engine;
     m_feat.window()->setWidget(&m_widget);
@@ -45,6 +45,10 @@ void EngineTest::save(QDir& dir) {
         file.write(data.toLocal8Bit());
     }
     file.close();
+}
+
+void EngineTest::render(const Position& from, const Position& to, DomChapter& dom, const QVector<Feature*>& activeFeatures) {
+    dom.addStyle(m_engine->getBook().getCurrentChapter().firstPos(), "color: red;");
 }
 
 void EngineTest::handler() {

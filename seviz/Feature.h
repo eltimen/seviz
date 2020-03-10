@@ -38,6 +38,8 @@ public:
 	const AbstractModule* owner() const { return m_owner; }
 	QDockWidget* window() { return m_window; }
 	Qt::DockWidgetArea dockLocation() const { return m_dockLocation; }
+	bool affectsView() const { return m_affectsView; }
+
 	void setDockLocation(Qt::DockWidgetArea loc) { m_dockLocation = loc; }
 
 private:

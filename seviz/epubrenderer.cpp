@@ -6,6 +6,7 @@
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QJsonObject>
+#include <QMap>
 
 EpubRenderer::EpubRenderer() :
     QObject(nullptr), //parent 
@@ -43,6 +44,14 @@ void EpubRenderer::showChapter(int index) {
 void EpubRenderer::close() {
     QString cmd = QStringLiteral(R"(window.render.close())");
     m_view->page()->runJavaScript(cmd);
+}
+
+void EpubRenderer::updateChapterView(const DomChapter& dom) {
+    const QMap<Position, QString>& styles = dom.getStyles();
+    for (QMap<Position, QString>::const_iterator it = styles.begin(); it != styles.end(); ++it) {
+        QString cmd = QStringLiteral(R"(document.querySelector("%1").style.cssText = "%2";)").arg(it.key().cssSelector(), it.value());
+        m_view->page()->runJavaScript(cmd);
+    }
 }
 
 void EpubRenderer::addHandler(const Handler& h) {

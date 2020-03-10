@@ -13,14 +13,12 @@ public:
 
 	int chapterId() const { return m_chapter.id(); }
 
-	void addStyleTo(const Paragraph& elem, const QString& css);
-	void addStyleTo(const Sentence& elem, const QString& css);
-	void addStyleTo(const Word& elem, const QString& css);
-	void addStyleToSpan(const Position& from, const Position& to);
+	void addStyle(const Position& pos, const QString& css);
+	void addStyleToSpan(const Position& from, const Position& to, const QString& css);
 
-	QString toHtml();
+	const QMap<Position, QString>& getStyles() const { return m_styles; }
 
 private:
-	QVector <QPair<Position,Position>> m_styleIntervals;
+	QMap <Position, QString> m_styles;
 	const Chapter& m_chapter;
 };

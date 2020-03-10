@@ -76,8 +76,19 @@ public:
         }
     }
 
-    // QString cssSelector() const { return QStringLiteral("#%1 #%2 #%3").arg(paragraphId(), sentenceId(), wordId()); }
 
+    QString cssSelector() const { 
+        QString sel = "#viewer ";
+
+        if (m_idParagraph > 0)
+            sel += QStringLiteral("> p:nth-child(%1) ").arg(2+m_idParagraph);
+        if (m_idSentence > 0)
+            sel += QStringLiteral("> sentence:nth-child(%1) ").arg(m_idSentence);
+        if (m_idWord > 0)
+            sel += QStringLiteral("> word:nth-child(%1) ").arg(m_idWord);
+
+        return sel; 
+    }
 
 private:
     int m_idChapter;
@@ -87,29 +98,11 @@ private:
     int m_idWord;
 };
 
-class Chapter {
-public:
-    Chapter(int id, const QString& name) :
-        m_id(id), m_name(name) {}
-
-    int id() const { return m_id; }
-    const QString& name() const { return m_name; } 
-
-    bool isInitialized() const { return sections.size() > 0; }
-
-    QList<Section> sections;
-    QList<Scene> scenes;
-
-private:
-    int m_id;
-    QString m_name;
-};
-
 class Section : public QList<Paragraph> {
 public:
     //Section(int id, const QString& name, const QList<Paragraph>& content) : 
     //	m_id(id), m_name(name), QList<Paragraph>(content) {}
-    Section(int id, const QList<Paragraph>& content) : 
+    Section(int id, const QList<Paragraph>& content) :
         m_id(id), QList<Paragraph>(content) {}
 
     int id() const { return m_id; }
@@ -144,7 +137,8 @@ class Word {
 
 public:
     Word(int id, const QString& text) :
-        m_id(id), m_text(text) {}
+        m_id(id), m_text(text) {
+    }
 
     bool operator< (const Word& o) const {
         return m_id < o.m_id;
@@ -152,6 +146,70 @@ public:
 
     int id() const { return m_id; }
     const QString& text() const { return m_text; }
+};
+
+class Chapter {
+public:
+    Chapter(int id, const QString& name) :
+        m_id(id), m_name(name) {}
+
+    int id() const { return m_id; }
+    const QString& name() const { return m_name; } 
+
+    bool isInitialized() const { return sections.size() > 0; }
+
+    Position firstPos() const { 
+        const Section& firstSect = sections.first();
+        int firstSectId = firstSect.id();
+        int firstParId = -1;
+        int firstSentId = -1;
+        int firstWordId = -1;
+
+        if (!firstSect.empty()) {
+            const Paragraph& firstPar = firstSect.first();
+            firstParId = firstPar.id();
+            if (!firstPar.empty()) {
+                const Sentence& firstSent = firstPar.first();
+                firstSentId = firstSent.id();
+                if (!firstSent.empty()) {
+                    const Word& firstWord = firstSent.first();
+                    firstWordId = firstWord.id();
+                }
+            }
+        }
+
+        return Position(m_id, firstSectId, firstParId, firstSentId, firstWordId);
+    }
+
+    Position lastPos() const {
+        const Section& lastSect = sections.last();
+        int lastSectId = lastSect.id();
+        int lastParId = -1;
+        int lastSentId = -1;
+        int lastWordId = -1;
+
+        if (!lastSect.empty()) {
+            const Paragraph& lastPar = lastSect.last();
+            lastParId = lastPar.id();
+            if (!lastPar.empty()) {
+                const Sentence& lastSent = lastPar.last();
+                lastSentId = lastSent.id();
+                if (!lastSent.empty()) {
+                    const Word& lastWord = lastSent.last();
+                    lastWordId = lastWord.id();
+                }
+            }
+        }
+
+        return Position(m_id, lastSectId, lastParId, lastSentId, lastWordId);
+    }
+
+    QList<Section> sections;
+    QList<Scene> scenes;
+
+private:
+    int m_id;
+    QString m_name;
 };
 
 class Scene : public QList<Fragment> {
