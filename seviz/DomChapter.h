@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QObject>
+#include <QMap>
 #include "BookModels.h"
 
 class DomChapter : public QObject
