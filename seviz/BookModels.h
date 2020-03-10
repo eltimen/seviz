@@ -35,11 +35,20 @@ public:
     Position() : Position(-1) {}
 
     bool operator<(const Position& o) const {
-        return m_idChapter   < o.m_idChapter &&
-               m_idSection   < o.m_idSection &&
-               m_idSection   < o.m_idParagraph &&
-               m_idSentence  < o.m_idSentence &&
-               m_idWord      < o.m_idWord;
+        // TODO refactor
+        if (m_idChapter < o.m_idChapter) {
+            return true;
+        } else if (m_idSection < o.m_idSection) {
+            return true;
+        } else if (m_idParagraph < o.m_idParagraph) {
+            return true;
+        } else if (m_idSentence < o.m_idSentence) {
+            return true;
+        } else if (m_idWord < o.m_idWord) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     bool hasSameLevelWith(const Position& o) const {

@@ -49,6 +49,7 @@ void EngineTest::save(QDir& dir) {
 
 void EngineTest::render(const Position& from, const Position& to, DomChapter& dom, const QVector<Feature*>& activeFeatures) {
     dom.addStyle(m_engine->getBook().getCurrentChapter().firstPos(), "color: red;");
+    dom.addStyle(m_engine->getBook().getCurrentChapter().lastPos(), "color: blue; border: 1px solid black");
 }
 
 void EngineTest::handler() {
