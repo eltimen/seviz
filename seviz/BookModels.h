@@ -35,7 +35,7 @@ public:
     Position() : Position(-1) {}
 
     bool operator<(const Position& o) const {
-        // TODO refactor
+        // TODO refactor, unit tests
         if (m_idChapter < o.m_idChapter) {
             return true;
         } else if (m_idSection < o.m_idSection) {
@@ -84,7 +84,6 @@ public:
             return true;
         }
     }
-
 
     QString cssSelector() const { 
         QString sel = "#viewer ";

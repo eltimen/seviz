@@ -6,10 +6,13 @@
 #include "stwindow.h"
 #include "dependency.h"
 
+enum SentenceState {NODATA, PARTIAL, DONE};
+
 struct SentenceData {
     SentenceData(const Sentence& sent) : dependency(sent) {}
 
     DependencyTree dependency;
+    SentenceState dependencyState = NODATA;
 };
 
 class SentenceTree : public AbstractModule
@@ -21,6 +24,8 @@ public:
     ~SentenceTree();
 
     virtual QList<Feature> features() override;
+
+    virtual void render(const Position& from, const Position& to, DomChapter& dom, const QVector<Feature*>& activeFeatures) override;
 
 private slots:
     void onSentenceChanged(const Position& pos);

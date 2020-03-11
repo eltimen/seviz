@@ -4,7 +4,7 @@
 
 SentenceTree::SentenceTree(ModuleManager* engine) : 
     AbstractModule(engine, "SentenceTree"),
-    m_feature("Деревья предложений", QIcon(":/st/icon.png"), new QDockWidget(), this)
+    m_feature("Деревья предложений", QIcon(":/st/icon.png"), new QDockWidget(), this, true)
 {
     m_feature.window()->setWidget(&m_widget);
     
@@ -18,6 +18,18 @@ QList<Feature> SentenceTree::features() {
     return { 
         m_feature
     };
+}
+
+void SentenceTree::render(const Position& from, const Position& to, DomChapter& dom, const QVector<Feature*>& activeFeatures) {
+    const Chapter& ch = m_engine->getBook().getCurrentChapter();
+    for (const Paragraph& par : ch.sections.first()) {
+        for (const Sentence& sent : par) {
+            Position pos = Position(ch.id(), 1, par.id(), sent.id());
+            if (!m_storage.contains(pos) || m_storage.value(pos, SentenceData(sent)).dependencyState == NODATA) {
+                dom.addStyle(pos, "background-color: #ffe6e6;");
+            }
+        }
+    }
 }
 
 void SentenceTree::onSentenceChanged(const Position& pos) {
