@@ -41,10 +41,12 @@ public:
 
     QPair<Position, Position> selectedTextPos();
     Position mouseHoverElement();
+
+    EpubRenderer& m_render;
     
 private:
     QMap<QString,AbstractModule*> m_container;
-    EpubRenderer& m_render;
+    
     MainWindow* m_window;
     Book* m_book = nullptr;
     QMultiMap<const AbstractModule*, Feature*> m_enabledFeatures;

@@ -42,8 +42,34 @@ EngineTestWidget::EngineTestWidget(EngineTest& facade) :
         } catch (EmptySelectionException&) {
             ui->selectedLabel->setText("Не выделено");
         }
-    });
+        });
 
+
+    connect(ui->pushButton_2, &QPushButton::clicked, [this]() {
+        m_engine->m_render.run(R"1(
+            el = document.querySelector("#viewer > p:nth-of-type(1) > sentence:nth-of-type(1) > word:nth-of-type(1)");
+var newEl = document.createElement('span');
+newEl.innerHTML = '<style1> This is </style1> <style1> This is </style1><style1> This is </style1><style1> This is </style1><style1> This is </style1><style1> This is </style1><style1> This is </style1><style1> This is </style1><style1> This is </style1><style1> This is </style1><style1> This is </style1><style1> This is </style1><style1> This is </style1><style1> This is </style1><style1> This is </style1> <style12> some. </style12> Text. </style2><style1> This is </style1>  <style12> some. </style12> Text. </style2><style1> This is </style1>  <style12> some. </style12> Text. </style2><style1> This is </style1>  <style12> some. </style12> Text. </style2><style1> This is </style1>  <style12> some. </style12> Text. </style2><style1> This is </style1>  <style12> some. </style12> Text. </style2><style1> This is </style1>  <style12> some. </style12> Text. </style2><style1> This is </style1>  <style12> some. </style12> Text. </style2><style1> This is </style1>  <style12> some. </style12> Text. </style2><style1> This is </style1>  <style12> some. </style12> Text. </style2><style1> This is </style1>  <style12> some. </style12> Text. </style2><style1> This is </style1>  <style12> some. </style12> Text. </style2><style1> This is </style1>  <style12> some. </style12> Text. </style2><style1> This is </style1>  <style12> some. </style12> Text. </style2>';
+
+             el.parentNode.replaceChild(newEl, el);
+
+
+)1");
+
+
+        });
+
+    connect(ui->pushButton_3, &QPushButton::clicked, [this]() {
+        m_engine->m_render.run(R"1(
+            el = document.querySelector("#viewer > p:nth-of-type(1) > sentence:nth-of-type(1) > word:nth-of-type(1)");
+var newEl = document.createElement('span');
+newEl.innerHTML = '<style1> </style2><style1> subscript';
+
+             el.appendChild(newEl);
+
+
+)1");
+        });
 }
 
 EngineTestWidget::~EngineTestWidget()

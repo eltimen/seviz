@@ -31,6 +31,10 @@ public:
 
     QPair<Position, Position> selectedTextPos();
     Position mouseHoverElement();
+
+    void run(QString str) {
+        m_view->page()->runJavaScript(str);
+    }
    
 public slots:
     // функции, доступные из js
