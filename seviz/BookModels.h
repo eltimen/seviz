@@ -89,11 +89,11 @@ public:
         QString sel = "#viewer ";
 
         if (m_idParagraph > 0)
-            sel += QStringLiteral("> p:nth-child(%1) ").arg(2+m_idParagraph);
+            sel += QStringLiteral("> p:nth-of-type(%1) ").arg(m_idParagraph);
         if (m_idSentence > 0)
-            sel += QStringLiteral("> sentence:nth-child(%1) ").arg(m_idSentence);
+            sel += QStringLiteral("> sentence:nth-of-type(%1) ").arg(m_idSentence);
         if (m_idWord > 0)
-            sel += QStringLiteral("> word:nth-child(%1) ").arg(m_idWord);
+            sel += QStringLiteral("> word:nth-of-type(%1) ").arg(m_idWord);
 
         return sel; 
     }
