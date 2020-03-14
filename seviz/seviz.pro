@@ -59,6 +59,7 @@ SOURCES += \
         3rdparty/zlib/zutil.c \
         AbstractModule.cpp \
         Book.cpp \
+        BookModels.cpp \
         DomChapter.cpp \
         ModuleManager.cpp \
         epubrenderer.cpp \

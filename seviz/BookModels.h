@@ -2,9 +2,9 @@
 
 #include <QList>
 #include <QString>
-
 #include "EventModels.h"
 
+class Book;
 class Chapter;
 class Section;
 class Paragraph;
@@ -16,48 +16,12 @@ class Fragment;
 
 class Position {
 public:
-    Position(int idChapter, int idSection = -1, int idParagraph = -1, int idSentence = -1, int idWord = -1) :
-        m_idChapter(idChapter), 
-        m_idSection(idSection), 
-        m_idParagraph(idParagraph), 
-        m_idSentence(idSentence), 
-        m_idWord(idWord) 
-    {
-        if (!(idChapter == -1   || idChapter >= 1   )||
-            !(idSection == -1   || idSection >= 1   )||
-            !(idParagraph == -1 || idParagraph >= 1 )||
-            !(idSentence == -1  || idSentence >= 1  )||
-            !(idWord == -1      || idWord >= 1	    ))
+    Position(int idChapter, int idSection = -1, int idParagraph = -1, int idSentence = -1, int idWord = -1);
+    Position() : Position(1) {}
 
-            throw std::invalid_argument("id must be >=1");
-    }
+    bool operator<(const Position& o) const;
 
-    Position() : Position(-1) {}
-
-    bool operator<(const Position& o) const {
-        // TODO refactor, unit tests
-        if (m_idChapter < o.m_idChapter) {
-            return true;
-        } else if (m_idSection < o.m_idSection) {
-            return true;
-        } else if (m_idParagraph < o.m_idParagraph) {
-            return true;
-        } else if (m_idSentence < o.m_idSentence) {
-            return true;
-        } else if (m_idWord < o.m_idWord) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    bool hasSameLevelWith(const Position& o) const {
-        return (m_idChapter == -1)   == (o.m_idChapter == -1)   &&
-               (m_idSection == -1)   == (o.m_idSection == -1)   &&
-               (m_idParagraph == -1) == (o.m_idParagraph == -1) &&
-               (m_idSentence == -1)  == (o.m_idSentence == -1)  &&
-               (m_idWord == -1)      == (o.m_idWord == -1);
-    }
+    bool hasSameLevelWith(const Position& o) const;
 
     bool isEmpty() const { return m_idChapter == -1; }
 
@@ -73,30 +37,24 @@ public:
     int sentenceId() const { return m_idSentence; }
     int wordId() const { return m_idWord; }
 
-    bool hasElement(ElementType type) {
-        if (type == ElementType::PARAGRAPH) {
-            return paragraphId() != -1;
-        } else if (type == ElementType::SENTENCE) {
-            return sentenceId() != -1;
-        } else if (type == ElementType::WORD) {
-            return wordId() != -1;
-        } else {
-            return true;
-        }
-    }
+    bool hasElement(ElementType type);
 
-    QString cssSelector() const { 
-        QString sel = "#viewer ";
+    void setBook(const Book* book) { m_book = book; }
 
-        if (m_idParagraph > 0)
-            sel += QStringLiteral("> p:nth-of-type(%1) ").arg(m_idParagraph);
-        if (m_idSentence > 0)
-            sel += QStringLiteral("> sentence:nth-of-type(%1) ").arg(m_idSentence);
-        if (m_idWord > 0)
-            sel += QStringLiteral("> word:nth-of-type(%1) ").arg(m_idWord);
+    // !!! для функций-итераторов предварительно нужно задать книгу через setBook
+    Position prevChapter() const;
+    Position prevSection() const;
+    Position prevParagraph() const;
+    Position prevSentence() const; 
+    Position prevWord() const;
 
-        return sel; 
-    }
+    Position nextChapter() const;
+    Position nextSection() const;    
+    Position nextParagraph() const;
+    Position nextSentence() const;
+    Position nextWord() const;
+
+    QString cssSelector() const;
 
 private:
     int m_idChapter;
@@ -104,6 +62,8 @@ private:
     int m_idParagraph;
     int m_idSentence;
     int m_idWord;
+
+    const Book* m_book;
 };
 
 class Section : public QList<Paragraph> {
