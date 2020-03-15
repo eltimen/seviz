@@ -118,7 +118,7 @@ void EpubRenderer::setChaptersList(const QVariant& objects) {
     int i = 1;
     for (const QVariant& toc : objects.toList()) {
         QVariantMap obj = toc.toMap();
-        Chapter ch(i, obj.value("label").toString().trimmed());
+        Chapter ch(m_book, i, obj.value("label").toString().trimmed());
         m_chapterTitles <<ch;
         ++i;
     }

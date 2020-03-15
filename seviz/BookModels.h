@@ -16,10 +16,12 @@ class Fragment;
 
 class Position {
 public:
-    Position(int idChapter, int idSection = -1, int idParagraph = -1, int idSentence = -1, int idWord = -1);
+    Position(int idChapter, int idSection = -1, int idParagraph = -1, int idSentence = -1, int idWord = -1, const Book* book = nullptr);
     Position() : Position(1) {}
 
     bool operator<(const Position& o) const;
+    bool operator==(const Position& o) const;
+    bool operator<=(const Position& o) const;
 
     bool hasSameLevelWith(const Position& o) const;
 
@@ -124,9 +126,10 @@ public:
 
 class Chapter {
 public:
-    Chapter(int id, const QString& name) :
-        m_id(id), m_name(name) {}
+    Chapter(const Book* book, int id, const QString& name) :
+        m_id(id), m_name(name), m_book(book) {}
 
+    const Book* book() const { return m_book; }
     int id() const { return m_id; }
     const QString& name() const { return m_name; } 
 
@@ -182,6 +185,7 @@ public:
     QList<Scene> scenes;
 
 private:
+    const Book* m_book;
     int m_id;
     QString m_name;
 };

@@ -1,12 +1,13 @@
 #include "BookModels.h"
 #include "Book.h"
 
-Position::Position(int idChapter, int idSection, int idParagraph, int idSentence, int idWord) :
+Position::Position(int idChapter, int idSection, int idParagraph, int idSentence, int idWord, const Book* book) :
     m_idChapter(idChapter),
     m_idSection(idSection),
     m_idParagraph(idParagraph),
     m_idSentence(idSentence),
-    m_idWord(idWord) {
+    m_idWord(idWord),
+    m_book(book) {
     if (!(idChapter >= 1) ||
         !(idSection == -1 || idSection >= 1) ||
         !(idParagraph == -1 || idParagraph >= 1) ||
@@ -31,6 +32,18 @@ bool Position::operator<(const Position& o) const {
     } else {
         return false;
     }
+}
+
+bool Position::operator==(const Position& o) const {
+    return m_idChapter == o.m_idChapter &&
+        m_idSection == o.m_idSection &&
+        m_idParagraph == o.m_idParagraph &&
+        m_idSentence == o.m_idSentence &&
+        m_idWord == o.m_idWord;
+}
+
+bool Position::operator<=(const Position& o) const {
+    return *this < o || *this == o;
 }
 
 bool Position::hasSameLevelWith(const Position& o) const {
@@ -58,7 +71,7 @@ Position Position::prevChapter() const {
     if (val < 1) {
         throw std::range_error("chapter not exist");
     }
-    return Position(val, m_idSection, m_idParagraph, m_idSentence, m_idWord);
+    return Position(val, 1, 1, 1, 1, m_book);
 }
 
 Position Position::nextChapter() const {
@@ -66,7 +79,7 @@ Position Position::nextChapter() const {
     if (val > m_book->chapters().size()) {
         throw std::range_error("chapter not exist");
     }
-    return Position(val, m_idSection, m_idParagraph, m_idSentence, m_idWord);
+    return Position(val, 1, 1, 1, 1, m_book);
 }
 
 Position Position::prevSection() const {
@@ -74,15 +87,15 @@ Position Position::prevSection() const {
     if (val < 1) {
         throw std::range_error("section not exist");
     }
-    return Position(m_idChapter, val, m_idParagraph, m_idSentence, m_idWord);
+    return Position(m_idChapter, val, 1, 1, 1, m_book);
 }
 
 Position Position::nextSection() const {
     int val = m_idSection + 1;
-    if (val < 1 || val > m_book->chapters()[m_idChapter-1].sections.size()) {
+    if (val < 1 || !hasNextSection()) {
         throw std::range_error("section not exist");
     }
-    return Position(m_idChapter, val, m_idParagraph, m_idSentence, m_idWord);
+    return Position(m_idChapter, val, 1, 1, 1, m_book);
 }
 
 Position Position::prevParagraph() const {
@@ -90,15 +103,15 @@ Position Position::prevParagraph() const {
     if (val < 1) {
         throw std::range_error("paragraph not exist");
     }
-    return Position(m_idChapter, m_idSection, val, m_idSentence, m_idWord);
+    return Position(m_idChapter, m_idSection, val, 1, 1, m_book);
 }
 
 Position Position::nextParagraph() const {
     int val = m_idParagraph + 1;
-    if (val < 1 || m_book->getSection(*this).size()) {
+    if (val < 1 || !hasNextParagraph()) {
         throw std::range_error("paragraph not exist");
     }
-    return Position(m_idChapter, m_idSection, val, m_idSentence, m_idWord);
+    return Position(m_idChapter, m_idSection, val, 1, 1, m_book);
 }
 
 Position Position::prevSentence() const {
@@ -106,15 +119,15 @@ Position Position::prevSentence() const {
     if (val < 1) {
         throw std::range_error("sentence not exist");
     }
-    return Position(m_idChapter, m_idSection, m_idParagraph, val, m_idWord);
+    return Position(m_idChapter, m_idSection, m_idParagraph, val, 1, m_book);
 }
 
 Position Position::nextSentence() const {
     int val = m_idSentence + 1;
-    if (val < 1 || m_book->getParagraph(*this).size()) {
+    if (val < 1 || !hasNextSentence()) {
         throw std::range_error("sentence not exist");
     }
-    return Position(m_idChapter, m_idSection, m_idParagraph, val, m_idWord);
+    return Position(m_idChapter, m_idSection, m_idParagraph, val, 1, m_book);
 }
 
 Position Position::prevWord() const {
@@ -122,39 +135,39 @@ Position Position::prevWord() const {
     if (val < 1) {
         throw std::range_error("word not exist");
     }
-    return Position(m_idChapter, m_idSection, m_idParagraph, m_idSentence, val);
+    return Position(m_idChapter, m_idSection, m_idParagraph, m_idSentence, val, m_book);
 }
 
 Position Position::nextWord() const {
     int val = m_idWord + 1;
-    if (val < 1 || m_book->getSentence(*this).size()) {
+    if (val < 1 || !hasNextWord()) {
         throw std::range_error("word not exist");
     }
-    return Position(m_idChapter, m_idSection, m_idParagraph, m_idSentence, val);
+    return Position(m_idChapter, m_idSection, m_idParagraph, m_idSentence, val, m_book);
 }
 
 bool Position::hasNextChapter() const {
-    return m_idChapter + 1 > m_book->chapters().size();
+    return m_idChapter + 1 < m_book->chapters().size();
 }
 
 bool Position::hasNextSection() const {
     int val = m_idSection + 1;
-    return val < 1 || val > m_book->chapters()[m_idChapter - 1].sections.size();
+    return val > 1 && val <= m_book->chapters()[m_idChapter - 1].sections.size();
 }
 
 bool Position::hasNextParagraph() const {
     int val = m_idParagraph + 1;
-    return val < 1 || m_book->getSection(*this).size();
+    return val > 1 && val <= m_book->getSection(*this).size();
 }
 
 bool Position::hasNextSentence() const {
     int val = m_idSentence + 1;
-    return val < 1 || m_book->getParagraph(*this).size();
+    return val > 1 && val <= m_book->getParagraph(*this).size();
 }
 
 bool Position::hasNextWord() const {
     int val = m_idWord + 1;
-    return val < 1 || m_book->getSentence(*this).size();
+    return val > 1 && val <= m_book->getSentence(*this).size();
 }
 
 QString Position::cssSelector() const {
@@ -169,4 +182,3 @@ QString Position::cssSelector() const {
 
     return sel;
 }
-
