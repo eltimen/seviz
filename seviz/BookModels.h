@@ -54,6 +54,12 @@ public:
     Position nextSentence() const;
     Position nextWord() const;
 
+    bool hasNextChapter() const;
+    bool hasNextSection() const;
+    bool hasNextParagraph() const;
+    bool hasNextSentence() const;
+    bool hasNextWord() const;
+
     QString cssSelector() const;
 
 private:

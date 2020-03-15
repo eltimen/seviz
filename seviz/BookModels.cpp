@@ -133,6 +133,30 @@ Position Position::nextWord() const {
     return Position(m_idChapter, m_idSection, m_idParagraph, m_idSentence, val);
 }
 
+bool Position::hasNextChapter() const {
+    return m_idChapter + 1 > m_book->chapters().size();
+}
+
+bool Position::hasNextSection() const {
+    int val = m_idSection + 1;
+    return val < 1 || val > m_book->chapters()[m_idChapter - 1].sections.size();
+}
+
+bool Position::hasNextParagraph() const {
+    int val = m_idParagraph + 1;
+    return val < 1 || m_book->getSection(*this).size();
+}
+
+bool Position::hasNextSentence() const {
+    int val = m_idSentence + 1;
+    return val < 1 || m_book->getParagraph(*this).size();
+}
+
+bool Position::hasNextWord() const {
+    int val = m_idWord + 1;
+    return val < 1 || m_book->getSentence(*this).size();
+}
+
 QString Position::cssSelector() const {
     QString sel = "#viewer ";
 
