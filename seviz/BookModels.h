@@ -62,6 +62,8 @@ public:
     bool hasNextSentence() const;
     bool hasNextWord() const;
 
+    Position firstWord();
+
     QString cssSelector() const;
 
 private:

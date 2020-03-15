@@ -49,7 +49,7 @@ void EngineTest::save(QDir& dir) {
 
 void EngineTest::render(const Position& from, const Position& to, DomChapter& dom, const QVector<Feature*>& activeFeatures) {
     const Chapter& ch = m_engine->getBook().getCurrentChapter();
-    dom.addStyleToSpan(Position(ch.id(), 1, 1, 1, 3), Position(ch.id(), 1, 1, 2, 1), "background-color: #ffe6e6;");
+    dom.addStyleToSpan(Position(ch.id(), 1, 1, 1, 3), Position(ch.id(), 1, 1, 3, 2), "background-color: #ffe6e6;");
     dom.addStyle(m_engine->getBook().getCurrentChapter().firstPos(), "color: green;");
     dom.addStyle(m_engine->getBook().getCurrentChapter().lastPos(), "color: blue; border: 1px solid black");
 }

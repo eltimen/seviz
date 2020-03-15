@@ -34,7 +34,7 @@ void DomChapter::addStyleToSpan(const Position& from, const Position& to, const 
 		current = current.nextSentence();
 		addStyle(current, css);
 	}
-	current = current.nextSentence();
+	current = current.nextSentence().firstWord();
 	while (current <= to) {
 		addStyle(current, css);
 		current = current.nextWord();
