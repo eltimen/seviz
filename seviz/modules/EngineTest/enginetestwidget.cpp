@@ -6,8 +6,7 @@
 EngineTestWidget::EngineTestWidget(EngineTest& facade) :
     QWidget(nullptr),
     ui(new Ui::EngineTestWidget),
-    m_main(facade)
-{
+    m_main(facade) {
     ui->setupUi(this);
 
     connect(ui->pushButton, &QPushButton::clicked, [this]() {
@@ -44,6 +43,11 @@ EngineTestWidget::EngineTestWidget(EngineTest& facade) :
         }
     });
 
+    connect(ui->renderButton, &QPushButton::clicked, [this]() {
+        m_main.renderStateChanged = true;
+        const auto& ch = m_engine->getBook().getCurrentChapter();
+        m_engine->triggerRerendering(ch.firstPos(), ch.lastPos());
+    });
 }
 
 EngineTestWidget::~EngineTestWidget()

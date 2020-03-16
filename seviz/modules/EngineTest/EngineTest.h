@@ -19,6 +19,7 @@ public:
     void render(const Position& from, const Position& to, DomChapter& dom, const QVector<Feature*>& activeFeatures) override;
 
     QString data;
+    bool renderStateChanged = false;
 
 private slots:
     void handler();
