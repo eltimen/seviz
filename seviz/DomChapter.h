@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QObject>
+#include <QMap>
 #include "BookModels.h"
 
 class DomChapter : public QObject
@@ -11,10 +12,14 @@ public:
 	DomChapter(const Chapter& chapter);
 	~DomChapter();
 
-	void addStyleTo(const Paragraph& elem, const QString& css);
-	void addStyleTo(const Sentence& elem, const QString& css);
-	void addStyleTo(const Word& elem, const QString& css);
-	void addStyleToSpan(const Position& from, const Position& to);
+	int chapterId() const { return m_chapter.id(); }
 
-	QString toHtml();
+	void addStyle(const Position& pos, const QString& css);
+	void addStyleToSpan(const Position& from, const Position& to, const QString& css);
+
+	const QMap<Position, QString>& getStyles() const { return m_styles; }
+
+private:
+	QMap <Position, QString> m_styles;
+	const Chapter& m_chapter;
 };

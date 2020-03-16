@@ -15,6 +15,7 @@ class Book;
 
 // макросы для передачи слотов как колбеков в методы register...
 #define VOIDSLOT(x) [this](){x();}
+#define POSSLOT(x) [this](const Position& pos){x(pos);}
 
 class ModuleManager : public QObject
 {
@@ -46,6 +47,7 @@ private:
     EpubRenderer& m_render;
     MainWindow* m_window;
     Book* m_book = nullptr;
+    QMultiMap<const AbstractModule*, Feature*> m_enabledFeatures;
 
     QMultiMap<Feature, QPair<Handler, bool>> m_handlers;
     QMultiMap<Feature, QShortcut*> m_hotkeys;

@@ -1,8 +1,8 @@
 #include "mainwindow.h"
 #include <tuple>
 #include <iterator>
+#include "DomChapter.h"
 #include "modules/modules.h"
-
 ModuleManager::ModuleManager(EpubRenderer& render, MainWindow* w) : 
     m_render(render),
     m_window(w) {
@@ -59,13 +59,33 @@ const Book& ModuleManager::getBook() {
     return *m_book;
 }
 
+void ModuleManager::triggerRerendering(const Position& from, const Position& to) {
+    //if (!from.hasSameLevelWith(to)) {
+    //    throw std::invalid_argument("if FROM is paragraph then TO must be paragraph, etc");
+    //}
+
+    DomChapter styles(m_book->getCurrentChapter());
+    for (AbstractModule* m : m_container) {
+        QList<Feature*> active = m_enabledFeatures.values(m);
+        if (!active.empty()) {
+            m->render(from, to, styles, active.toVector());
+        }
+    }
+
+    m_render.updateChapterView(styles);
+}
+
 QList<Feature*> ModuleManager::featureEnabled(const Feature& feature) {
     QList<Feature*> conflicts = getConflictFeaturesFor(feature);
 
+    m_enabledFeatures.insert(feature.owner(), const_cast<Feature*>(&feature));
+
+    if (feature.affectsView()) {
+        triggerRerendering(getBook().getCurrentChapter().firstPos(), getBook().getCurrentChapter().lastPos());
+    }
     for (auto& i : m_hotkeys.values(feature)) {
         i->setEnabled(true);
     }
-
     for (auto& h : m_handlers.values(feature)) {
         m_render.addHandler(h.first);
         h.second = true;
@@ -75,10 +95,15 @@ QList<Feature*> ModuleManager::featureEnabled(const Feature& feature) {
 }
 
 void ModuleManager::featureDisabled(const Feature& feature) {
+
+    m_enabledFeatures.remove(feature.owner(), const_cast<Feature*>(&feature));
+
+    if (feature.affectsView()) {
+        triggerRerendering(getBook().getCurrentChapter().firstPos(), getBook().getCurrentChapter().lastPos());
+    }
     for (auto& i : m_hotkeys.values(feature)) {
         i->setEnabled(false);
     }
-
     for (auto& h : m_handlers.values(feature)) {
         m_render.removeHandler(h.first);
         h.second = false;

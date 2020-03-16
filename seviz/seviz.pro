@@ -59,6 +59,7 @@ SOURCES += \
         3rdparty/zlib/zutil.c \
         AbstractModule.cpp \
         Book.cpp \
+        BookModels.cpp \
         DomChapter.cpp \
         ModuleManager.cpp \
         epubrenderer.cpp \
@@ -67,6 +68,7 @@ SOURCES += \
         modules/EngineTest/EngineTest.cpp \
         modules/EngineTest/enginetestwidget.cpp \
         modules/SentenceTree/SentenceTree.cpp \
+        modules/SentenceTree/dependency.cpp \
         modules/SentenceTree/stwindow.cpp
 
 HEADERS += \
@@ -85,6 +87,7 @@ HEADERS += \
         modules/EngineTest/EngineTest.h \
         modules/EngineTest/enginetestwidget.h \
         modules/SentenceTree/SentenceTree.h \
+        modules/SentenceTree/dependency.h \
         modules/SentenceTree/stwindow.h \
         modules/modules.h
 

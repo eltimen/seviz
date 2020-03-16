@@ -2,6 +2,19 @@ function addListenerMulti(el, s, fn) {
     s.split(' ').forEach(e => el.addEventListener(e, fn, false));
 } 
 
+function clearStyles(el) {
+    let pars = el.getElementsByTagName('p');
+    for (let p of pars) {
+        for (let s of p.children) {
+            for (let w of s.children) {
+                w.style.cssText = "";
+            }
+            s.style.cssText = "";
+        }
+        p.style.cssText = "";
+    }
+}
+
 function makePos(node) {
     let pos = {};
     if (node.tagName == "WORD") {
@@ -99,7 +112,7 @@ function markParagraphs(viewer) {
                 let words = el.raw.match(/([\w]+|\.|,|"|'|:|”|“|!|\(|\)|;|‘|’)/g);
                 for (let wordId = 0; wordId < words.length; ++wordId) {
                     wordsArr.push({ id: wordId + 1, text: words[wordId] });
-                    sentHtml += "<word id=\"" + String(wordId + 1) + "\">" + words[wordId] + "</word> ";
+                    sentHtml += "<word id=\"" + String(wordId + 1) + "\">" + words[wordId] + " </word>";
                 }
                 sentHtml += "</sentence> ";
                 sentArr.push({ id: sentId, words: wordsArr });

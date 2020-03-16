@@ -25,7 +25,6 @@ public:
     void close();
 
     void updateChapterView(const DomChapter& dom);
-    DomChapter generateDomChapter();
 
     void addHandler(const Handler& h);
     void removeHandler(const Handler& h);

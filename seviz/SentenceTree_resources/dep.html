@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="qrc:///qtwebchannel/qwebchannel.js"></script>
+    <script type="text/javascript"> 
+    window.channel = new QWebChannel(qt.webChannelTransport,
+    function (channel) {
+        console.log("init");
+        window.core = channel.objects.core;
+        //window.core.setPageLoadedState(false);
+    });
+    </script>
+    <link rel="stylesheet" type="text/css" href="3rdparty/brat-frontend-editor.min.css"/>
+    <script type="text/javascript" src="3rdparty/brat-frontend-editor.js"></script>
+    <script type="text/javascript">
+        var collData = {
+            "messages": [],
+            "items": [],
+            "ui_names": {
+                "entities": "annotation",
+                "events": "événements",
+                "relations": "relations",
+                "attributes": "attributs"
+            },
+            "disambiguator_config": [],
+            "unconfigured_types": [
+                {
+                    "borderColor": "darken",
+                    "arrowHead": "triangle,5",
+                    "name": "Cause",
+                    "color": "#007700",
+                    "labels": [
+                        "Cause"
+                    ],
+                    "unused": true,
+                    "bgColor": "lightgreen",
+                    "type": "Cause",
+                    "fgColor": "black"
+                }
+            ],
+            "entity_types": [
+                {
+                    "name": "NP",
+                    "type": "NP",
+                    "labels": ["NP"],
+                    "bgColor": "#FE2E2E",
+                    "borderColor": "darken",
+                    "children": [],
+                    "unused": false,
+                    "attributes": [
+                        "Notorious", "Polarity"
+                    ],
+                    "arcs": [],
+                    "children": []
+                },
+                //null, //will produde <hr> between entity groups or single entities but generate bugs with current code
+                {
+                    "name": "Object",
+                    "type": "Object",
+                    "labels": ["Object", "Obj"],
+                    "bgColor": "#7fa2ff",
+                    "borderColor": "darken",
+                    "attributes": [],
+                    "children": [],
+                    "unused": false,
+                    "arcs": [{
+                        "arrowHead": "triangle,5",
+                        "color": "black",
+                        "labels": ["Destruction", "Dest"],
+                        "dashArray": ",",
+                        "hotkey": "T",
+                        "type": "Destruction",
+                        "targets": ["Object", "Person"]
+                    }]
+                }],
+            "entity_attribute_types": [],
+            "relation_types": [ // кажется, можно оставить пустым. настройки не нужны, а вид связи можно задать и текстом
+                {
+                    "type": "Friend",
+                    "labels": ["Friend", "Fr"],
+                    "dashArray": "3,3",
+                    "color": "purple",
+                    "attributes": [
+                        "RelConfidence", "Safe"
+                    ],
+                    "args": [
+                        {"role": "From", "targets": ["Person"]},
+                        {"role": "To", "targets": ["Person"]}
+                    ]
+                }
+            ]
+        };
+
+        var docData = {
+            //"messages": [],
+            "source_files": ["ann", "txt"],
+            //"modifications": [],
+            //"normalizations": [],
+            //"ctime": 1351154734.5055847,
+            "text": "Наведите курсор мыши на предложение при нажатом Ctrl, чтобы просмотреть его дерево",
+            
+            "entities": [
+                //["N1", "NP", [[0, 2]]], //TODO, name text-bound annotations Tn to be coherent with standoff brat format http://brat.nlplab.org/standoff.html
+                //["N2", "NP", [[20, 21]]],
+                //["N3", "NP", [[22, 30]]],
+            ],
+            "relations": [
+                //["R1", "nsubj", [["From", "N2"], ["To", "N1"]]]
+            ]
+            
+        };
+
+        var options = {
+            assetsPath: "./3rdparty/static/",
+            webFontURLs: [//
+                'fonts/Astloch-Bold.ttf',
+                'fonts/PT_Sans-Caption-Web-Regular.ttf',
+                'fonts/Liberation_Sans-Regular.ttf'
+            ],
+            ajax: 'local',
+            overWriteModals: false,
+            maxFragmentLength: 30,
+            showTooltip: true
+        };
+        
+        function render() {
+            var brat = new BratFrontendEditor(document.getElementById("brat"), collData, docData, options);
+            brat.dispatcher.on('sglclick', function (data) {
+                console.log(data)
+            });
+        }
+
+        function window_onload() {
+            render();
+        }
+
+
+    </script>
+</head>
+<body onLoad="window_onload()">
+
+<div id="brat"></div>
+
+</body>
+</html>
