@@ -99,7 +99,7 @@ function markParagraphs(viewer) {
                 let words = el.raw.match(/([\w]+|\.|,|"|'|:|”|“|!|\(|\)|;|‘|’)/g);
                 for (let wordId = 0; wordId < words.length; ++wordId) {
                     wordsArr.push({ id: wordId + 1, text: words[wordId] });
-                    sentHtml += "<word id=\"" + String(wordId + 1) + "\">" + words[wordId] + "</word> ";
+                    sentHtml += "<word id=\"" + String(wordId + 1) + "\">" + words[wordId] + " </word>";
                 }
                 sentHtml += "</sentence> ";
                 sentArr.push({ id: sentId, words: wordsArr });
