@@ -170,12 +170,21 @@ bool Position::hasNextWord() const {
     return val > 0 && val <= m_book->getSentence(*this).size();
 }
 
-Position Position::firstWord() {
+Position Position::firstSentence() const {
+    return Position(m_idChapter,
+        m_idSection > 0 ? m_idSection : 1,
+        m_idParagraph > 0 ? m_idParagraph : 1,
+        1,
+        -1,
+        m_book);
+}
+
+Position Position::firstWord() const {
     return Position(m_idChapter, 
         m_idSection > 0 ? m_idSection : 1, 
         m_idParagraph > 0 ? m_idParagraph : 1,
         m_idSentence > 0 ? m_idSentence : 1,
-        m_idWord > 0 ? m_idWord : 1,
+        1,
         m_book);
 }
 
