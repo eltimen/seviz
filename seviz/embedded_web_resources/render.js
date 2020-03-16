@@ -2,6 +2,19 @@ function addListenerMulti(el, s, fn) {
     s.split(' ').forEach(e => el.addEventListener(e, fn, false));
 } 
 
+function clearStyles(el) {
+    let pars = el.getElementsByTagName('p');
+    for (let p of pars) {
+        for (let s of p.children) {
+            for (let w of s.children) {
+                w.style.cssText = "";
+            }
+            s.style.cssText = "";
+        }
+        p.style.cssText = "";
+    }
+}
+
 function makePos(node) {
     let pos = {};
     if (node.tagName == "WORD") {
