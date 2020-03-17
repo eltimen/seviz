@@ -9,7 +9,7 @@ class Chapter;
 class Section;
 class Paragraph;
 class Sentence;
-class Word; // знаки пунктуации - пусть пока будут тоже словами
+class Word; // Р·РЅР°РєРё РїСѓРЅРєС‚СѓР°С†РёРё Рё СЃР»РѕРІР°
 
 class Scene;
 class Fragment;
@@ -43,12 +43,18 @@ public:
 
     void setBook(const Book* book) { m_book = book; }
 
-    // !!! для функций-итераторов предварительно нужно задать книгу через setBook
+    // !!! РґР»СЏ С„СѓРЅРєС†РёР№-РёС‚РµСЂР°С‚РѕСЂРѕРІ РїСЂРµРґРІР°СЂРёС‚РµР»СЊРЅРѕ РЅСѓР¶РЅРѕ Р·Р°РґР°С‚СЊ РєРЅРёРіСѓ С‡РµСЂРµР· setBook
     Position prevChapter() const;
     Position prevSection() const;
     Position prevParagraph() const;
     Position prevSentence() const; 
     Position prevWord() const;
+
+    bool hasPrevChapter() const;
+    bool hasPrevSection() const;
+    bool hasPrevParagraph() const;
+    bool hasPrevSentence() const;
+    bool hasPrevWord() const;
 
     Position nextChapter() const;
     Position nextSection() const;    
@@ -201,6 +207,6 @@ class Scene : public QList<Fragment> {
 
 class Fragment {
     int id;
-    QPair<Position, Position> positions; // границы по предложениям
+    QPair<Position, Position> positions; // РіСЂР°РЅРёС†С‹ РїРѕ РїСЂРµРґР»РѕР¶РµРЅРёСЏРј
 };
 

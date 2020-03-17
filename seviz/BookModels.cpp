@@ -138,6 +138,26 @@ Position Position::prevWord() const {
     return Position(m_idChapter, m_idSection, m_idParagraph, m_idSentence, val, m_book);
 }
 
+bool Position::hasPrevChapter() const {
+    return m_idChapter - 1 >= 1;
+}
+
+bool Position::hasPrevSection() const {
+    return m_idSection - 1 >= 1;
+}
+
+bool Position::hasPrevParagraph() const {
+    return m_idParagraph - 1 >= 1;
+}
+
+bool Position::hasPrevSentence() const {
+    return m_idSentence - 1 >= 1;
+}
+
+bool Position::hasPrevWord() const {
+    return m_idWord - 1 >= 1;
+}
+
 Position Position::nextWord() const {
     int val = m_idWord + 1;
     if (val < 1 || !hasNextWord()) {
