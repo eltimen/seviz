@@ -28,9 +28,10 @@ public:
     QString toBratJson() const;
 
 private:
-    bool hasLoop() const;
+    Sentence m_sentence;
+    bool hasLoopWithRelation(int from, int to) const;
 
     // adjacency list
-    // word id -> <relation, word id>, <relation, word id>, ...
+    // word id -> [ {word id, stanford relation}, ...]
     std::multimap<int, std::pair<int, DependencyRelation>> m_tree;
 };
