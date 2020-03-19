@@ -8,21 +8,18 @@ enum DependencyRelation {
     nsubj
 };
 
-// TODO функция добавления ребра
-   // вход - ID откуда, ID куда, тип связи
-
-   // TODO функция удаления ребра
-   // вход - ID откуда, ID куда или ID ребра
-
-   // TODO функция изменения типа ребра
-   // вход - ID откуда, ID куда или ID ребра
-
 class DependencyTree {
 public:
     DependencyTree(const Sentence& sent);
    
+    // добавить ребро
+    // in: ID откуда, ID куда, тип связи
     void insert(int from, int to, DependencyRelation type);
+    // удалить ребро
+    // in: ID откуда, ID куда
     void remove(int from, int to);
+    // изменить тип связи
+    // in: ID откуда, ID куда, новый тип связи
     void change(int from, int to, DependencyRelation type);
 
     QString toBratJson() const;
