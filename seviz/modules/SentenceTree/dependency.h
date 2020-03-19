@@ -4,9 +4,16 @@
 #include <QString>
 #include "BookModels.h"
 
+#define DEPENDENCY_RELATION(DO) \
+    DO(nsubj) \
+    DO(advd)
+
+#define MAKE_ENUM(VAR) VAR,
 enum DependencyRelation {
-    nsubj
+    DEPENDENCY_RELATION(MAKE_ENUM)
 };
+
+#undef MAKE_ENUM
 
 class DependencyTree {
 public:
@@ -26,9 +33,10 @@ public:
 
 private:
     Sentence m_sentence;
-    bool hasLoopWithRelation(int from, int to) const;
-
     // adjacency list
     // word id -> [ {word id, stanford relation}, ...]
     std::multimap<int, std::pair<int, DependencyRelation>> m_tree;
+
+    bool hasLoopWithRelation(int from, int to) const;
+    QString string(DependencyRelation rel) const;
 };

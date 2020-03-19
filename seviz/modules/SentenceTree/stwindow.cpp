@@ -40,12 +40,6 @@ void STWindow::showSentence(const Sentence& sent, const SentenceData& data) {
 }
 
 void STWindow::renderDependencies(const DependencyTree& tree) {
-    QString docData = QStringLiteral(R"(
-        { 
-            "source_files": ["ann", "txt"],
-            "text": "%1"
-        }       
-    )").arg(m_sentenceText);
-
+    QString docData = tree.toBratJson();
     ui->dependencyView->page()->runJavaScript("docData=" + docData + "; render();");
 }

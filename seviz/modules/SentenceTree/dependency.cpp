@@ -2,6 +2,10 @@
 #include <unordered_set>
 #include <algorithm>
 
+DependencyTree::DependencyTree(const Sentence& sent) :
+	m_sentence(sent) {
+}
+
 void DependencyTree::insert(int from, int to, DependencyRelation type) {
 	assert(from >= 1);
 	assert(to <= m_sentence.size());
@@ -26,14 +30,6 @@ void DependencyTree::change(int from, int to, DependencyRelation type) {
 	edge->second.second = type;
 }
 
-DependencyTree::DependencyTree(const Sentence& sent) :
-	m_sentence(sent) 
-{
-	for (const Word& w : m_sentence) {
-		
-	}
-}
-
 bool DependencyTree::hasLoopWithRelation(int from, int to) const {
 	std::unordered_set<int> visited = { to };
 	// если в какой-то из узлов дерева входит больше двух ребер - цикл обнаружен
@@ -46,4 +42,61 @@ bool DependencyTree::hasLoopWithRelation(int from, int to) const {
 		}
 	}
 	return false;
+}
+
+QString DependencyTree::toBratJson() const {
+	QString entities;
+	int lastIndex = 0;
+	for (const Word& w : m_sentence) {
+		int tokenEndIndex = lastIndex + w.text().length();
+		entities += QStringLiteral("\t[\"N%1\", \"%2\", [[%3, %4]]],\n").arg(
+			QString::number(w.id()),
+			"Word", // TODO POS-tag
+			QString::number(lastIndex),
+			QString::number(tokenEndIndex)
+		);
+		lastIndex = tokenEndIndex + 1; // + пробел
+	}
+
+	QString relations;
+	int i = 0;
+	for (const auto& [from, edge] : m_tree) {
+		relations += QStringLiteral("\t[\"R%1\", \"%2\", [[\"From\", \"N%3\"], [\"To\", \"N%4\"]]],\n").arg(
+			QString::number(i),
+			string(edge.second),
+			QString::number(from),
+			QString::number(edge.first)
+		);
+		++i;
+	}
+
+	QString sentenceText;
+	for (const Word& w : m_sentence) {
+		sentenceText.append(w.text() + " ");
+	}
+
+	QString docData = QStringLiteral(R"(
+        { 
+            "source_files": ["ann", "txt"],
+            "entities": [
+			%1
+			],
+			"relations": [
+			%2
+			],
+			"text": "%3"
+        }       
+    )").arg(entities, relations, sentenceText);
+
+
+	return docData;
+}
+
+QString DependencyTree::string(DependencyRelation rel) const {
+	#define MAKE_STRINGS(VAR) QStringLiteral(#VAR),
+	QString const relationStrings[] = {
+		DEPENDENCY_RELATION(MAKE_STRINGS)
+	};
+	#undef MAKE_STRINGS
+	return relationStrings[rel];
 }
