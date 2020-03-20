@@ -25,80 +25,88 @@ void DomChapter::addStyleToSpan(const Position& from, const Position& to, const 
 		throw std::invalid_argument("from must be < to");
 	}
 
-	Position current(from);
-	current.setBook(m_chapter.book());
+	Position iter(from);
+	iter.setBook(m_chapter.book());
 
 	// TODO refactor
 
 	assert(from.sectionId() != -1);
 	assert(from.chapterId() == to.chapterId());
 
+	addStyle(from, css);
 	if (from.wordId() != -1) {
-		// начальные слова
-		addStyle(from, css);
-		while (current.hasNextWord() && current < to) {
-			current = current.nextWord();
-			addStyle(current, css);
+		if (iter.hasNextWord()) {
+			iter = iter.nextWord();
 		}
-		if (from.sentenceId() != to.sentenceId()) {
-			// обработка предложений и абзацев посередине
-		// если from и to из одинаковых абзацев
-			if (from.sentenceId() != to.sentenceId() && from.paragraphId() == to.paragraphId()) {
-				for (int i = 0; i < (to.sentenceId() - from.sentenceId() - 1); ++i) {
-					current = current.nextSentence();
-					addStyle(current, css);
-				}
-				current = current.nextSentence().firstWord();
-			} else {
-				// если из разных абзацев, то
-				// дообрабатываем предложения в абзаце из которого from
-				int idLastSentence = m_chapter.book()->getParagraph(from).size();
-				for (int i = 0; i < (idLastSentence - from.sentenceId()); ++i) {
-					current = current.nextSentence();
-					addStyle(current, css);
-				}
-				// обрабатываем абзацы посередине
-				for (int i = 0; i < (to.paragraphId() - from.paragraphId() - 1); ++i) {
-					current = current.nextParagraph();
-					addStyle(current, css);
-				}
-				current = current.nextParagraph().firstSentence();
-				// и начальные предложения абзаца to
-				for (int i = 0; i < to.sentenceId() - 1; ++i) {
-					addStyle(current, css);
-					current = current.nextSentence();
-				}
-				current = current.firstWord();
+		if (from.paragraphId() == to.paragraphId() && from.sentenceId() == to.sentenceId()) {
+			addStyleToWordCount(iter, to.wordId() - from.wordId() - 1, css);
+		} else {
+			int idLastWord = m_chapter.book()->getSentence(from).size();
+			addStyleToWordCount(iter, idLastWord - from.wordId(), css);
+			if (iter.hasNextSentence()) {
+				iter = iter.nextSentence();
 			}
-		}
-		// конечные слова
-		while (current <= to) {
-			addStyle(current, css);
-			current = current.nextWord();
+			addStyleToSentenceSpan(iter, from, to, css);
+			iter = iter.firstWord();
+			addStyleToWordCount(iter, to.wordId() - 1, css);
 		}
 	} else if (from.sentenceId() != -1) {
-		addStyle(from, css);
-		while (current.hasNextSentence() && current < to) {
-			current = current.nextSentence();
-			addStyle(current, css);
+		if (iter.hasNextSentence()) {
+			iter = iter.nextSentence();
 		}
-		for (int i = 0; i < (to.paragraphId() - from.paragraphId() - 1); ++i) {
-			current = current.nextParagraph();
-			addStyle(current, css);
-		}
-		current = current.nextParagraph().firstSentence();
-		while (current < to) {
-			addStyle(current, css);
-			current = current.nextSentence();
-		}
-		addStyle(to, css);
+		addStyleToSentenceSpan(iter, from, to, css);
 	} else if (from.paragraphId() != -1) {
-		addStyle(from, css);
-		while (current.hasNextParagraph() && current < to) {
-			current = current.nextParagraph();
-			addStyle(current, css);
+		if (iter.hasNextParagraph()) {
+			iter = iter.nextParagraph();
 		}
-		addStyle(to, css);
+		addStyleToParagraphCount(iter, to.sentenceId() - from.sentenceId() - 1, css);
 	}
+	addStyle(to, css);
 	
+}
+
+void DomChapter::addStyleToSentenceSpan(Position& iter, const Position& from, const Position& to, const QString& css) {
+	if (from.paragraphId() == to.paragraphId()) {
+		addStyleToSentenceCount(iter, to.sentenceId() - from.sentenceId() - 1, css);
+	} else {
+		int idLastSentInPar = m_chapter.book()->getParagraph(from).size();
+		addStyleToSentenceCount(iter, idLastSentInPar - from.sentenceId(), css);
+		iter = iter.nextParagraph();
+		addStyleToParagraphCount(iter, to.paragraphId() - from.paragraphId() - 1, css);
+		iter = iter.firstSentence();
+		addStyleToSentenceCount(iter, to.sentenceId() - 1, css);
+		if (iter.hasNextSentence()) {
+			iter = iter.nextSentence();
+		}
+	}
+}
+
+void DomChapter::addStyleToWordCount(Position& first, int n, const QString& css) {
+	for (int i = 0; i < n - 1; ++i) {
+		addStyle(first, css);
+		first = first.nextWord();
+	}
+	if (n > 0) {
+		addStyle(first, css);
+	}
+}
+
+void DomChapter::addStyleToSentenceCount(Position& first, int n, const QString& css) {
+	for (int i = 0; i < n - 1; ++i) {
+		addStyle(first, css);
+		first = first.nextSentence();
+	}
+	if (n > 0) {
+		addStyle(first, css);
+	}
+}
+
+void DomChapter::addStyleToParagraphCount(Position& first, int n, const QString& css) {
+	for (int i = 0; i < n - 1; ++i) {
+		addStyle(first, css);
+		first = first.nextParagraph();
+	}
+	if (n > 0) {
+		addStyle(first, css);
+	}
 }

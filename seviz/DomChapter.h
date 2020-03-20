@@ -22,4 +22,9 @@ public:
 private:
 	QMap <Position, QString> m_styles;
 	const Chapter& m_chapter;
+
+	void addStyleToWordCount(Position& first, int n, const QString& css);
+	void addStyleToSentenceCount(Position& first, int n, const QString& css);
+	void addStyleToParagraphCount(Position& first, int n, const QString& css);
+	void addStyleToSentenceSpan(Position& iter, const Position& from, const Position& to, const QString& css);
 };
