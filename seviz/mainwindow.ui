@@ -100,14 +100,23 @@
     <addaction name="fileOpenAction"/>
     <addaction name="fileSaveAction"/>
    </widget>
-   <widget class="QMenu" name="menu_2">
+   <widget class="QMenu" name="helpMenu">
     <property name="title">
      <string>Справка</string>
     </property>
     <addaction name="aboutAction"/>
    </widget>
+   <widget class="QMenu" name="modulesMenu">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="title">
+     <string>Модули</string>
+    </property>
+   </widget>
    <addaction name="fileMenu"/>
-   <addaction name="menu_2"/>
+   <addaction name="modulesMenu"/>
+   <addaction name="helpMenu"/>
   </widget>
   <action name="fileOpenAction">
    <property name="text">
