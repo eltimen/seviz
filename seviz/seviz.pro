@@ -83,7 +83,6 @@ HEADERS += \
         EventModels.h \
         ModuleManager.h \
         bookloader/bookloaderdialog.h \
-        bookloaderdialog.h \
         epubrenderer.h \
         exceptions.h \
         mainwindow.h \
@@ -96,7 +95,6 @@ HEADERS += \
 
 FORMS += \
         bookloader/bookloaderdialog.ui \
-        bookloaderdialog.ui \
         mainwindow.ui \
         modules/EngineTest/enginetestwidget.ui \
         modules/SentenceTree/stwindow.ui
