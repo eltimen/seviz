@@ -70,6 +70,9 @@ void MainWindow::setupModules() {
             // добавление пунктов меню
             QMenu* menu = ui->modulesMenu;
             QAction* menuAction = menu->addAction(f.icon(), f.name(), onFeatureTriggered);
+            if (f.menu()) {
+                menuAction->setMenu(f.menu());
+            }
             menuAction->setCheckable(true);
 
             m_actions.insert(f, qMakePair(toolbarAction,menuAction));

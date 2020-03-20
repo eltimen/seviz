@@ -1,14 +1,16 @@
 #include "EngineTest.h"
 #include <QMessageBox>
+#include <QMenu>
 #include "Book.h"
 
 EngineTest::EngineTest(ModuleManager* engine) :
     AbstractModule(engine, "EngineTest"),
     m_widget(*this),
-    m_feat("Тесты движка", QIcon(), new QDockWidget(), this, true)
+    m_feat("Тесты движка", QIcon(), new QDockWidget(), this, true, new QMenu("Тест"))
 {
     m_widget.m_engine = m_engine;
     m_feat.window()->setWidget(&m_widget);
+    m_feat.menu()->addAction("Тест", [this]() { QMessageBox::information(m_feat.window(), "Сообщение", "Тест"); });
     m_feat.setDockLocation(Qt::RightDockWidgetArea);
 
     m_engine->registerHotkey(QKeySequence("Shift+A"), m_feat, VOIDSLOT(EngineTest::handler));
