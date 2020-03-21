@@ -188,7 +188,6 @@ class Render {
                 this.viewer.innerHTML = "";
                 let chapterDoc = new DOMParser().parseFromString(html, 'text/html');
                 // находим id начала этой главы и следующей.
-                // TODO поменять способ итерации на учитывающий дочерние узлы
                 // TODO реализовать загрузку данной главы из соседних html файлов. сейчас показывается только из начального html
                 let from = this.chapters[i].href.split('#')[1];
                 let to = i+1 < this.chapters.length ? this.chapters[i+1].href.split('#')[1] : null;
@@ -203,6 +202,9 @@ class Render {
                     while (currentElem != null && (currentElem.id != to || to == null)) {
                         // показываем элемент
                         this.viewer.appendChild(currentElem.cloneNode(true));
+                        // TODO не просто проверить, есть ли в следующем узле элмент оглавления to, но и вырезать  все что до него
+                        if (currentElem instanceof Element && currentElem.querySelector("#" + to) != null)
+                            break;
                         currentElem = currentElem.nextSibling;
                         if (currentElem == null) console.log('currentElem = null'); // debug
                     }
