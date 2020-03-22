@@ -160,15 +160,6 @@ class Render {
 
             }.bind(this));
 
-            //$select.appendChild(docfrag);
-
-            //$select.onchange = function () {
-            //    var index = $select.selectedIndex,
-            //        url = $select.options[index].ref;
-            //    display(url);
-            //    return false;
-            //};
-
             this.book.opened.then(function () {
                 window.core.setChaptersList(this.chapters);
             }.bind(this));
@@ -177,54 +168,75 @@ class Render {
         
     };
 
+    displayChapterPartInFile = function (i, foundEndOfChapter, callback, searchTo) {
+        console.log('call');
+        if (!foundEndOfChapter) {
+            // получаем html файл (spine) с нужной главой. если глава разбита на несколько файлов, подгружаем остальные
+            var section = this.book.spine.get(this.chapters[i].href);
+            if (section) {
+                section.render().then(function (html) {
+                    // собираем dom-дерево, содержащее только заданную главу
+                    let chapterDoc = new DOMParser().parseFromString(html, 'text/html');
+                    // находим id начала этой главы и следующей.
+                    let from = this.chapters[i].href.split('#')[1];
+                    let to = i + 1 < this.chapters.length ? this.chapters[i + 1].href.split('#')[1] : null;
+
+                    // если url файла не содержит никаких ID, то глава вся находится в файле
+                    if (from == null && to == null) {
+                        this.viewer.innerHTML += html;
+                    } else {
+                        // иначе вырезаем главу из остальных элементов страницы
+                        let currentElem;
+                        if (searchTo != undefined) {
+                            currentElem = chapterDoc.body.firstElementChild;
+                            to = searchTo;
+                        } else {
+                            currentElem = chapterDoc.getElementById(from);
+                        }
+                        console.log('from: ' + from + ' to: ' + to);
+                        while (currentElem != null && (currentElem.id != to || to == null)) {
+                            // показываем элемент
+                            this.viewer.appendChild(currentElem.cloneNode(true));
+                            // TODO не просто проверить, есть ли в следующем узле элемент оглавления to, но и вырезать все элементы до него
+                            if (currentElem instanceof Element && currentElem.querySelector("#" + to) != null) {
+                                break;
+                            }
+                            currentElem = currentElem.nextSibling;
+
+                            // если достигнут конец текущего уровня иерархии DOM html-файла, но не найден конец главы
+                            if (to != null && currentElem == null) {
+                                console.log('call 2');
+                                return this.displayChapterPartInFile(i + 1, false, callback, to);
+                            } 
+                        }
+                        return this.displayChapterPartInFile(i, true, callback);
+                    }
+                }.bind(this));
+            }
+        } else {
+            console.log('callback');
+            callback(viewer);
+        }
+    }.bind(this);
+
     // показывает элемент chapters по заданному индексу
     display(i) {
-        console.log(i);
-        // получаем html файл с нужной главой
-        var section = this.book.spine.get(this.chapters[i].href);
-        if (section) {
-            section.render().then(function (html) {
-                // собираем dom-дерево, содержащее только заданную главу
-                this.viewer.innerHTML = "";
-                let chapterDoc = new DOMParser().parseFromString(html, 'text/html');
-                // находим id начала этой главы и следующей.
-                // TODO реализовать загрузку данной главы из соседних html файлов. сейчас показывается только из начального html
-                let from = this.chapters[i].href.split('#')[1];
-                let to = i+1 < this.chapters.length ? this.chapters[i+1].href.split('#')[1] : null;
-                console.log('from: ' + from + ' to: ' + to);
+        const renderCallback = function (viewer) {
+            // блокируем все ссылки
+            let lnks = this.viewer.getElementsByTagName("a");
+            for (let i = 0; i < lnks.length; i++) {
+                lnks[i].onclick = function () { return false; };
+            }
 
-                // проверяем, что ссылка на главу не содержит в себе селектор элемента из html-файла секции
-                if (from == null && to == null) {
-                    this.viewer.innerHTML = html;
-                } else {
-                    // иначе вырезаем главу из остальных элементов страницы
-                    let currentElem = chapterDoc.getElementById(from);
-                    while (currentElem != null && (currentElem.id != to || to == null)) {
-                        // показываем элемент
-                        this.viewer.appendChild(currentElem.cloneNode(true));
-                        // TODO не просто проверить, есть ли в следующем узле элмент оглавления to, но и вырезать  все что до него
-                        if (currentElem instanceof Element && currentElem.querySelector("#" + to) != null)
-                            break;
-                        currentElem = currentElem.nextSibling;
-                        if (currentElem == null) console.log('currentElem = null'); // debug
-                    }
-                }
+            // инициализируем модель
+            let model = markParagraphs(this.viewer);
+            window.core.setModelDataForChapter(i, model);
 
-                // блокируем все ссылки
-                let lnks = this.viewer.getElementsByTagName("a");
-                for (let i = 0; i < lnks.length; i++) {
-                    lnks[i].onclick = function () { return false; };
-                }
+            setupHandlers(this.viewer);
+        }.bind(this);
 
-                // инициализируем модель
-                let model = markParagraphs(this.viewer);
-                window.core.setModelDataForChapter(i, model);
-
-                setupHandlers(this.viewer);
-            }.bind(this));
-        }
-
-        return section;
+        this.viewer.innerHTML = "";
+        this.displayChapterPartInFile(i, false, renderCallback);
     }
 
     close() {
