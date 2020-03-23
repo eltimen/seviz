@@ -143,20 +143,28 @@ class Render {
         document.getElementById("viewer").style.visibility = "visible";
         this.book = ePub(path);
         this.chapters = [];
+        this.toc = {};
         this.alreadyOpened = true;
 
         this.book.loaded.navigation.then(function (toc) {
 
-            let processSubItems = (chapter) => {
+            let processSubItems = (chapter, depth) => {
+                if (depth === 0) {
+                    return;
+                }
                 chapter.subitems.forEach((el) => {
                     this.chapters.push(el);
-                    processSubItems(el);
+                    processSubItems(el, depth-1);
                 });
             };
 
+            this.toc = toc;
+
+            console.log(toc);
+
             toc.forEach(function (chapter) {
                 this.chapters.push(chapter);
-                processSubItems(chapter);
+                processSubItems(chapter, 1);
 
             }.bind(this));
 
@@ -169,44 +177,44 @@ class Render {
     };
 
     displayChapterPartInFile = function (i, foundEndOfChapter, callback, searchTo) {
-        console.log('call');
+        console.log('call ', i, foundEndOfChapter, searchTo);
         if (!foundEndOfChapter) {
-            // получаем html файл (spine) с нужной главой. если глава разбита на несколько файлов, подгружаем остальные
+            // получаем html файл (spine) с нужной главой. если глава разбита на несколько файлов, рекурсивно загружаем соседние
             var section = this.book.spine.get(this.chapters[i].href);
             if (section) {
                 section.render().then(function (html) {
                     // собираем dom-дерево, содержащее только заданную главу
                     let chapterDoc = new DOMParser().parseFromString(html, 'text/html');
                     // находим id начала этой главы и следующей.
-                    let from = this.chapters[i].href.split('#')[1];
-                    let to = i + 1 < this.chapters.length ? this.chapters[i + 1].href.split('#')[1] : null;
+                    let idFrom = this.chapters[i].href.split('#')[1];
+                    let idTo = i + 1 < this.chapters.length ? this.chapters[i + 1].href.split('#')[1] : null;
 
                     // если url файла не содержит никаких ID, то глава вся находится в файле
-                    if (from == null && to == null) {
+                    if (idFrom == null && idTo == null) {
                         this.viewer.innerHTML += html;
+                        console.log("inner");
                     } else {
                         // иначе вырезаем главу из остальных элементов страницы
                         let currentElem;
                         if (searchTo != undefined) {
                             currentElem = chapterDoc.body.firstElementChild;
-                            to = searchTo;
+                            idTo = searchTo;
                         } else {
-                            currentElem = chapterDoc.getElementById(from);
+                            currentElem = chapterDoc.getElementById(idFrom);
                         }
-                        console.log('from: ' + from + ' to: ' + to);
-                        while (currentElem != null && (currentElem.id != to || to == null)) {
+                        console.log('idFrom: ' + idFrom + ' idTo: ' + idTo);
+                        while (currentElem != null && (currentElem.id != idTo || idTo == null)) {
                             // показываем элемент
                             this.viewer.appendChild(currentElem.cloneNode(true));
-                            // TODO не просто проверить, есть ли в следующем узле элемент оглавления to, но и вырезать все элементы до него
-                            if (currentElem instanceof Element && currentElem.querySelector("#" + to) != null) {
+                            // TODO не просто проверить, есть ли в следующем узле элемент оглавления idTo, но и вырезать все элементы до него
+                            if (currentElem instanceof Element && currentElem.querySelector("#" + idTo) != null) {
                                 break;
                             }
                             currentElem = currentElem.nextSibling;
-
                             // если достигнут конец текущего уровня иерархии DOM html-файла, но не найден конец главы
-                            if (to != null && currentElem == null) {
+                            if (idTo != null && currentElem == null) {
                                 console.log('call 2');
-                                return this.displayChapterPartInFile(i + 1, false, callback, to);
+                                return this.displayChapterPartInFile(i + 1, false, callback, idTo);
                             } 
                         }
                         return this.displayChapterPartInFile(i, true, callback);
