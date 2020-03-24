@@ -11950,13 +11950,21 @@ var AnnotatorUI = (function($, window, undefined) {
           var origin = arcDragOrigin;
           var targetValid = target.hasClass('reselectTarget');
           stopArcDrag(target);
+          let from;
+          let to;
           if ((id = target.attr('data-span-id')) && origin != id && targetValid) {
             var originSpan = data.spans[origin];
             var targetSpan = data.spans[id];
-            core.onDepCreateEdge(Number(originSpan.id.match(/[\d]+/)), Number(targetSpan.id.match(/[\d]+/)));
+            from = Number(originSpan.id.match(/[\d]+/));
+            to = Number(targetSpan.id.match(/[\d]+/));
           } else {
-            core.onDepCreateEdge(Number(origin.match(/[\d]+/)), Number(target.context.dataset.spanId.match(/[\d]+/)));
+            from = Number(origin.match(/[\d]+/));
+            to = Number(target.context.dataset.spanId.match(/[\d]+/));
           }
+          if (from != to) {
+            core.onDepCreateEdge(from, to);
+          }
+          
         } else if (!evt.ctrlKey) {
           // if not, then is it span selection? (ctrl key cancels)
           var sel = window.getSelection();
@@ -19455,8 +19463,10 @@ var VisualizerUI = (function($, window, undefined) {
       var onSingleClick = function(evt) {
         var target = $(evt.target);
         var id;
+        console.log('single click id target', id, target);
         if (id = target.attr('data-span-id')) {
           var span = data.spans[id];
+          console.log('span ', span);
           dispatcher.post('sglclick', [span]);
         }
       };
