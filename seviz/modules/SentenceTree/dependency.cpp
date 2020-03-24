@@ -66,7 +66,10 @@ QString DependencyTree::toBratJson() const {
 
 	QString relations;
 	int i = 0;
-	for (const auto& [from, edge] : m_tree) {
+	for (const auto& adjacency : m_tree) {
+		const auto& from = adjacency.first;
+		const auto& edge = adjacency.second;
+
 		relations += QStringLiteral("\t[\"R%1\", \"%2\", [[\"From\", \"N%3\"], [\"To\", \"N%4\"]]],\n").arg(
 			QString::number(i),
 			string(edge.second),
