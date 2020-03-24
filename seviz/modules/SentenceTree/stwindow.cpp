@@ -40,17 +40,23 @@ void STWindow::showSentence(const Sentence& sent, const SentenceData& data) {
     renderDependencies(data.dependency);
 }
 void STWindow::onDepCreateEdge(int from, int to) {
-    QMessageBox::information(this, "Тест", "create " + QString::number(from) + " " + QString::number(to));
-    renderDependencies(m_core->currentSentence().second.dependency);
+    DependencyTree& tree = m_core->currentSentenceData().dependency;
+    DependencyRelation rel = nsubj; // TODO диалог выбора типа связи
+    if (tree.insert(from, to, rel)) {
+        renderDependencies(tree);
+    } else {
+        QMessageBox::critical(this, "Ошибка", "Дерево зависимостей не должно содержать циклов");
+        renderDependencies(tree); // TODO после тестирования убрать 
+    } 
 }
 
 void STWindow::onDepRemoveEdge(int from, int to) {
     QMessageBox::information(this, "Тест", "remove " + QString::number(from) + " " + QString::number(to));
-    renderDependencies(m_core->currentSentence().second.dependency);
+    renderDependencies(m_core->currentSentenceData().dependency);
 }
 void STWindow::onDepChangeEdgeType(int from, int to) {
     QMessageBox::information(this, "Тест", "change " + QString::number(from) + " " + QString::number(to));
-    renderDependencies(m_core->currentSentence().second.dependency);
+    renderDependencies(m_core->currentSentenceData().dependency);
 }
 void STWindow::renderDependencies(const DependencyTree& tree) {
     QString docData = tree.toBratJson();

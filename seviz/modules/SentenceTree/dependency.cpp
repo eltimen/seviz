@@ -12,15 +12,16 @@ DependencyTree::DependencyTree(const Sentence& sent) :
 	}
 }
 
-void DependencyTree::insert(int from, int to, DependencyRelation type) {
+bool DependencyTree::insert(int from, int to, DependencyRelation type) {
 	assert(from >= 1);
 	assert(to <= m_sentence.size());
 
 	if (hasLoopWithRelation(from, to)) {
-		throw std::runtime_error("loop");
+		return false;
 	}
 
     m_tree.emplace(from, std::make_pair(to, type));
+	return true;
 }
 
 void DependencyTree::remove(int from, int to) {

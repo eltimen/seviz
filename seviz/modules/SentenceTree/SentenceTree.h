@@ -24,10 +24,9 @@ public:
     ~SentenceTree();
 
     virtual QList<Feature> features() override;
-
     virtual void render(const Position& from, const Position& to, DomChapter& dom, const QVector<Feature*>& activeFeatures) override;
 
-    QPair<Sentence, SentenceData> currentSentence() const;
+    SentenceData& SentenceTree::currentSentenceData();
 
 private slots:
     void onSentenceChanged(const Position& pos);

@@ -21,7 +21,7 @@ public:
    
     // добавить ребро
     // in: ID откуда, ID куда, тип связи
-    void insert(int from, int to, DependencyRelation type);
+    bool insert(int from, int to, DependencyRelation type);
     // удалить ребро
     // in: ID откуда, ID куда
     void remove(int from, int to);

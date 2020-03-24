@@ -34,8 +34,8 @@ void SentenceTree::render(const Position& from, const Position& to, DomChapter& 
     }
 }
 
-QPair<Sentence, SentenceData> SentenceTree::currentSentence() const {
-    return qMakePair(m_currentSentence, m_currentSentenceData);
+SentenceData& SentenceTree::currentSentenceData() {
+    return m_currentSentenceData;
 }
 
 void SentenceTree::onSentenceChanged(const Position& pos) {
