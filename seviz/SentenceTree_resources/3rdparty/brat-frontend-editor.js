@@ -19462,13 +19462,24 @@ var VisualizerUI = (function($, window, undefined) {
 
       var onSingleClick = function(evt) {
         var target = $(evt.target);
-        var id;
-        console.log('single click id target', id, target);
+        //var id;
+        
+        let dataset = target.context.dataset;
+        if (dataset.spanId != undefined) {
+            // если клик на POS-тег
+            // на будущее: если слово, то chunkId
+        } else if (dataset.arcOrigin != undefined && dataset.arcTarget != undefined) {
+            from = Number(dataset.arcOrigin.match(/[\d]+/));
+            to = Number(dataset.arcTarget.match(/[\d]+/));
+            core.onDepChangeEdgeType(from, to);
+        }          
+        /*
         if (id = target.attr('data-span-id')) {
           var span = data.spans[id];
           console.log('span ', span);
           dispatcher.post('sglclick', [span]);
         }
+        */
       };
 
       var onDblClick = function(evt) {
