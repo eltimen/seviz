@@ -2,9 +2,11 @@
 #include "ModuleManager.h"
 #include "Book.h"
 
-SentenceTree::SentenceTree(ModuleManager* engine) : 
+SentenceTree::SentenceTree(ModuleManager* engine) :
     AbstractModule(engine, "SentenceTree"),
-    m_feature("Деревья предложений", QIcon(":/st/icon.png"), new QDockWidget(), this, true)
+    m_feature("Деревья предложений", QIcon(":/st/icon.png"), new QDockWidget(), this, true),
+    m_widget(this),
+    m_currentSentenceData(m_currentSentence)
 {
     m_feature.window()->setWidget(&m_widget);
     
@@ -32,6 +34,10 @@ void SentenceTree::render(const Position& from, const Position& to, DomChapter& 
     }
 }
 
+QPair<Sentence, SentenceData> SentenceTree::currentSentence() const {
+    return qMakePair(m_currentSentence, m_currentSentenceData);
+}
+
 void SentenceTree::onSentenceChanged(const Position& pos) {
     // TODO проверка на наличие несохраненных изменений
     // TODO если для такой pos предложение было загружено, показать его
@@ -39,6 +45,7 @@ void SentenceTree::onSentenceChanged(const Position& pos) {
     // иначе
     m_currentSentence = m_engine->getBook().getSentence(pos);
     SentenceData trees(m_currentSentence);
+    m_currentSentenceData = trees;
     m_storage.insert(pos, trees);
     m_widget.showSentence(m_currentSentence, trees);
 }

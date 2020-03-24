@@ -6,8 +6,10 @@ DependencyTree::DependencyTree(const Sentence& sent) :
 	m_sentence(sent) 
 {
     // TEST
-	insert(sent.first().id(), sent.last().id(), nsubj);
-    change(sent.first().id(), sent.last().id(), advd);
+	if (sent.size() > 0) {
+		insert(sent.first().id(), sent.last().id(), nsubj);
+		change(sent.first().id(), sent.last().id(), advd);
+	}
 }
 
 void DependencyTree::insert(int from, int to, DependencyRelation type) {

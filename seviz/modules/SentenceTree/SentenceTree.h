@@ -27,6 +27,8 @@ public:
 
     virtual void render(const Position& from, const Position& to, DomChapter& dom, const QVector<Feature*>& activeFeatures) override;
 
+    QPair<Sentence, SentenceData> currentSentence() const;
+
 private slots:
     void onSentenceChanged(const Position& pos);
 
@@ -35,6 +37,7 @@ private:
     STWindow m_widget;
 
     Sentence m_currentSentence;
+    SentenceData m_currentSentenceData;
     QMap<Position, SentenceData> m_storage;
 };
 

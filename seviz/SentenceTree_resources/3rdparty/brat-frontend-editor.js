@@ -11953,23 +11953,9 @@ var AnnotatorUI = (function($, window, undefined) {
           if ((id = target.attr('data-span-id')) && origin != id && targetValid) {
             var originSpan = data.spans[origin];
             var targetSpan = data.spans[id];
-            if (arcOptions && arcOptions.old_target) {
-              arcOptions.target = targetSpan.id;
-              dispatcher.post('ajax', [arcOptions, 'edited']);
-            } else {
-              arcOptions = {
-                action: 'createArc',
-                origin: originSpan.id,
-                target: targetSpan.id,
-                collection: coll,
-                'document': doc
-              };
-              $('#arc_origin').text(Util.spanDisplayForm(spanTypes, originSpan.type)+' ("'+originSpan.text+'")');
-              $('#arc_target').text(Util.spanDisplayForm(spanTypes, targetSpan.type)+' ("'+targetSpan.text+'")');
-              fillArcTypesAndDisplayForm(evt, originSpan.type, targetSpan.type);
-              // for precise timing, log dialog display to user.
-              dispatcher.post('logAction', ['arcSelected']);
-            }
+            core.onDepCreateEdge(Number(originSpan.id.match(/[\d]+/)), Number(targetSpan.id.match(/[\d]+/)));
+          } else {
+            core.onDepCreateEdge(Number(origin.match(/[\d]+/)), Number(target.context.dataset.spanId.match(/[\d]+/)));
           }
         } else if (!evt.ctrlKey) {
           // if not, then is it span selection? (ctrl key cancels)

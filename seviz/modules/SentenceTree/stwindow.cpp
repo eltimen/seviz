@@ -3,14 +3,16 @@
 
 #include <QWebEngineSettings>
 #include <QWebChannel>
+#include <QMessageBox>
 #include "BookModels.h"
 #include "SentenceTree.h"
 #include "dependency.h"
 
-STWindow::STWindow(QWidget *parent) :
-    QWidget(parent),
+STWindow::STWindow(SentenceTree* core) :
+    QWidget(nullptr),
     ui(new Ui::STWindow),
-    m_webchannel(new QWebChannel(this))
+    m_webchannel(new QWebChannel(this)),
+    m_core(core)
 {
     ui->setupUi(this);
 
@@ -33,12 +35,23 @@ void STWindow::showSentence(const Sentence& sent, const SentenceData& data) {
     for (const Word& w : sent) {
         m_sentenceText.append(w.text() + " ");
     }
-
     ui->idLabel->setText(QStringLiteral("ID: %1").arg(sent.id()));
 
     renderDependencies(data.dependency);
+}
+void STWindow::onDepCreateEdge(int from, int to) {
+    QMessageBox::information(this, "Тест", "create " + QString::number(from) + " " + QString::number(to));
+    renderDependencies(m_core->currentSentence().second.dependency);
 }
 
+void STWindow::onDepRemoveEdge(int from, int to) {
+    QMessageBox::information(this, "Тест", "remove " + QString::number(from) + " " + QString::number(to));
+    renderDependencies(m_core->currentSentence().second.dependency);
+}
+void STWindow::onDepChangeEdgeType(int from, int to) {
+    QMessageBox::information(this, "Тест", "change " + QString::number(from) + " " + QString::number(to));
+    renderDependencies(m_core->currentSentence().second.dependency);
+}
 void STWindow::renderDependencies(const DependencyTree& tree) {
     QString docData = tree.toBratJson();
     ui->dependencyView->page()->runJavaScript("docData=" + docData + "; render();");
