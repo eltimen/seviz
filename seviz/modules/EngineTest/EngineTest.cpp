@@ -3,11 +3,10 @@
 #include <QMenu>
 #include "Book.h"
 
-EngineTest::EngineTest(ModuleManager* engine) :
-    AbstractModule(engine, "EngineTest"),
-    m_widget(*this),
-    m_feat("Тесты движка", QIcon(), new QDockWidget(), this, true, new QMenu("Тест"))
-{
+EngineTest::EngineTest(ModuleManager* engine)
+    : AbstractModule(engine, "EngineTest"),
+      m_widget(*this),
+      m_feat("Тесты движка", QIcon(), new QDockWidget(), this, true, new QMenu("Тест")) {
     m_widget.m_engine = m_engine;
     m_feat.window()->setWidget(&m_widget);
     m_feat.menu()->addAction("Тест", [this]() { QMessageBox::information(m_feat.window(), "Сообщение", "Тест"); });
@@ -56,7 +55,15 @@ void EngineTest::render(const Position& from, const Position& to, DomChapter& do
             dom.addStyleToSpan(Position(ch.id(), 1, 1, 1, 3), Position(ch.id(), 1, 2, 2, 1), "background-color: #ffe6e6;");
             renderStateChanged = false;
         }
-        dom.addStyle(m_engine->getBook().getCurrentChapter().firstPos(), "color: green;");
+        Position first = m_engine->getBook().getCurrentChapter().firstPos();
+        dom.addStyle(first, "color: green;");
+        dom.addTailContent(first, TOPLEFT, "topleft");
+        dom.addTailContent(first, TOPRIGHT, "topright");
+        dom.addTailContent(first, BOTTOMLEFT, "bottomleft");
+        dom.addTailContent(first, BOTTOMRIGHT, "bottomright");
+
+        dom.addTailContent(Position(m_engine->getBook().getCurrentChapter().id(), 1, 1, 1, 3), BOTTOMRIGHT, "test");
+
         dom.addStyle(m_engine->getBook().getCurrentChapter().lastPos(), "color: blue; border: 1px solid black");
     } catch (std::out_of_range&) {}
 }

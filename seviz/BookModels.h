@@ -14,9 +14,17 @@ class Word; // знаки пунктуации и слова
 class Scene;
 class Fragment;
 
+enum TailPosition {
+    NOT_TAIL = 0,
+    TOPLEFT,
+    TOPRIGHT,
+    BOTTOMLEFT,
+    BOTTOMRIGHT
+};
+
 class Position {
 public:
-    Position(int idChapter, int idSection = -1, int idParagraph = -1, int idSentence = -1, int idWord = -1, const Book* book = nullptr);
+    Position(int idChapter, int idSection = -1, int idParagraph = -1, int idSentence = -1, int idWord = -1, TailPosition tail = NOT_TAIL, const Book* book = nullptr);
     Position() : Position(1) {}
 
     bool operator<(const Position& o) const;
@@ -32,12 +40,12 @@ public:
     int paragraphIndex() const { return m_idParagraph - 1; }
     int sentenceIndex() const { return m_idSentence - 1; }
     int wordIndex() const { return m_idWord - 1; }
-
     int chapterId() const { return m_idChapter; }
     int sectionId() const { return m_idSection; }
     int paragraphId() const { return m_idParagraph; }
     int sentenceId() const { return m_idSentence; }
     int wordId() const { return m_idWord; }
+    TailPosition tail() const { return m_tail; }
 
     bool hasElement(ElementType type);
 
@@ -79,6 +87,8 @@ private:
     int m_idParagraph;
     int m_idSentence;
     int m_idWord;
+    TailPosition m_tail;
+
 
     const Book* m_book;
 };

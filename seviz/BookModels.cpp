@@ -1,13 +1,14 @@
 #include "BookModels.h"
 #include "Book.h"
 
-Position::Position(int idChapter, int idSection, int idParagraph, int idSentence, int idWord, const Book* book) :
-    m_idChapter(idChapter),
-    m_idSection(idSection),
-    m_idParagraph(idParagraph),
-    m_idSentence(idSentence),
-    m_idWord(idWord),
-    m_book(book) {
+Position::Position(int idChapter, int idSection, int idParagraph, int idSentence, int idWord, TailPosition tail, const Book* book)
+    : m_idChapter(idChapter), 
+      m_idSection(idSection), 
+      m_idParagraph(idParagraph), 
+      m_idSentence(idSentence), 
+      m_idWord(idWord),
+      m_tail(tail),
+      m_book(book) {
     if (!(idChapter >= 1) ||
         !(idSection == -1 || idSection >= 1) ||
         !(idParagraph == -1 || idParagraph >= 1) ||
@@ -15,7 +16,7 @@ Position::Position(int idChapter, int idSection, int idParagraph, int idSentence
         !(idWord == -1 || idWord >= 1))
 
         throw std::invalid_argument("id must be >=1");
-}
+} 
 
 bool Position::operator<(const Position& o) const {
     // TODO refactor, unit tests
@@ -29,6 +30,8 @@ bool Position::operator<(const Position& o) const {
         return true;
     } else if (m_idWord < o.m_idWord) {
         return true;
+    } else if (m_tail < o.m_tail) {
+        return true;
     } else {
         return false;
     }
@@ -39,7 +42,8 @@ bool Position::operator==(const Position& o) const {
         m_idSection == o.m_idSection &&
         m_idParagraph == o.m_idParagraph &&
         m_idSentence == o.m_idSentence &&
-        m_idWord == o.m_idWord;
+        m_idWord == o.m_idWord &&
+        m_tail == m_tail;
 }
 
 bool Position::operator<=(const Position& o) const {
@@ -71,7 +75,7 @@ Position Position::prevChapter() const {
     if (val < 1) {
         throw std::range_error("chapter not exist");
     }
-    return Position(val, -1, -1, -1, -1, m_book);
+    return Position(val, -1, -1, -1, -1, NOT_TAIL, m_book);
 }
 
 Position Position::nextChapter() const {
@@ -79,7 +83,7 @@ Position Position::nextChapter() const {
     if (val > m_book->chapters().size()) {
         throw std::range_error("chapter not exist");
     }
-    return Position(val, -1, -1, -1, -1, m_book);
+    return Position(val, -1, -1, -1, -1, NOT_TAIL, m_book);
 }
 
 Position Position::prevSection() const {
@@ -87,7 +91,7 @@ Position Position::prevSection() const {
     if (val < 1) {
         throw std::range_error("section not exist");
     }
-    return Position(m_idChapter, val, -1, -1, -1, m_book);
+    return Position(m_idChapter, val, -1, -1, -1, NOT_TAIL, m_book);
 }
 
 Position Position::nextSection() const {
@@ -95,7 +99,7 @@ Position Position::nextSection() const {
     if (val < 1 || !hasNextSection()) {
         throw std::range_error("section not exist");
     }
-    return Position(m_idChapter, val, -1, -1, -1, m_book);
+    return Position(m_idChapter, val, -1, -1, -1, NOT_TAIL, m_book);
 }
 
 Position Position::prevParagraph() const {
@@ -103,7 +107,7 @@ Position Position::prevParagraph() const {
     if (val < 1) {
         throw std::range_error("paragraph not exist");
     }
-    return Position(m_idChapter, m_idSection, val, -1, -1, m_book);
+    return Position(m_idChapter, m_idSection, val, -1, -1, NOT_TAIL, m_book);
 }
 
 Position Position::nextParagraph() const {
@@ -111,7 +115,7 @@ Position Position::nextParagraph() const {
     if (val < 1 || !hasNextParagraph()) {
         throw std::range_error("paragraph not exist");
     }
-    return Position(m_idChapter, m_idSection, val, -1, -1, m_book);
+    return Position(m_idChapter, m_idSection, val, -1, -1, NOT_TAIL, m_book);
 }
 
 Position Position::prevSentence() const {
@@ -119,7 +123,7 @@ Position Position::prevSentence() const {
     if (val < 1) {
         throw std::range_error("sentence not exist");
     }
-    return Position(m_idChapter, m_idSection, m_idParagraph, val, -1, m_book);
+    return Position(m_idChapter, m_idSection, m_idParagraph, val, -1, NOT_TAIL, m_book);
 }
 
 Position Position::nextSentence() const {
@@ -127,7 +131,7 @@ Position Position::nextSentence() const {
     if (val < 1 || !hasNextSentence()) {
         throw std::range_error("sentence not exist");
     }
-    return Position(m_idChapter, m_idSection, m_idParagraph, val, -1, m_book);
+    return Position(m_idChapter, m_idSection, m_idParagraph, val, -1, NOT_TAIL, m_book);
 }
 
 Position Position::prevWord() const {
@@ -135,7 +139,7 @@ Position Position::prevWord() const {
     if (val < 1) {
         throw std::range_error("word not exist");
     }
-    return Position(m_idChapter, m_idSection, m_idParagraph, m_idSentence, val, m_book);
+    return Position(m_idChapter, m_idSection, m_idParagraph, m_idSentence, val, NOT_TAIL, m_book);
 }
 
 bool Position::hasPrevChapter() const {
@@ -163,7 +167,7 @@ Position Position::nextWord() const {
     if (val < 1 || !hasNextWord()) {
         throw std::range_error("word not exist");
     }
-    return Position(m_idChapter, m_idSection, m_idParagraph, m_idSentence, val, m_book);
+    return Position(m_idChapter, m_idSection, m_idParagraph, m_idSentence, val, NOT_TAIL, m_book);
 }
 
 bool Position::hasNextChapter() const {
@@ -196,6 +200,7 @@ Position Position::firstSentence() const {
         m_idParagraph > 0 ? m_idParagraph : 1,
         1,
         -1,
+        NOT_TAIL,
         m_book);
 }
 
@@ -205,18 +210,38 @@ Position Position::firstWord() const {
         m_idParagraph > 0 ? m_idParagraph : 1,
         m_idSentence > 0 ? m_idSentence : 1,
         1,
+        NOT_TAIL,
         m_book);
 }
 
 QString Position::cssSelector() const {
-    QString sel = "#viewer ";
+    QString sel;
 
-    if (m_idParagraph > 0)
-        sel += QStringLiteral("> p:nth-of-type(%1) ").arg(m_idParagraph);
-    if (m_idSentence > 0)
-        sel += QStringLiteral("> sentence:nth-of-type(%1) ").arg(m_idSentence);
-    if (m_idWord > 0)
-        sel += QStringLiteral("> word:nth-of-type(%1) ").arg(m_idWord);
+    if (m_tail == NOT_TAIL) {
+        sel = "#viewer ";
+        if (m_idParagraph > 0)
+            sel += QStringLiteral("> p:nth-of-type(%1) ").arg(m_idParagraph);
+        if (m_idSentence > 0)
+            sel += QStringLiteral("> sentence:nth-of-type(%1) ").arg(m_idSentence);
+        if (m_idWord > 0)
+            sel += QStringLiteral("> word:nth-of-type(%1) ").arg(m_idWord);
+    } else {
+        QString tailNumber = QString::number(m_idParagraph);
+        if (m_idSentence > 0)
+            tailNumber += QStringLiteral("_%1").arg(m_idSentence);
+        if (m_idWord > 0)
+            tailNumber += QStringLiteral("_%1").arg(m_idWord);
+
+        if (m_tail == TOPLEFT) {
+            sel += QStringLiteral("#shl%1 ").arg(tailNumber);
+        } else if (m_tail == TOPRIGHT) {
+            sel += QStringLiteral("#shr%1 ").arg(tailNumber);
+        } else if (m_tail == BOTTOMLEFT) {
+            sel += QStringLiteral("#sdl%1 ").arg(tailNumber);
+        } else if (m_tail == BOTTOMRIGHT) {
+            sel += QStringLiteral("#sdr%1 ").arg(tailNumber);
+        }
+    }
 
     return sel;
 }

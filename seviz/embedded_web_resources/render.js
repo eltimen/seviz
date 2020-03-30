@@ -2,7 +2,7 @@ function addListenerMulti(el, s, fn) {
     s.split(' ').forEach(e => el.addEventListener(e, fn, false));
 } 
 
-function clearStyles(el) {
+function clearStylesAndSubsups(el) {
     let pars = el.getElementsByTagName('p');
     for (let p of pars) {
         for (let s of p.children) {
@@ -13,6 +13,11 @@ function clearStyles(el) {
         }
         p.style.cssText = "";
     }
+
+    document.querySelectorAll("SPAN.supsub > *").forEach(el => {
+        el.style.cssText = "";
+        el.textContent = "";
+    });
 }
 
 function makePos(node) {
@@ -99,8 +104,22 @@ function markParagraphs(viewer) {
             "paragraphs": [ { "id": 1, "sentences": [ { "id": 1, "text": [{1,"word1"}, {2,"."}] } ] } ] }
         */
 
-        pars[i].setAttribute("id", i + 1);         
-        let rawSplitData = splitter.split(pars[i].textContent);
+        var strParId = String(i + 1);
+        let par = pars[i];
+        let parParent = par.parentNode;
+
+        let beforeNode =  document.createElement('span');
+        var domString = "<span class=\"supsub\"><sup id=\"shl" + strParId + "\"></sup><sub id=\"sdl" + strParId + "\"></sub></span>";
+        beforeNode.innerHTML = domString;
+        parParent.insertBefore(beforeNode.firstChild, par); 
+
+        let afterNode = document.createElement('span');
+        var domString = "<span class=\"supsub\"><sup id=\"shr" + strParId + "\"></sup><sub id=\"sdr" + strParId + "\"></sub></span>";
+        afterNode.innerHTML = domString;
+        parParent.insertBefore(afterNode.firstChild, par.nextSibling);
+
+        par.setAttribute("id", i + 1);         
+        let rawSplitData = splitter.split(par.textContent);
         let parInnerHtml = "";
         let sentArr = [];
         // собираем абзац как набор маркированных предложений
@@ -108,20 +127,27 @@ function markParagraphs(viewer) {
         rawSplitData.forEach(el => {
             if (el.type == "Sentence") {
                 let wordsArr = [];
-                let sentHtml = "<sentence id=\"" + String(sentId) + "\">";
+                let strSentTailId = strParId + "_" + String(sentId);
+                let sentHtml = "<span class=\"supsub\"><sup id=\"shl" + strSentTailId + "\"></sup><sub id=\"sdl" + strSentTailId + "\"></sub></span>" +
+                               "<sentence id=\"" + String(sentId) + "\">";
                 let words = el.raw.match(/([\w]+|\.|,|"|'|:|”|“|!|\(|\)|;|‘|’)/g);
                 for (let wordId = 0; wordId < words.length; ++wordId) {
                     wordsArr.push({ id: wordId + 1, text: words[wordId] });
-                    sentHtml += "<word id=\"" + String(wordId + 1) + "\">" + words[wordId] + " </word>";
+                    let strWordId = String(wordId + 1);
+                    let strTailId = strParId + "_" + String(sentId) + "_" + strWordId;
+                    sentHtml += "<span class=\"supsub\"><sup id=\"shl" + strTailId + "\"></sup><sub id=\"sdl" + strTailId + "\"></sub></span>" +
+                                "<word id=\"" + strWordId + "\">" + words[wordId] + " </word>" +
+                                "<span class=\"supsub\"><sup id=\"shr" + strTailId + "\"></sup><sub id=\"sdr" + strTailId + "\"></sub></span>";
                 }
-                sentHtml += "</sentence> ";
+                sentHtml += "</sentence>" +
+                            "<span class=\"supsub\"><sup id=\"shr" + strSentTailId + "\"></sup><sub id=\"sdr" + strSentTailId + "\"></sub></span>";
                 sentArr.push({ id: sentId, words: wordsArr });
                 parInnerHtml += sentHtml;
                 sentId++;
             } 
         });
         outParagraphs.push({ id: i + 1, sentences: sentArr });
-        pars[i].innerHTML = parInnerHtml;
+        par.innerHTML = parInnerHtml;
     }
     return outParagraphs;
 };
