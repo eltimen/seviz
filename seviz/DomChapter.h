@@ -18,13 +18,17 @@ public:
 	void addStyleToSpan(const Position& from, const Position& to, const QString& css);
 	void addTailContent(const Position& tailPos, const QString& tailText);
 	void addTailContent(const Position& pos, TailPosition where, const QString& tailText);
+	void addTooltip(const Position& pos, const QString& text);
+	void addTooltip(const Position& pos, TailPosition where, const QString& tooltipText);
 
 	const QMap<Position, QString>& getStyles() const { return m_styles; }
 	const QMap<Position, QString>& getTails() const { return m_tails; }
+	const QMap<Position, QString>& getTooltips() const { return m_tooltips; }
 
 private:
 	QMap <Position, QString> m_styles;
 	QMap <Position, QString> m_tails;
+	QMap <Position, QString> m_tooltips;
 	const Chapter& m_chapter;
 
 	void addStyleToWordCount(Position& first, int n, const QString& css);

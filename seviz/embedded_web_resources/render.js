@@ -2,7 +2,15 @@ function addListenerMulti(el, s, fn) {
     s.split(' ').forEach(e => el.addEventListener(e, fn, false));
 } 
 
-function clearStylesAndSubsups(el) {
+let tooltips = [];
+
+function addTooltip(selector, text) {
+    let el = document.querySelector(selector);
+    el.setAttribute("data-tooltip", text);
+    tooltips.push(el)
+}
+
+function cleanupBeforeRender(el) {
     let pars = el.getElementsByTagName('p');
     for (let p of pars) {
         for (let s of p.children) {
@@ -18,6 +26,11 @@ function clearStylesAndSubsups(el) {
         el.style.cssText = "";
         el.textContent = "";
     });
+
+    tooltips.forEach(el => {
+        el.removeAttribute("data-tooltip");
+    });
+    tooltips = [];
 }
 
 function makePos(node) {

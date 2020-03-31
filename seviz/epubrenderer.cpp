@@ -47,7 +47,8 @@ void EpubRenderer::close() {
 }
 
 void EpubRenderer::updateChapterView(const DomChapter& dom) {
-    m_view->page()->runJavaScript("clearStylesAndSubsups(window.render.viewer);");
+    m_view->page()->runJavaScript("cleanupBeforeRender(window.render.viewer);");
+    
     const QMap<Position, QString>& styles = dom.getStyles();
     for (QMap<Position, QString>::const_iterator it = styles.begin(); it != styles.end(); ++it) {
         QString cmd = QStringLiteral(R"(document.querySelector("%1").style.cssText = "%2";)").arg(it.key().cssSelector(), it.value());
@@ -57,6 +58,12 @@ void EpubRenderer::updateChapterView(const DomChapter& dom) {
     const QMap<Position, QString>& tails = dom.getTails();
     for (QMap<Position, QString>::const_iterator it = tails.begin(); it != tails.end(); ++it) {
         QString cmd = QStringLiteral(R"(document.querySelector("%1").textContent = "%2";)").arg(it.key().cssSelector(), it.value());
+        m_view->page()->runJavaScript(cmd);
+    }
+ 
+    const QMap<Position, QString>& tooltips = dom.getTooltips();
+    for (QMap<Position, QString>::const_iterator it = tooltips.begin(); it != tooltips.end(); ++it) {
+        QString cmd = QStringLiteral(R"(addTooltip("%1", "%2");)").arg(it.key().cssSelector(), it.value());
         m_view->page()->runJavaScript(cmd);
     }
 }

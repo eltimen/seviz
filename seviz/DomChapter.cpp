@@ -75,6 +75,20 @@ void DomChapter::addTailContent(const Position& pos, TailPosition where, const Q
     addTailContent(tailPos, tailText);
 }
 
+void DomChapter::addTooltip(const Position& pos, const QString& text) {
+    if (m_tooltips.contains(pos)) {
+        throw std::runtime_error("can't set tooltip for element twice");
+    } else {
+        m_tooltips.insert(pos, text);
+    }
+}
+
+void DomChapter::addTooltip(const Position& pos, TailPosition where, const QString& tooltipText) {
+    assert(pos.tail() == NOT_TAIL);
+    Position tailPos = Position(pos.chapterId(), pos.sectionId(), pos.paragraphId(), pos.sentenceId(), pos.wordId(), where);
+    addTooltip(tailPos, tooltipText);
+}
+
 void DomChapter::addStyleToSentenceSpan(Position& iter, const Position& from, const Position& to, const QString& css) {
     if (from.paragraphId() == to.paragraphId()) {
         addStyleToSentenceCount(iter, to.sentenceId() - from.sentenceId() - 1, css);
