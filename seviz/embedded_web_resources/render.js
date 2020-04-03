@@ -207,10 +207,10 @@ class Render {
             }.bind(this));
 
             this.book.opened.then(function () {
+                let chaptersCount = this.chapters.size;
+                this.chapterData = Array.apply(null, Array(chaptersCount)).map(function () { });
                 window.core.setChaptersList(this.chapters);
             }.bind(this));
-
-
 
         }.bind(this));
         
@@ -270,7 +270,6 @@ class Render {
         }
     }.bind(this);
 
-    chapterData = Array.apply(null, Array(5)).map(function () { });
     // показывает элемент chapters по заданному индексу
     display(i) {
         if (this.chapterData[i] == undefined) {
