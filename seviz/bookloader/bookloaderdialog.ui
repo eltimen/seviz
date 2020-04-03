@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>369</width>
-    <height>257</height>
+    <height>555</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -97,7 +97,7 @@
         <enum>Qt::ScrollBarAlwaysOff</enum>
        </property>
        <property name="sizeAdjustPolicy">
-        <enum>QAbstractScrollArea::AdjustToContents</enum>
+        <enum>QAbstractScrollArea::AdjustIgnored</enum>
        </property>
        <property name="editTriggers">
         <set>QAbstractItemView::NoEditTriggers</set>

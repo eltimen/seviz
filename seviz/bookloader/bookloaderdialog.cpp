@@ -4,14 +4,17 @@
 #include "ui_bookloaderdialog.h"
 
 BookLoaderDialog::BookLoaderDialog(QWidget* parent, ModuleManager* engine, QList<Chapter>& chapters, QDir& dir)
-	: QDialog(parent),
+	: QDialog(parent, Qt::CustomizeWindowHint
+					| Qt::WindowTitleHint
+					| Qt::WindowSystemMenuHint
+					| Qt::WindowMaximizeButtonHint
+					| Qt::WindowCloseButtonHint),
 	  ui(new Ui::BookLoaderDialog),
 	  m_engine(engine),
 	  m_chapters(chapters),
 	  m_dir(dir) {
 	ui->setupUi(this);
 
-	setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 	ui->chaptersTableWidget->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
 	ui->chaptersTableWidget->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Fixed);
 
