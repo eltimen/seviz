@@ -108,7 +108,6 @@ function setupHandlers(viewer) {
 }
 
 function markParagraphs(viewer) {
-    // TODO кешировать результат для каждой главы
     // TODO реакция на некорректный символ в предложении. необходимо отбросить его и продолжить работу
     let outParagraphs = [];
     pars = viewer.getElementsByTagName("p");
@@ -211,11 +210,16 @@ class Render {
                 window.core.setChaptersList(this.chapters);
             }.bind(this));
 
+
+
         }.bind(this));
         
     };
 
-    displayChapterPartInFile = function (i, foundEndOfChapter, callback, searchTo) {
+    // извлекает в this.result html куска главы из файла. если глава содержится в нескольких файлах, рекурсивно вызывает сама себя, пока конец главы не найден
+    // после того, как вся глава будет на экране, вызывает callback
+    result;
+    extractChapterPartHtml = function (i, foundEndOfChapter, callback, searchTo) {
         console.log('call ', i, foundEndOfChapter, searchTo);
         if (!foundEndOfChapter) {
             // получаем html файл (spine) с нужной главой. если глава разбита на несколько файлов, рекурсивно загружаем соседние
@@ -230,7 +234,7 @@ class Render {
 
                     // если url файла не содержит никаких ID, то глава вся находится в файле
                     if (idFrom == null && idTo == null) {
-                        this.viewer.innerHTML += html;
+                        this.result.innerHTML += html;
                         console.log("inner");
                     } else {
                         // иначе вырезаем главу из остальных элементов страницы
@@ -244,7 +248,7 @@ class Render {
                         console.log('idFrom: ' + idFrom + ' idTo: ' + idTo);
                         while (currentElem != null && (currentElem.id != idTo || idTo == null)) {
                             // показываем элемент
-                            this.viewer.appendChild(currentElem.cloneNode(true));
+                            this.result.appendChild(currentElem.cloneNode(true));
                             // TODO не просто проверить, есть ли в следующем узле элемент оглавления idTo, но и вырезать все элементы до него
                             if (currentElem instanceof Element && currentElem.querySelector("#" + idTo) != null) {
                                 break;
@@ -253,37 +257,46 @@ class Render {
                             // если достигнут конец текущего уровня иерархии DOM html-файла, но не найден конец главы
                             if (idTo != null && currentElem == null) {
                                 console.log('call 2');
-                                return this.displayChapterPartInFile(i + 1, false, callback, idTo);
+                                return this.extractChapterPartHtml(i + 1, false, callback, idTo);
                             } 
                         }
-                        return this.displayChapterPartInFile(i, true, callback);
+                        return this.extractChapterPartHtml(i, true, callback);
                     }
                 }.bind(this));
             }
         } else {
             console.log('callback');
-            callback(viewer);
+            callback(this.result);
         }
     }.bind(this);
 
+    chapterData = Array.apply(null, Array(5)).map(function () { });
     // показывает элемент chapters по заданному индексу
     display(i) {
-        const renderCallback = function (viewer) {
-            // блокируем все ссылки
-            let lnks = this.viewer.getElementsByTagName("a");
-            for (let i = 0; i < lnks.length; i++) {
-                lnks[i].onclick = function () { return false; };
-            }
+        if (this.chapterData[i] == undefined) {
+            console.log("making");
+            this.result = document.createElement("div");
+            this.extractChapterPartHtml(i, false, function () {
+                // блокируем все ссылки
+                let lnks = this.result.getElementsByTagName("a");
+                for (let i = 0; i < lnks.length; i++) {
+                    lnks[i].onclick = function () { return false; };
+                }
 
-            // инициализируем модель
-            let model = markParagraphs(this.viewer);
-            window.core.setModelDataForChapter(i, model);
+                // инициализируем модель
+                let model = markParagraphs(this.result);
+                window.core.setModelDataForChapter(i, model);
 
+                this.chapterData[i] = this.result;
+
+                this.viewer.innerHTML = this.chapterData[i].innerHTML;
+                setupHandlers(this.viewer);
+            }.bind(this));
+        } else {
+            console.log("exist");
+            this.viewer.innerHTML = this.chapterData[i].innerHTML;
             setupHandlers(this.viewer);
-        }.bind(this);
-
-        this.viewer.innerHTML = "";
-        this.displayChapterPartInFile(i, false, renderCallback);
+        }
     }
 
     close() {

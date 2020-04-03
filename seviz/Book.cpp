@@ -129,6 +129,8 @@ const Word& Book::getWord(const Position& pos) const {
 
 void Book::setModelForChapter(int chapterIndex, const QList<Section>& data) {
     m_chapters[chapterIndex].sections = data;
+
+    // TODO перенести отсюда. для этого надо ловить момент окончания рендеринга главы
     if (m_chapters[chapterIndex].sections.size() > 0) {
         m_moduleManager.triggerRerendering(m_chapters[chapterIndex].firstPos(), m_chapters[chapterIndex].lastPos());
     }
