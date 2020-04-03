@@ -3,12 +3,15 @@
 #include <QMultiMap>
 #include <QList>
 #include <QShortcut>
+#include <QTemporaryDir>
 #include <functional>
+#include <memory>
 #include "AbstractModule.h"
 #include "EventModels.h"
 #include "BookModels.h"
 #include "epubrenderer.h"
 #include "exceptions.h"
+#include "bookloader/bookloader.h"
 
 class MainWindow;
 class Book;
@@ -25,7 +28,7 @@ public:
     ModuleManager(EpubRenderer& render, MainWindow* w);
     ~ModuleManager();
 
-    void bookOpened(Book* book);
+    void bookOpened(Book* book, QTemporaryDir& epubDir, QList<Chapter>& chapters);
     QList<Feature*> featureEnabled(const Feature& feature);
     void featureDisabled(const Feature& feature);
     void forEachModule(std::function<void(AbstractModule*)> functor);
@@ -44,6 +47,8 @@ public:
     
 private:
     QMap<QString,AbstractModule*> m_container;
+    BookLoader m_loader;
+
     EpubRenderer& m_render;
     MainWindow* m_window;
     Book* m_book = nullptr;

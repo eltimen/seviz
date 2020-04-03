@@ -9,12 +9,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>339</width>
-    <height>149</height>
+    <width>369</width>
+    <height>257</height>
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+   <sizepolicy hsizetype="Fixed" vsizetype="MinimumExpanding">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -88,7 +88,7 @@
      <item>
       <widget class="QTableWidget" name="chaptersTableWidget">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+        <sizepolicy hsizetype="Minimum" vsizetype="MinimumExpanding">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -118,9 +118,15 @@
         <number>0</number>
        </property>
        <property name="columnCount">
-        <number>3</number>
+        <number>2</number>
        </property>
+       <attribute name="horizontalHeaderHighlightSections">
+        <bool>false</bool>
+       </attribute>
        <attribute name="horizontalHeaderStretchLastSection">
+        <bool>false</bool>
+       </attribute>
+       <attribute name="verticalHeaderVisible">
         <bool>false</bool>
        </attribute>
        <column>
@@ -131,11 +137,6 @@
        <column>
         <property name="text">
          <string>Статус</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
-         <string>Действия</string>
         </property>
        </column>
       </widget>

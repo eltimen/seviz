@@ -3,9 +3,11 @@
 #include <iterator>
 #include "DomChapter.h"
 #include "modules/modules.h"
-ModuleManager::ModuleManager(EpubRenderer& render, MainWindow* w) : 
-    m_render(render),
-    m_window(w) {
+
+ModuleManager::ModuleManager(EpubRenderer& render, MainWindow* w)
+    : m_render(render),
+      m_window(w),
+      m_loader(this) {
     for (AbstractModule* m : registrar()) {
         if (!m_container.contains(m->id())) {
             m_container.insert(m->id(), m);
@@ -21,8 +23,37 @@ ModuleManager::~ModuleManager() {
     destroy();
 }
 
-void ModuleManager::bookOpened(Book* book) {
+void ModuleManager::bookOpened(Book* book, QTemporaryDir& epubDir, QList<Chapter>& chapters) {
     m_book = book;
+
+    {
+        QDir dir(epubDir.path());
+        if (dir.cd("seviz")) {
+            // подгрузка преобразованных глав
+
+        } else { 
+            // иначе если файл с книгой не содержит корпусных данных, вызываем загрузчик 
+            dir.mkdir("seviz");
+            dir.cd("seviz");
+            dir.mkdir(m_loader.id());
+            dir.cd(m_loader.id());
+
+            m_loader.importBook(chapters, dir, m_window);
+        }
+    }
+
+    // загрузка данных остальных плагинов
+    m_container.remove(m_loader.id());
+	for (AbstractModule* m : m_container) {
+        QDir dir(epubDir.path()); // QDir каждый раз создается, чтобы гарантировать, что плагин не поменял текущую директорию
+        if (dir.cd("seviz") && dir.cd(m->id())) {
+            m->load(&dir);
+        } else {
+            // если папки нет - передаем NULL, чтобы плагин понял, что загружена новая книга
+            m->load(nullptr);
+        }
+	}
+    m_container.insert(m_loader.id(), &m_loader);
 }
 
 void ModuleManager::forEachModule(std::function<void(AbstractModule*)> functor) {
@@ -44,6 +75,7 @@ QList<Feature*> ModuleManager::getConflictFeaturesFor(const Feature& f) {
 }
 
 void ModuleManager::destroy() {
+    m_container.remove(m_loader.id());
     for (AbstractModule* i : m_container) {
         delete i;
     }

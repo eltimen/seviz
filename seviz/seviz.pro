@@ -62,6 +62,7 @@ SOURCES += \
         BookModels.cpp \
         DomChapter.cpp \
         ModuleManager.cpp \
+        bookloader/bookloader.cpp \
         bookloader/bookloaderdialog.cpp \
         epubrenderer.cpp \
         main.cpp \
@@ -82,6 +83,7 @@ HEADERS += \
         DomChapter.h \
         EventModels.h \
         ModuleManager.h \
+        bookloader/bookloader.h \
         bookloader/bookloaderdialog.h \
         epubrenderer.h \
         exceptions.h \
