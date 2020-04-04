@@ -33,6 +33,8 @@ public:
     void featureDisabled(const Feature& feature);
     void forEachModule(std::function<void(AbstractModule*)> functor);
 
+    EpubRenderer& getBookRender();
+
     // методы для модулей
     AbstractModule* getModule(const QString& id, int minVersion = 0);
     const Book& getBook();

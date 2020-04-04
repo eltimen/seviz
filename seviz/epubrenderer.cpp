@@ -10,9 +10,10 @@
 
 EpubRenderer::EpubRenderer() :
     QObject(nullptr), //parent 
+    m_view(nullptr),
     m_webchannel(new QWebChannel(this))
 {
-    // нужно вызвать setupUi перед передачей виджета, поэтому конструктор без параметров
+    // нужно вызвать setupUi перед передачей виджета, поэтому инициализация m_view через метод setWidget
 }
 
 void EpubRenderer::setWidget(QWebEngineView* widget) {
@@ -32,18 +33,26 @@ QList<Chapter> EpubRenderer::open(Book* book, const QString& opfPath) {
     close();
     QString cmd = QStringLiteral(R"(window.render.open("%1"))").arg(opfPath);
     m_view->page()->runJavaScript(cmd);
-    m_loop.exec();
+    m_openLoop.exec();
     return std::move(m_chapterTitles);
 }
 
 void EpubRenderer::showChapter(int index) {
+    QEventLoop loop;
     QString cmd = QStringLiteral(R"(window.render.display(%1))").arg(index);
-    m_view->page()->runJavaScript(cmd);
+    m_view->page()->runJavaScript(cmd, [&loop](const QVariant&) { loop.exit(0); });
+    loop.exec();
 }
 
 void EpubRenderer::close() {
     QString cmd = QStringLiteral(R"(window.render.close())");
     m_view->page()->runJavaScript(cmd);
+}
+
+void EpubRenderer::tokenizeChapter(int index) {
+    QString cmd = QStringLiteral(R"(window.render.tokenizeChapter(%1))").arg(index);
+    m_view->page()->runJavaScript(cmd);
+    m_tokenizeLoop.exec();
 }
 
 void EpubRenderer::updateChapterView(const DomChapter& dom) {
@@ -136,7 +145,7 @@ void EpubRenderer::setChaptersList(const QVariant& objects) {
         m_chapterTitles <<ch;
         ++i;
     }
-    m_loop.exit(0);   
+    m_openLoop.exit(0);   
 }
 
 void EpubRenderer::setModelDataForChapter(int chapterIndex, const QVariant& data) {
@@ -155,6 +164,7 @@ void EpubRenderer::setModelDataForChapter(int chapterIndex, const QVariant& data
     }
     qDebug() << "model " << chapterIndex;
     m_book->setModelForChapter(chapterIndex, QList<Section> {Section(1, paragraphs)});
+    m_tokenizeLoop.exit(0);
 }
 
 void EpubRenderer::processEvent(const QByteArray& mouseEvent) {

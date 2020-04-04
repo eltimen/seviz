@@ -219,6 +219,7 @@ class Render {
     // извлекает в this.result html куска главы из файла. если глава содержится в нескольких файлах, рекурсивно вызывает сама себя, пока конец главы не найден
     // после того, как вся глава будет на экране, вызывает callback
     result;
+    // TODO переписать с нуля метод ниже
     extractChapterPartHtml = function (i, foundEndOfChapter, callback, searchTo) {
         console.log('call ', i, foundEndOfChapter, searchTo);
         if (!foundEndOfChapter) {
@@ -270,32 +271,27 @@ class Render {
         }
     }.bind(this);
 
+    tokenizeChapter(i) {
+        this.result = document.createElement("div");
+        this.extractChapterPartHtml(i, false, function () {
+            // блокируем все ссылки
+            let lnks = this.result.getElementsByTagName("a");
+            for (let i = 0; i < lnks.length; i++) {
+                lnks[i].onclick = function () { return false; };
+            }
+
+            // инициализируем модель
+            let model = markParagraphs(this.result);
+            this.chapterData[i] = this.result;
+
+            window.core.setModelDataForChapter(i, model);
+        }.bind(this));
+    }
+
     // показывает элемент chapters по заданному индексу
     display(i) {
-        if (this.chapterData[i] == undefined) {
-            console.log("making");
-            this.result = document.createElement("div");
-            this.extractChapterPartHtml(i, false, function () {
-                // блокируем все ссылки
-                let lnks = this.result.getElementsByTagName("a");
-                for (let i = 0; i < lnks.length; i++) {
-                    lnks[i].onclick = function () { return false; };
-                }
-
-                // инициализируем модель
-                let model = markParagraphs(this.result);
-                window.core.setModelDataForChapter(i, model);
-
-                this.chapterData[i] = this.result;
-
-                this.viewer.innerHTML = this.chapterData[i].innerHTML;
-                setupHandlers(this.viewer);
-            }.bind(this));
-        } else {
-            console.log("exist");
-            this.viewer.innerHTML = this.chapterData[i].innerHTML;
-            setupHandlers(this.viewer);
-        }
+        this.viewer.innerHTML = this.chapterData[i].innerHTML;
+        setupHandlers(this.viewer); // TODO переместить эту медленную строчку в tokenize (или сделать асинхронной)
     }
 
     close() {

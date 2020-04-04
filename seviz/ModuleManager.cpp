@@ -28,9 +28,9 @@ void ModuleManager::bookOpened(Book* book, QTemporaryDir& epubDir, QList<Chapter
 
     {
         QDir dir(epubDir.path());
-        if (dir.cd("seviz")) {
+        if (dir.cd("seviz") && dir.cd(m_loader.id())) {
             // подгрузка преобразованных глав
-
+            // TODO
         } else { 
             // иначе если файл с книгой не содержит корпусных данных, вызываем загрузчик 
             dir.mkdir("seviz");
@@ -60,6 +60,10 @@ void ModuleManager::forEachModule(std::function<void(AbstractModule*)> functor) 
     for (AbstractModule* i : m_container) {
         functor(i);
     }
+}
+
+EpubRenderer& ModuleManager::getBookRender() {
+    return m_render;
 }
 
 QList<Feature*> ModuleManager::getConflictFeaturesFor(const Feature& f) {

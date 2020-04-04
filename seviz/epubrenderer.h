@@ -24,6 +24,10 @@ public:
     void showChapter(int index);
     void close();
 
+    void tokenizeChapter(int index);
+    QString getParagraphText(int chapterIndex, int paragraphIndex); // реализовать частичное перетокенизирование (отдельных абзацев)?
+    void setParagraphText(int chapterIndex, int paragraphIndex);
+
     void updateChapterView(const DomChapter& dom);
 
     void addHandler(const Handler& h);
@@ -41,7 +45,8 @@ public slots:
 private:
     QWebEngineView *m_view;
     QWebChannel* m_webchannel;
-    QEventLoop m_loop;
+    QEventLoop m_openLoop;
+    QEventLoop m_tokenizeLoop;
     Book* m_book = nullptr;
 
     QMultiHash<QString, Handler> m_handlers;

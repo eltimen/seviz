@@ -1,4 +1,6 @@
 #include "bookloaderdialog.h"
+
+#include <QTimer>
 #include "ModuleManager.h"
 #include "Book.h"
 #include "ui_bookloaderdialog.h"
@@ -27,11 +29,24 @@ BookLoaderDialog::~BookLoaderDialog() {
 }
 
 void BookLoaderDialog::showEvent(QShowEvent* event) {
-	// emit ?
+	Q_UNUSED(event);
+
 	ui->chaptersTableWidget->setRowCount(m_chapters.size());
 	for (Chapter& ch : m_chapters) {
 		ui->chaptersTableWidget->setItem(ch.id() - 1, 0, new QTableWidgetItem(ch.name()));
 		ui->chaptersTableWidget->setItem(ch.id() - 1, 1, new QTableWidgetItem("Ожидает"));
 	}
 	setFixedWidth(width());
+
+	QTimer::singleShot(0, [this]() {
+		ui->parsingProgressBar->setMinimum(0);
+		ui->parsingProgressBar->setMaximum(m_chapters.size());
+		for (Chapter& ch : m_chapters) {
+			m_engine->getBookRender().tokenizeChapter(ch.id() - 1);
+			ui->chaptersTableWidget->setItem(ch.id() - 1, 1, new QTableWidgetItem("Токенизировано"));
+			ui->parsingProgressBar->setValue(ch.id());
+		}
+		ui->parsingProgressBar->setVisible(false);
+		ui->okButton->setEnabled(true);
+	});
 }
