@@ -49,6 +49,27 @@ void EpubRenderer::close() {
     m_view->page()->runJavaScript(cmd);
 }
 
+QString EpubRenderer::serializeTokenizedChapters() const {
+    QEventLoop loop;
+    QString ret;
+
+    QString cmd = QStringLiteral("window.render.serializeTokenizedChapters();");
+    m_view->page()->runJavaScript(cmd, [&](const QVariant& array) {
+        ret = array.toString();
+        loop.exit(0);
+    });
+    loop.exec();
+
+    return ret;
+}
+
+void EpubRenderer::deserializeTokenizedChapters(const QString& json) const {
+    QEventLoop loop;
+    QString cmd = QStringLiteral("window.render.deserializeTokenizedChapters(%1);").arg(json);
+    m_view->page()->runJavaScript(cmd, [&](const QVariant&) { loop.exit(0); });
+    loop.exec();
+}
+
 void EpubRenderer::tokenizeChapter(int index) {
     QString cmd = QStringLiteral(R"(window.render.tokenizeChapter(%1))").arg(index);
     m_view->page()->runJavaScript(cmd);
@@ -162,9 +183,8 @@ void EpubRenderer::setModelDataForChapter(int chapterIndex, const QVariant& data
         }
         paragraphs.push_back(Paragraph(p.toMap()["id"].toInt(), sentences));
     }
-    qDebug() << "model " << chapterIndex;
     m_book->setModelForChapter(chapterIndex, QList<Section> {Section(1, paragraphs)});
-    m_tokenizeLoop.exit(0);
+    m_tokenizeLoop.exit(0); // TODO
 }
 
 void EpubRenderer::processEvent(const QByteArray& mouseEvent) {

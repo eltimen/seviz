@@ -30,7 +30,7 @@ void ModuleManager::bookOpened(Book* book, QTemporaryDir& epubDir, QList<Chapter
         QDir dir(epubDir.path());
         if (dir.cd("seviz") && dir.cd(m_loader.id())) {
             // подгрузка преобразованных глав
-            // TODO
+            m_loader.load(&dir);
         } else { 
             // иначе если файл с книгой не содержит корпусных данных, вызываем загрузчик 
             dir.mkdir("seviz");

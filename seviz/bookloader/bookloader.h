@@ -13,8 +13,8 @@ public:
 
     bool importBook(QList<Chapter>& chapters, QDir& dir, QWidget* mainWindow);
 
-    // void load(QDir& dir) override;
-    //void save(QDir& dir) override;
+    void load(QDir* dir) override;
+    void save(QDir& dir) override;
 
 private:
     BookLoaderDialog* m_dialog = nullptr;

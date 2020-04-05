@@ -23,6 +23,9 @@ public:
     QList<Chapter> open(Book* book, const QString& opfPath);
     void showChapter(int index);
     void close();
+    QString serializeTokenizedChapters() const;
+    void deserializeTokenizedChapters(const QString& json) const;
+
 
     void tokenizeChapter(int index);
     QString getParagraphText(int chapterIndex, int paragraphIndex); // реализовать частичное перетокенизирование (отдельных абзацев)?

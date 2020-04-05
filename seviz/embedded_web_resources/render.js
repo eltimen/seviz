@@ -207,8 +207,9 @@ class Render {
             }.bind(this));
 
             this.book.opened.then(function () {
-                let chaptersCount = this.chapters.size;
+                let chaptersCount = this.chapters.length;
                 this.chapterData = Array.apply(null, Array(chaptersCount)).map(function () { });
+                this.model = Array.apply(null, Array(chaptersCount)).map(function () { });
                 window.core.setChaptersList(this.chapters);
             }.bind(this));
 
@@ -284,6 +285,7 @@ class Render {
             let model = markParagraphs(this.result);
             this.chapterData[i] = this.result;
 
+            this.model[i] = model;
             window.core.setModelDataForChapter(i, model);
         }.bind(this));
     }
@@ -292,6 +294,34 @@ class Render {
     display(i) {
         this.viewer.innerHTML = this.chapterData[i].innerHTML;
         setupHandlers(this.viewer); // TODO переместить эту медленную строчку в tokenize (или сделать асинхронной)
+    }
+
+    serializeTokenizedChapters() {
+        let arr = [];
+        for (let i = 0; i < this.chapterData.length; ++i) {
+            arr.push(this.chapterData[i].outerHTML);
+        }
+        return JSON.stringify({
+            model: JSON.stringify(this.model),
+            dom: JSON.stringify(arr)
+        });
+    }
+
+    deserializeTokenizedChapters(json) {
+        json.model = JSON.parse(json.model);
+        for (let i = 0; i < json.model.length; ++i) {
+            window.core.setModelDataForChapter(i, json.model[i]);
+        }
+
+        this.chapterData = JSON.parse(json.dom, (key, value) => {
+            if (Array.isArray(value)) {
+                return value;
+            }
+
+            var el = document.createElement('div');
+            el.innerHTML = value;
+            return el.firstChild;
+        });
     }
 
     close() {

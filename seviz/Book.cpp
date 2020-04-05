@@ -47,6 +47,7 @@ void Book::showChapter(int index) {
 
 void Book::save() {
     QDir dir(m_epubDir.path());
+    dir.cd("seviz");
 
     m_moduleManager.forEachModule([this, &dir](AbstractModule* m) {
         if (dir.cd(m->id())) {
