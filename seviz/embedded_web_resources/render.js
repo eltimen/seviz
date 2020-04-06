@@ -275,12 +275,6 @@ class Render {
     tokenizeChapter(i) {
         this.result = document.createElement("div");
         this.extractChapterPartHtml(i, false, function () {
-            // блокируем все ссылки
-            let lnks = this.result.getElementsByTagName("a");
-            for (let i = 0; i < lnks.length; i++) {
-                lnks[i].onclick = function () { return false; };
-            }
-
             // инициализируем модель
             let model = markParagraphs(this.result);
             this.chapterData[i] = this.result;
@@ -293,7 +287,13 @@ class Render {
     // показывает элемент chapters по заданному индексу
     display(i) {
         this.viewer.innerHTML = this.chapterData[i].innerHTML;
-        setupHandlers(this.viewer); // TODO переместить эту медленную строчку в tokenize (или сделать асинхронной)
+        // TODO переместить действия ниже в tokenize (или сделать асинхронной)
+        // блокируем все ссылки
+        let lnks = this.viewer.getElementsByTagName("a");
+        for (let i = 0; i < lnks.length; i++) {
+            lnks[i].onclick = function () { return false; };
+        }
+        setupHandlers(this.viewer); 
     }
 
     serializeTokenizedChapters() {
