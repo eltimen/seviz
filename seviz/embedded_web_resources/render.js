@@ -2,7 +2,15 @@ function addListenerMulti(el, s, fn) {
     s.split(' ').forEach(e => el.addEventListener(e, fn, false));
 } 
 
-function clearStyles(el) {
+let tooltips = [];
+
+function addTooltip(selector, text) {
+    let el = document.querySelector(selector);
+    el.setAttribute("data-tooltip", text);
+    tooltips.push(el)
+}
+
+function cleanupBeforeRender(el) {
     let pars = el.getElementsByTagName('p');
     for (let p of pars) {
         for (let s of p.children) {
@@ -13,6 +21,16 @@ function clearStyles(el) {
         }
         p.style.cssText = "";
     }
+
+    document.querySelectorAll("SPAN.supsub > *").forEach(el => {
+        el.style.cssText = "";
+        el.textContent = "";
+    });
+
+    tooltips.forEach(el => {
+        el.removeAttribute("data-tooltip");
+    });
+    tooltips = [];
 }
 
 function makePos(node) {
@@ -89,8 +107,53 @@ function setupHandlers(viewer) {
     }
 }
 
+function tokenizeAndPrepareDomParagraph(par, i) {
+    let parParent = par.parentNode;
+    var strParId = String(i + 1);
+
+    let beforeNode = document.createElement('span');
+    var domString = "<span class=\"supsub\"><sup id=\"shl" + strParId + "\"></sup><sub id=\"sdl" + strParId + "\"></sub></span>";
+    beforeNode.innerHTML = domString;
+    parParent.insertBefore(beforeNode.firstChild, par);
+
+    let afterNode = document.createElement('span');
+    var domString = "<span class=\"supsub\"><sup id=\"shr" + strParId + "\"></sup><sub id=\"sdr" + strParId + "\"></sub></span>";
+    afterNode.innerHTML = domString;
+    parParent.insertBefore(afterNode.firstChild, par.nextSibling);
+
+    par.setAttribute("id", i + 1);
+    let rawSplitData = splitter.split(par.textContent);
+    let parInnerHtml = "";
+    let sentArr = [];
+    // собираем абзац как набор маркированных предложений
+    let sentId = 1;
+    rawSplitData.forEach(el => {
+        if (el.type == "Sentence") {
+            let wordsArr = [];
+            let strSentTailId = strParId + "_" + String(sentId);
+            let sentHtml = "<span class=\"supsub\"><sup id=\"shl" + strSentTailId + "\"></sup><sub id=\"sdl" + strSentTailId + "\"></sub></span>" +
+                "<sentence id=\"" + String(sentId) + "\">";
+            let words = el.raw.match(/([\w]+|\.|,|"|'|:|”|“|!|\(|\)|;|‘|’)/g);
+            for (let wordId = 0; wordId < words.length; ++wordId) {
+                wordsArr.push({ id: wordId + 1, text: words[wordId] });
+                let strWordId = String(wordId + 1);
+                let strTailId = strParId + "_" + String(sentId) + "_" + strWordId;
+                sentHtml += "<span class=\"supsub\"><sup id=\"shl" + strTailId + "\"></sup><sub id=\"sdl" + strTailId + "\"></sub></span>" +
+                    "<word id=\"" + strWordId + "\">" + words[wordId] + " </word>" +
+                    "<span class=\"supsub\"><sup id=\"shr" + strTailId + "\"></sup><sub id=\"sdr" + strTailId + "\"></sub></span>";
+            }
+            sentHtml += "</sentence>" +
+                "<span class=\"supsub\"><sup id=\"shr" + strSentTailId + "\"></sup><sub id=\"sdr" + strSentTailId + "\"></sub></span>";
+            sentArr.push({ id: sentId, words: wordsArr });
+            parInnerHtml += sentHtml;
+            sentId++;
+        }
+    });
+    par.innerHTML = parInnerHtml;
+    return { id: i + 1, sentences: sentArr };
+}
+
 function markParagraphs(viewer) {
-    // TODO кешировать результат для каждой главы
     // TODO реакция на некорректный символ в предложении. необходимо отбросить его и продолжить работу
     let outParagraphs = [];
     pars = viewer.getElementsByTagName("p");
@@ -99,32 +162,20 @@ function markParagraphs(viewer) {
             "paragraphs": [ { "id": 1, "sentences": [ { "id": 1, "text": [{1,"word1"}, {2,"."}] } ] } ] }
         */
 
-        pars[i].setAttribute("id", i + 1);         
-        let rawSplitData = splitter.split(pars[i].textContent);
-        let parInnerHtml = "";
-        let sentArr = [];
-        // собираем абзац как набор маркированных предложений
-        let sentId = 1;
-        rawSplitData.forEach(el => {
-            if (el.type == "Sentence") {
-                let wordsArr = [];
-                let sentHtml = "<sentence id=\"" + String(sentId) + "\">";
-                let words = el.raw.match(/([\w]+|\.|,|"|'|:|”|“|!|\(|\)|;|‘|’)/g);
-                for (let wordId = 0; wordId < words.length; ++wordId) {
-                    wordsArr.push({ id: wordId + 1, text: words[wordId] });
-                    sentHtml += "<word id=\"" + String(wordId + 1) + "\">" + words[wordId] + " </word>";
-                }
-                sentHtml += "</sentence> ";
-                sentArr.push({ id: sentId, words: wordsArr });
-                parInnerHtml += sentHtml;
-                sentId++;
-            } 
-        });
-        outParagraphs.push({ id: i + 1, sentences: sentArr });
-        pars[i].innerHTML = parInnerHtml;
+        let par = pars[i];
+        outParagraphs.push(tokenizeAndPrepareDomParagraph(par, i));
     }
     return outParagraphs;
 };
+
+function replaceParagraphContent(chId, parId, text) {
+    let par = render.chapterData[chId - 1].querySelector("p:nth-of-type(" + String(parId) + ")");
+    par.innerText = text;
+    console.log(render.model[chId - 1][parId - 1]);
+    let model = tokenizeAndPrepareDomParagraph(par, parId - 1)
+    render.model[chId-1][parId-1] = model;
+    window.core.setModelDataForParagraph(chId-1, parId-1, model);
+}
 
 class Render {
     book;
@@ -143,33 +194,35 @@ class Render {
         document.getElementById("viewer").style.visibility = "visible";
         this.book = ePub(path);
         this.chapters = [];
+        this.toc = {};
         this.alreadyOpened = true;
 
         this.book.loaded.navigation.then(function (toc) {
 
-            let processSubItems = (chapter) => {
+            let processSubItems = (chapter, depth) => {
+                if (depth === 0) {
+                    return;
+                }
                 chapter.subitems.forEach((el) => {
                     this.chapters.push(el);
-                    processSubItems(el);
+                    processSubItems(el, depth-1);
                 });
             };
 
+            this.toc = toc;
+
+            console.log(toc);
+
             toc.forEach(function (chapter) {
                 this.chapters.push(chapter);
-                processSubItems(chapter);
+                processSubItems(chapter, 1);
 
             }.bind(this));
 
-            //$select.appendChild(docfrag);
-
-            //$select.onchange = function () {
-            //    var index = $select.selectedIndex,
-            //        url = $select.options[index].ref;
-            //    display(url);
-            //    return false;
-            //};
-
             this.book.opened.then(function () {
+                let chaptersCount = this.chapters.length;
+                this.chapterData = Array.apply(null, Array(chaptersCount)).map(function () { });
+                this.model = Array.apply(null, Array(chaptersCount)).map(function () { });
                 window.core.setChaptersList(this.chapters);
             }.bind(this));
 
@@ -177,60 +230,118 @@ class Render {
         
     };
 
+    // извлекает в this.result html куска главы из файла. если глава содержится в нескольких файлах, рекурсивно вызывает сама себя, пока конец главы не найден
+    // после того, как вся глава будет на экране, вызывает callback
+    result;
+    // TODO переписать с нуля метод ниже
+    extractChapterPartHtml = function (i, foundEndOfChapter, callback, searchTo) {
+        console.log('call ', i, foundEndOfChapter, searchTo);
+        if (!foundEndOfChapter) {
+            // получаем html файл (spine) с нужной главой. если глава разбита на несколько файлов, рекурсивно загружаем соседние
+            var section = this.book.spine.get(this.chapters[i].href);
+            if (section) {
+                section.render().then(function (html) {
+                    // собираем dom-дерево, содержащее только заданную главу
+                    let chapterDoc = new DOMParser().parseFromString(html, 'text/html');
+                    // находим id начала этой главы и следующей.
+                    let idFrom = this.chapters[i].href.split('#')[1];
+                    let idTo = i + 1 < this.chapters.length ? this.chapters[i + 1].href.split('#')[1] : null;
+
+                    // если url файла не содержит никаких ID, то глава вся находится в файле
+                    if (idFrom == null && idTo == null) {
+                        this.result.innerHTML += html;
+                        console.log("inner");
+                    } else {
+                        // иначе вырезаем главу из остальных элементов страницы
+                        let currentElem;
+                        if (searchTo != undefined) {
+                            currentElem = chapterDoc.body.firstElementChild;
+                            idTo = searchTo;
+                        } else {
+                            currentElem = chapterDoc.getElementById(idFrom);
+                        }
+                        console.log('idFrom: ' + idFrom + ' idTo: ' + idTo);
+                        while (currentElem != null && (currentElem.id != idTo || idTo == null)) {
+                            // показываем элемент
+                            this.result.appendChild(currentElem.cloneNode(true));
+                            // TODO не просто проверить, есть ли в следующем узле элемент оглавления idTo, но и вырезать все элементы до него
+                            if (currentElem instanceof Element && currentElem.querySelector("#" + idTo) != null) {
+                                break;
+                            }
+                            currentElem = currentElem.nextSibling;
+                            // если достигнут конец текущего уровня иерархии DOM html-файла, но не найден конец главы
+                            if (idTo != null && currentElem == null) {
+                                console.log('call 2');
+                                return this.extractChapterPartHtml(i + 1, false, callback, idTo);
+                            } 
+                        }
+                        return this.extractChapterPartHtml(i, true, callback);
+                    }
+                }.bind(this));
+            }
+        } else {
+            console.log('callback');
+            callback(this.result);
+        }
+    }.bind(this);
+
+    tokenizeChapter(i) {
+        this.result = document.createElement("div");
+        this.extractChapterPartHtml(i, false, function () {
+            // инициализируем модель
+            let model = markParagraphs(this.result);
+            this.chapterData[i] = this.result;
+
+            this.model[i] = model;
+            window.core.setModelDataForChapter(i, model);
+        }.bind(this));
+    }
+
     // показывает элемент chapters по заданному индексу
     display(i) {
-        console.log(i);
-        // получаем html файл с нужной главой
-        var section = this.book.spine.get(this.chapters[i].href);
-        if (section) {
-            section.render().then(function (html) {
-                // собираем dom-дерево, содержащее только заданную главу
-                this.viewer.innerHTML = "";
-                let chapterDoc = new DOMParser().parseFromString(html, 'text/html');
-                // находим id начала этой главы и следующей.
-                // TODO поменять способ итерации на учитывающий дочерние узлы
-                // TODO реализовать загрузку данной главы из соседних html файлов. сейчас показывается только из начального html
-                let from = this.chapters[i].href.split('#')[1];
-                let to = i+1 < this.chapters.length ? this.chapters[i+1].href.split('#')[1] : null;
-                console.log('from: ' + from + ' to: ' + to);
-
-                // проверяем, что ссылка на главу не содержит в себе селектор элемента из html-файла секции
-                if (from == null && to == null) {
-                    this.viewer.innerHTML = html;
-                } else {
-                    // иначе вырезаем главу из остальных элементов страницы
-                    let currentElem = chapterDoc.getElementById(from);
-                    while (currentElem != null && (currentElem.id != to || to == null)) {
-                        // показываем элемент
-                        this.viewer.appendChild(currentElem.cloneNode(true));
-                        currentElem = currentElem.nextSibling;
-                        if (currentElem == null) console.log('currentElem = null'); // debug
-                    }
-                }
-
-                // блокируем все ссылки
-                let lnks = this.viewer.getElementsByTagName("a");
-                for (let i = 0; i < lnks.length; i++) {
-                    lnks[i].onclick = function () { return false; };
-                }
-
-                // инициализируем модель
-                let model = markParagraphs(this.viewer);
-                window.core.setModelDataForChapter(i, model);
-
-                setupHandlers(this.viewer);
-            }.bind(this));
+        this.viewer.innerHTML = this.chapterData[i].innerHTML;
+        // TODO переместить действия ниже в tokenize (или сделать асинхронной)
+        // блокируем все ссылки
+        let lnks = this.viewer.getElementsByTagName("a");
+        for (let i = 0; i < lnks.length; i++) {
+            lnks[i].onclick = function () { return false; };
         }
-
-        return section;
+        setupHandlers(this.viewer); 
     }
 
-    close() {
-        if (this.book != undefined) {
-            //this.rendition.destroy();
+    serializeTokenizedChapters() {
+        let arr = [];
+        for (let i = 0; i < this.chapterData.length; ++i) {
+            arr.push(this.chapterData[i].outerHTML);
         }
+        return JSON.stringify({
+            model: JSON.stringify(this.model),
+            dom: JSON.stringify(arr)
+        });
     }
 
+    deserializeTokenizedChapters(json) {
+        json.model = JSON.parse(json.model);
+        for (let i = 0; i < json.model.length; ++i) {
+            window.core.setModelDataForChapter(i, json.model[i]);
+        }
+
+        this.chapterData = JSON.parse(json.dom, (key, value) => {
+            if (Array.isArray(value)) {
+                return value;
+            }
+
+            var el = document.createElement('div');
+            el.innerHTML = value;
+            return el.firstChild;
+        });
+    }
+}
+
+function closeBook() {
+    window.render = new Render();
+    document.getElementById("help").style.display = "visible";
+    document.getElementById("viewer").style.visibility = "none";
 }
 
 let render = new Render();

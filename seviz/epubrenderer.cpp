@@ -10,9 +10,10 @@
 
 EpubRenderer::EpubRenderer() :
     QObject(nullptr), //parent 
+    m_view(nullptr),
     m_webchannel(new QWebChannel(this))
 {
-    // нужно вызвать setupUi перед передачей виджета, поэтому конструктор без параметров
+    // нужно вызвать setupUi перед передачей виджета, поэтому инициализация m_view через метод setWidget
 }
 
 void EpubRenderer::setWidget(QWebEngineView* widget) {
@@ -32,25 +33,84 @@ QList<Chapter> EpubRenderer::open(Book* book, const QString& opfPath) {
     close();
     QString cmd = QStringLiteral(R"(window.render.open("%1"))").arg(opfPath);
     m_view->page()->runJavaScript(cmd);
-    m_loop.exec();
+    m_openLoop.exec();
     return std::move(m_chapterTitles);
 }
 
 void EpubRenderer::showChapter(int index) {
+    QEventLoop loop;
     QString cmd = QStringLiteral(R"(window.render.display(%1))").arg(index);
-    m_view->page()->runJavaScript(cmd);
+    m_view->page()->runJavaScript(cmd, [&loop](const QVariant&) { loop.exit(0); });
+    loop.exec();
 }
 
 void EpubRenderer::close() {
-    QString cmd = QStringLiteral(R"(window.render.close())");
+    QString cmd = QStringLiteral(R"(closeBook())");
     m_view->page()->runJavaScript(cmd);
 }
 
+QString EpubRenderer::serializeTokenizedChapters() const {
+    QEventLoop loop;
+    QString ret;
+
+    QString cmd = QStringLiteral("window.render.serializeTokenizedChapters();");
+    m_view->page()->runJavaScript(cmd, [&](const QVariant& array) {
+        ret = array.toString();
+        loop.exit(0);
+    });
+    loop.exec();
+
+    return ret;
+}
+
+void EpubRenderer::deserializeTokenizedChapters(const QString& json) const {
+    QEventLoop loop;
+    QString cmd = QStringLiteral("window.render.deserializeTokenizedChapters(%1);").arg(json);
+    m_view->page()->runJavaScript(cmd, [&](const QVariant&) { loop.exit(0); });
+    loop.exec();
+}
+
+void EpubRenderer::tokenizeChapter(int index) {
+    QString cmd = QStringLiteral(R"(window.render.tokenizeChapter(%1))").arg(index);
+    m_view->page()->runJavaScript(cmd);
+    m_tokenizeLoop.exec();
+}
+
+QString EpubRenderer::getParagraphText(const Position& pos) {
+    QEventLoop loop;
+    QString ret;
+    QString cmd = QStringLiteral("render.chapterData[%1].querySelector(\"p:nth-of-type(%2)\").innerText;").arg(pos.chapterIndex()).arg(pos.paragraphId());
+    m_view->page()->runJavaScript(cmd, [&](const QVariant& str) { 
+        ret = str.toString();
+        loop.exit(0); 
+    });
+    loop.exec();
+    return ret;
+}
+
+void EpubRenderer::setParagraphText(const Position& pos, const QString& str) {
+    QString cmd = QStringLiteral("replaceParagraphContent(%1, %2, \"%3\");").arg(pos.chapterId()).arg(pos.paragraphId()).arg(str);
+    m_view->page()->runJavaScript(cmd, [&](const QVariant&) { });
+}
+
 void EpubRenderer::updateChapterView(const DomChapter& dom) {
-    m_view->page()->runJavaScript("clearStyles(window.render.viewer);");
+    m_view->page()->runJavaScript("cleanupBeforeRender(window.render.viewer);");
+    
     const QMap<Position, QString>& styles = dom.getStyles();
     for (QMap<Position, QString>::const_iterator it = styles.begin(); it != styles.end(); ++it) {
         QString cmd = QStringLiteral(R"(document.querySelector("%1").style.cssText = "%2";)").arg(it.key().cssSelector(), it.value());
+        m_view->page()->runJavaScript(cmd);
+    }
+
+    const QMap<Position, QString>& tails = dom.getTails();
+    for (QMap<Position, QString>::const_iterator it = tails.begin(); it != tails.end(); ++it) {
+        QString cmd = QStringLiteral(R"(document.querySelector("%1").textContent = "%2";)").arg(it.key().cssSelector(), it.value());
+        m_view->page()->runJavaScript(cmd);
+    }
+ 
+    const QMap<Position, QString>& tooltips = dom.getTooltips();
+    for (QMap<Position, QString>::const_iterator it = tooltips.begin(); it != tooltips.end(); ++it) {
+        QString cmd = QStringLiteral(R"(addTooltip("%1", "%2");)").arg(it.key().cssSelector(), it.value());
         m_view->page()->runJavaScript(cmd);
     }
 }
@@ -123,7 +183,19 @@ void EpubRenderer::setChaptersList(const QVariant& objects) {
         m_chapterTitles <<ch;
         ++i;
     }
-    m_loop.exit(0);   
+    m_openLoop.exit(0);   
+}
+
+void EpubRenderer::setModelDataForParagraph(int chapterIndex, int parIndex, const QVariant& par) {
+    QList<Sentence> sentences;
+    for (const QVariant& s : par.toMap().value("sentences").toList()) {
+        QList<Word> words;
+        for (const QVariant& w : s.toMap().value("words").toList()) {
+            words.push_back(Word(w.toMap()["id"].toInt(), w.toMap()["text"].toString()));
+        }
+        sentences.push_back(Sentence(s.toMap()["id"].toInt(), words));
+    }
+    m_book->setModelForParagraph(chapterIndex, parIndex, sentences);
 }
 
 void EpubRenderer::setModelDataForChapter(int chapterIndex, const QVariant& data) {
@@ -140,8 +212,8 @@ void EpubRenderer::setModelDataForChapter(int chapterIndex, const QVariant& data
         }
         paragraphs.push_back(Paragraph(p.toMap()["id"].toInt(), sentences));
     }
-    qDebug() << "model " << chapterIndex;
     m_book->setModelForChapter(chapterIndex, QList<Section> {Section(1, paragraphs)});
+    m_tokenizeLoop.exit(0); // TODO
 }
 
 void EpubRenderer::processEvent(const QByteArray& mouseEvent) {

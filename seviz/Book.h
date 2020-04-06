@@ -29,6 +29,7 @@ public:
     const Word& getWord(const Position& pos) const;
 
     void setModelForChapter(int chapterIndex, const QList<Section>& data);
+    void setModelForParagraph(int chapterIndex, int paragraphIndex, const QList<Sentence>& data);
 
 private:
     QTemporaryDir m_epubDir;

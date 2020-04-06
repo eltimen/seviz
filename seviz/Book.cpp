@@ -26,18 +26,8 @@ void Book::open() {
             // TODO взять путь к opf из META_INF/container.xml. пока берем первый попавшийся opf из epub
             QString opf = files.filter(QRegularExpression(".\.opf$"))[0];
             m_chapters = m_renderer->open(this, opf);
-            m_moduleManager.bookOpened(this);
+            m_moduleManager.bookOpened(this, m_epubDir, m_chapters);
 
-            m_moduleManager.forEachModule([this](AbstractModule* m) {
-                // если есть папка с именем плагина - вызвать load и передать эту папку
-                QDir dir(m_epubDir.path());
-                if (dir.cd("seviz") && dir.cd(m->id())) {
-                    m->load(&dir);
-                } else {
-                    // если папки нет - передаем NULL, чтобы плагин понял, что загружена новая книга
-                    m->load(nullptr);
-                }
-            });
         } else {
             throw InvalidEpubException();
         }
@@ -49,11 +39,14 @@ void Book::open() {
 void Book::showChapter(int index) {
     m_currentChapterIndex = index;
     m_renderer->showChapter(index);
+
+    if (m_chapters[index].sections.size() > 0) {
+        m_moduleManager.triggerRerendering(m_chapters[index].firstPos(), m_chapters[index].lastPos());
+    }
 }
 
 void Book::save() {
     QDir dir(m_epubDir.path());
-    dir.mkdir("seviz");
     dir.cd("seviz");
 
     m_moduleManager.forEachModule([this, &dir](AbstractModule* m) {
@@ -141,7 +134,8 @@ const Word& Book::getWord(const Position& pos) const {
 
 void Book::setModelForChapter(int chapterIndex, const QList<Section>& data) {
     m_chapters[chapterIndex].sections = data;
-    if (m_chapters[chapterIndex].sections.size() > 0) {
-        m_moduleManager.triggerRerendering(m_chapters[chapterIndex].firstPos(), m_chapters[chapterIndex].lastPos());
-    }
+}
+
+void Book::setModelForParagraph(int chapterIndex, int paragraphIndex, const QList<Sentence>& data) {
+    m_chapters[chapterIndex].sections[0][paragraphIndex] = Paragraph(paragraphIndex+1, data);
 }

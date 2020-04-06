@@ -23,6 +23,12 @@ public:
     QList<Chapter> open(Book* book, const QString& opfPath);
     void showChapter(int index);
     void close();
+    QString serializeTokenizedChapters() const;
+    void deserializeTokenizedChapters(const QString& json) const;
+
+    void tokenizeChapter(int index);
+    QString getParagraphText(const Position& pos); 
+    void setParagraphText(const Position& pos, const QString& str);
 
     void updateChapterView(const DomChapter& dom);
 
@@ -35,13 +41,15 @@ public:
 public slots:
     // функции, доступные из js
     void setChaptersList(const QVariant&);
+    void setModelDataForParagraph(int chapterIndex, int parIndex, const QVariant& sentences);
     void setModelDataForChapter(int chapterIndex, const QVariant& paragraphs);
     void processEvent(const QByteArray& mouseEvent);
 
 private:
     QWebEngineView *m_view;
     QWebChannel* m_webchannel;
-    QEventLoop m_loop;
+    QEventLoop m_openLoop;
+    QEventLoop m_tokenizeLoop;
     Book* m_book = nullptr;
 
     QMultiHash<QString, Handler> m_handlers;

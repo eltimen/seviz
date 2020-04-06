@@ -9,14 +9,22 @@ class Chapter;
 class Section;
 class Paragraph;
 class Sentence;
-class Word; // знаки пунктуации - пусть пока будут тоже словами
+class Word; // Р·РЅР°РєРё РїСѓРЅРєС‚СѓР°С†РёРё Рё СЃР»РѕРІР°
 
 class Scene;
 class Fragment;
 
+enum TailPosition {
+    NOT_TAIL = 0,
+    TOPLEFT,
+    TOPRIGHT,
+    BOTTOMLEFT,
+    BOTTOMRIGHT
+};
+
 class Position {
 public:
-    Position(int idChapter, int idSection = -1, int idParagraph = -1, int idSentence = -1, int idWord = -1, const Book* book = nullptr);
+    Position(int idChapter, int idSection = -1, int idParagraph = -1, int idSentence = -1, int idWord = -1, TailPosition tail = NOT_TAIL, const Book* book = nullptr);
     Position() : Position(1) {}
 
     bool operator<(const Position& o) const;
@@ -32,23 +40,29 @@ public:
     int paragraphIndex() const { return m_idParagraph - 1; }
     int sentenceIndex() const { return m_idSentence - 1; }
     int wordIndex() const { return m_idWord - 1; }
-
     int chapterId() const { return m_idChapter; }
     int sectionId() const { return m_idSection; }
     int paragraphId() const { return m_idParagraph; }
     int sentenceId() const { return m_idSentence; }
     int wordId() const { return m_idWord; }
+    TailPosition tail() const { return m_tail; }
 
     bool hasElement(ElementType type);
 
     void setBook(const Book* book) { m_book = book; }
 
-    // !!! для функций-итераторов предварительно нужно задать книгу через setBook
+    // !!! РґР»СЏ С„СѓРЅРєС†РёР№-РёС‚РµСЂР°С‚РѕСЂРѕРІ РїСЂРµРґРІР°СЂРёС‚РµР»СЊРЅРѕ РЅСѓР¶РЅРѕ Р·Р°РґР°С‚СЊ РєРЅРёРіСѓ С‡РµСЂРµР· setBook
     Position prevChapter() const;
     Position prevSection() const;
     Position prevParagraph() const;
     Position prevSentence() const; 
     Position prevWord() const;
+
+    bool hasPrevChapter() const;
+    bool hasPrevSection() const;
+    bool hasPrevParagraph() const;
+    bool hasPrevSentence() const;
+    bool hasPrevWord() const;
 
     Position nextChapter() const;
     Position nextSection() const;    
@@ -73,6 +87,8 @@ private:
     int m_idParagraph;
     int m_idSentence;
     int m_idWord;
+    TailPosition m_tail;
+
 
     const Book* m_book;
 };
@@ -201,6 +217,6 @@ class Scene : public QList<Fragment> {
 
 class Fragment {
     int id;
-    QPair<Position, Position> positions; // границы по предложениям
+    QPair<Position, Position> positions; // РіСЂР°РЅРёС†С‹ РїРѕ РїСЂРµРґР»РѕР¶РµРЅРёСЏРј
 };
 

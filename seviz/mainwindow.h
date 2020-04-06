@@ -32,7 +32,7 @@ private:
     EpubRenderer* m_bookViewer = nullptr;
     ModuleManager m_manager;
 
-    QMap<Feature, QAction*> m_actions;
+    QMap<Feature, QPair<QAction*,QAction*>> m_actions;
 };
 
 #endif // MAINWINDOW_H

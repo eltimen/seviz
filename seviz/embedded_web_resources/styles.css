@@ -7,7 +7,7 @@ body {
   position: absolute;
   height: 100%;
   width: 100%;
-  min-height: 800px;
+  min-height: 100px;
 }
 
 #title {
@@ -23,6 +23,34 @@ body {
 #title:hover {
   color: #777;
 }
+
+/* ---toltips---*/
+[data-tooltip]:before {
+    /* needed - do not touch */
+    content: attr(data-tooltip);
+    position: absolute;
+    opacity: 0;
+    /* customizable */
+    padding: 5px;
+    color: #333;
+    border-radius: 10px;
+    box-shadow: 2px 2px 1px silver;
+}
+
+[data-tooltip]:hover:before {
+    /* needed - do not touch */
+    opacity: 1;
+    /* customizable */
+    background: ivory;
+    border: 1px solid;
+    margin-top: 10px;
+    margin-left: 20px;
+}
+
+[data-tooltip]:not([data-tooltip-persistent]):before {
+    pointer-events: none;
+}
+/* ---toltips---*/
 
 #viewer.scrolled {
   visibility: hidden; 

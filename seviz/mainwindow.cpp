@@ -48,9 +48,10 @@ void MainWindow::setupModules() {
             addDockWidget(f.dockLocation(), f.window());
             f.window()->hide();
 
-            // добавление кнопки на тулбар
-            QToolBar* toolbar = ui->mainToolBar;
-            QAction* action = toolbar->addAction(f.icon(), f.name(), [this, f] (bool checked) mutable {
+            const auto onFeatureTriggered = [this, f](bool checked) mutable {
+                m_actions[f].first->setChecked(checked);
+                m_actions[f].second->setChecked(checked);
+
                 if (checked) {
                     // TODO сделать неактивными все фичи, конфликтующие с включенной
                     m_manager.featureEnabled(f);
@@ -59,9 +60,22 @@ void MainWindow::setupModules() {
                     f.window()->hide();
                     m_manager.featureDisabled(f);
                 }
-            });
-            m_actions.insert(f, action);
-            action->setCheckable(true);
+            };
+
+            // добавление кнопки на тулбар
+            QToolBar* toolbar = ui->mainToolBar;
+            QAction* toolbarAction = toolbar->addAction(f.icon(), f.name(), onFeatureTriggered);
+            toolbarAction->setCheckable(true);
+
+            // добавление пунктов меню
+            QMenu* menu = ui->modulesMenu;
+            QAction* menuAction = menu->addAction(f.icon(), f.name(), onFeatureTriggered);
+            if (f.menu()) {
+                menuAction->setMenu(f.menu());
+            }
+            menuAction->setCheckable(true);
+
+            m_actions.insert(f, qMakePair(toolbarAction,menuAction));
         }
     });
 }
@@ -73,6 +87,7 @@ void MainWindow::onFileOpen() {
         m_book = new Book(path, m_bookViewer, m_manager); 
         m_book->open();
         ui->mainToolBar->setEnabled(true);
+        ui->modulesMenu->setEnabled(true);
         ui->fileSaveAction->setEnabled(true);
         ui->chapterComboBox->setEnabled(true);
         ui->chapterComboBox->clear();
