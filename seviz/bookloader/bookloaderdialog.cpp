@@ -9,8 +9,7 @@ BookLoaderDialog::BookLoaderDialog(QWidget* parent, ModuleManager* engine, QList
 	: QDialog(parent, Qt::CustomizeWindowHint
 					| Qt::WindowTitleHint
 					| Qt::WindowSystemMenuHint
-					| Qt::WindowMaximizeButtonHint
-					| Qt::WindowCloseButtonHint),
+					| Qt::WindowMaximizeButtonHint),
 	  ui(new Ui::BookLoaderDialog),
 	  m_engine(engine),
 	  m_chapters(chapters),
