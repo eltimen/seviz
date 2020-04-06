@@ -23,6 +23,9 @@ bool BookLoader::importBook(QList<Chapter>& chapters, QDir& dir, QWidget* mainWi
 
 void BookLoader::load(QDir* dir) {
     assert(dir);
+
+    // TODO реализовать прогресс открытия по загрузке модели и по каждому DOMу главы. скорее всего не здесь, а поближе к EpubRenderer
+
     // загрузка токенизированных глав из файла
     QFile file(dir->path() + "/tokenizedDom.json");
     if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -35,6 +38,8 @@ void BookLoader::load(QDir* dir) {
 }
 
 void BookLoader::save(QDir& dir) {
+    // TODO реализовать прогресс-бар открытия по загрузке модели и по каждому DOMу главы. скорее всего не здесь, а поближе к EpubRenderer
+
     // сохранение токензированной главы в файл
     QFile file(dir.path() + "/tokenizedDom.json");
     // WARNING файл перезаписывается, даже если книга не была импортирована в этот раз

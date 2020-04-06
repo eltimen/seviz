@@ -28,7 +28,7 @@ public:
 
     void tokenizeChapter(int index);
     QString getParagraphText(const Position& pos); 
-    void setParagraphText(const Position& pos, const QString& str); // реализовать частичное перетокенизирование (отдельных абзацев)?
+    void setParagraphText(const Position& pos, const QString& str);
 
     void updateChapterView(const DomChapter& dom);
 
