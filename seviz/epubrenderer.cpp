@@ -45,7 +45,7 @@ void EpubRenderer::showChapter(int index) {
 }
 
 void EpubRenderer::close() {
-    QString cmd = QStringLiteral(R"(window.render.close())");
+    QString cmd = QStringLiteral(R"(closeBook())");
     m_view->page()->runJavaScript(cmd);
 }
 

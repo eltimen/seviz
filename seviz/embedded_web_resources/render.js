@@ -336,13 +336,12 @@ class Render {
             return el.firstChild;
         });
     }
+}
 
-    close() {
-        if (this.book != undefined) {
-            //this.rendition.destroy();
-        }
-    }
-
+function closeBook() {
+    window.render = new Render();
+    document.getElementById("help").style.display = "visible";
+    document.getElementById("viewer").style.visibility = "none";
 }
 
 let render = new Render();
