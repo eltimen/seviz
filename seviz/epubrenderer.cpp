@@ -76,6 +76,18 @@ void EpubRenderer::tokenizeChapter(int index) {
     m_tokenizeLoop.exec();
 }
 
+QString EpubRenderer::getParagraphText(const Position& pos) {
+    QEventLoop loop;
+    QString ret;
+    QString cmd = QStringLiteral("render.chapterData[%1].querySelector(\"p:nth-of-type(%2)\").innerText;").arg(pos.chapterIndex()).arg(pos.paragraphId());
+    m_view->page()->runJavaScript(cmd, [&](const QVariant& str) { 
+        ret = str.toString();
+        loop.exit(0); 
+    });
+    loop.exec();
+    return ret;
+}
+
 void EpubRenderer::updateChapterView(const DomChapter& dom) {
     m_view->page()->runJavaScript("cleanupBeforeRender(window.render.viewer);");
     

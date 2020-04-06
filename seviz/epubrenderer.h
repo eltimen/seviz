@@ -26,10 +26,9 @@ public:
     QString serializeTokenizedChapters() const;
     void deserializeTokenizedChapters(const QString& json) const;
 
-
     void tokenizeChapter(int index);
-    QString getParagraphText(int chapterIndex, int paragraphIndex); // реализовать частичное перетокенизирование (отдельных абзацев)?
-    void setParagraphText(int chapterIndex, int paragraphIndex);
+    QString getParagraphText(const Position& pos); 
+    void setParagraphText(const Position& pos, const QString& str); // реализовать частичное перетокенизирование (отдельных абзацев)?
 
     void updateChapterView(const DomChapter& dom);
 

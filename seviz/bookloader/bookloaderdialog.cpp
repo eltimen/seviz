@@ -14,7 +14,8 @@ BookLoaderDialog::BookLoaderDialog(QWidget* parent, ModuleManager* engine, QList
 	  ui(new Ui::BookLoaderDialog),
 	  m_engine(engine),
 	  m_chapters(chapters),
-	  m_dir(dir) {
+	  m_dir(dir) 
+{
 	ui->setupUi(this);
 
 	ui->chaptersTableWidget->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
@@ -48,5 +49,8 @@ void BookLoaderDialog::showEvent(QShowEvent* event) {
 		}
 		ui->parsingProgressBar->setVisible(false);
 		ui->okButton->setEnabled(true);
+
+		qDebug() << m_engine->getBookRender().getParagraphText(Position(4, 1, 1));
+
 	});
 }
