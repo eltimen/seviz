@@ -41,6 +41,7 @@ public:
 public slots:
     // функции, доступные из js
     void setChaptersList(const QVariant&);
+    void setModelDataForParagraph(int chapterIndex, int parIndex, const QVariant& sentences);
     void setModelDataForChapter(int chapterIndex, const QVariant& paragraphs);
     void processEvent(const QByteArray& mouseEvent);
 

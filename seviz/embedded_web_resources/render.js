@@ -107,6 +107,52 @@ function setupHandlers(viewer) {
     }
 }
 
+function tokenizeAndPrepareDomParagraph(par, i) {
+    let parParent = par.parentNode;
+    var strParId = String(i + 1);
+
+    let beforeNode = document.createElement('span');
+    var domString = "<span class=\"supsub\"><sup id=\"shl" + strParId + "\"></sup><sub id=\"sdl" + strParId + "\"></sub></span>";
+    beforeNode.innerHTML = domString;
+    parParent.insertBefore(beforeNode.firstChild, par);
+
+    let afterNode = document.createElement('span');
+    var domString = "<span class=\"supsub\"><sup id=\"shr" + strParId + "\"></sup><sub id=\"sdr" + strParId + "\"></sub></span>";
+    afterNode.innerHTML = domString;
+    parParent.insertBefore(afterNode.firstChild, par.nextSibling);
+
+    par.setAttribute("id", i + 1);
+    let rawSplitData = splitter.split(par.textContent);
+    let parInnerHtml = "";
+    let sentArr = [];
+    // собираем абзац как набор маркированных предложений
+    let sentId = 1;
+    rawSplitData.forEach(el => {
+        if (el.type == "Sentence") {
+            let wordsArr = [];
+            let strSentTailId = strParId + "_" + String(sentId);
+            let sentHtml = "<span class=\"supsub\"><sup id=\"shl" + strSentTailId + "\"></sup><sub id=\"sdl" + strSentTailId + "\"></sub></span>" +
+                "<sentence id=\"" + String(sentId) + "\">";
+            let words = el.raw.match(/([\w]+|\.|,|"|'|:|”|“|!|\(|\)|;|‘|’)/g);
+            for (let wordId = 0; wordId < words.length; ++wordId) {
+                wordsArr.push({ id: wordId + 1, text: words[wordId] });
+                let strWordId = String(wordId + 1);
+                let strTailId = strParId + "_" + String(sentId) + "_" + strWordId;
+                sentHtml += "<span class=\"supsub\"><sup id=\"shl" + strTailId + "\"></sup><sub id=\"sdl" + strTailId + "\"></sub></span>" +
+                    "<word id=\"" + strWordId + "\">" + words[wordId] + " </word>" +
+                    "<span class=\"supsub\"><sup id=\"shr" + strTailId + "\"></sup><sub id=\"sdr" + strTailId + "\"></sub></span>";
+            }
+            sentHtml += "</sentence>" +
+                "<span class=\"supsub\"><sup id=\"shr" + strSentTailId + "\"></sup><sub id=\"sdr" + strSentTailId + "\"></sub></span>";
+            sentArr.push({ id: sentId, words: wordsArr });
+            parInnerHtml += sentHtml;
+            sentId++;
+        }
+    });
+    par.innerHTML = parInnerHtml;
+    return { id: i + 1, sentences: sentArr };
+}
+
 function markParagraphs(viewer) {
     // TODO реакция на некорректный символ в предложении. необходимо отбросить его и продолжить работу
     let outParagraphs = [];
@@ -116,53 +162,20 @@ function markParagraphs(viewer) {
             "paragraphs": [ { "id": 1, "sentences": [ { "id": 1, "text": [{1,"word1"}, {2,"."}] } ] } ] }
         */
 
-        var strParId = String(i + 1);
         let par = pars[i];
-        let parParent = par.parentNode;
-
-        let beforeNode =  document.createElement('span');
-        var domString = "<span class=\"supsub\"><sup id=\"shl" + strParId + "\"></sup><sub id=\"sdl" + strParId + "\"></sub></span>";
-        beforeNode.innerHTML = domString;
-        parParent.insertBefore(beforeNode.firstChild, par); 
-
-        let afterNode = document.createElement('span');
-        var domString = "<span class=\"supsub\"><sup id=\"shr" + strParId + "\"></sup><sub id=\"sdr" + strParId + "\"></sub></span>";
-        afterNode.innerHTML = domString;
-        parParent.insertBefore(afterNode.firstChild, par.nextSibling);
-
-        par.setAttribute("id", i + 1);         
-        let rawSplitData = splitter.split(par.textContent);
-        let parInnerHtml = "";
-        let sentArr = [];
-        // собираем абзац как набор маркированных предложений
-        let sentId = 1;
-        rawSplitData.forEach(el => {
-            if (el.type == "Sentence") {
-                let wordsArr = [];
-                let strSentTailId = strParId + "_" + String(sentId);
-                let sentHtml = "<span class=\"supsub\"><sup id=\"shl" + strSentTailId + "\"></sup><sub id=\"sdl" + strSentTailId + "\"></sub></span>" +
-                               "<sentence id=\"" + String(sentId) + "\">";
-                let words = el.raw.match(/([\w]+|\.|,|"|'|:|”|“|!|\(|\)|;|‘|’)/g);
-                for (let wordId = 0; wordId < words.length; ++wordId) {
-                    wordsArr.push({ id: wordId + 1, text: words[wordId] });
-                    let strWordId = String(wordId + 1);
-                    let strTailId = strParId + "_" + String(sentId) + "_" + strWordId;
-                    sentHtml += "<span class=\"supsub\"><sup id=\"shl" + strTailId + "\"></sup><sub id=\"sdl" + strTailId + "\"></sub></span>" +
-                                "<word id=\"" + strWordId + "\">" + words[wordId] + " </word>" +
-                                "<span class=\"supsub\"><sup id=\"shr" + strTailId + "\"></sup><sub id=\"sdr" + strTailId + "\"></sub></span>";
-                }
-                sentHtml += "</sentence>" +
-                            "<span class=\"supsub\"><sup id=\"shr" + strSentTailId + "\"></sup><sub id=\"sdr" + strSentTailId + "\"></sub></span>";
-                sentArr.push({ id: sentId, words: wordsArr });
-                parInnerHtml += sentHtml;
-                sentId++;
-            } 
-        });
-        outParagraphs.push({ id: i + 1, sentences: sentArr });
-        par.innerHTML = parInnerHtml;
+        outParagraphs.push(tokenizeAndPrepareDomParagraph(par, i));
     }
     return outParagraphs;
 };
+
+function replaceParagraphContent(chId, parId, text) {
+    let par = render.chapterData[chId - 1].querySelector("p:nth-of-type(" + String(parId) + ")");
+    par.innerText = text;
+    console.log(render.model[chId - 1][parId - 1]);
+    let model = tokenizeAndPrepareDomParagraph(par, parId - 1)
+    render.model[chId-1][parId-1] = model;
+    window.core.setModelDataForParagraph(chId-1, parId-1, model);
+}
 
 class Render {
     book;

@@ -88,6 +88,11 @@ QString EpubRenderer::getParagraphText(const Position& pos) {
     return ret;
 }
 
+void EpubRenderer::setParagraphText(const Position& pos, const QString& str) {
+    QString cmd = QStringLiteral("replaceParagraphContent(%1, %2, \"%3\");").arg(pos.chapterId()).arg(pos.paragraphId()).arg(str);
+    m_view->page()->runJavaScript(cmd, [&](const QVariant&) { });
+}
+
 void EpubRenderer::updateChapterView(const DomChapter& dom) {
     m_view->page()->runJavaScript("cleanupBeforeRender(window.render.viewer);");
     
@@ -179,6 +184,18 @@ void EpubRenderer::setChaptersList(const QVariant& objects) {
         ++i;
     }
     m_openLoop.exit(0);   
+}
+
+void EpubRenderer::setModelDataForParagraph(int chapterIndex, int parIndex, const QVariant& par) {
+    QList<Sentence> sentences;
+    for (const QVariant& s : par.toMap().value("sentences").toList()) {
+        QList<Word> words;
+        for (const QVariant& w : s.toMap().value("words").toList()) {
+            words.push_back(Word(w.toMap()["id"].toInt(), w.toMap()["text"].toString()));
+        }
+        sentences.push_back(Sentence(s.toMap()["id"].toInt(), words));
+    }
+    m_book->setModelForParagraph(chapterIndex, parIndex, sentences);
 }
 
 void EpubRenderer::setModelDataForChapter(int chapterIndex, const QVariant& data) {

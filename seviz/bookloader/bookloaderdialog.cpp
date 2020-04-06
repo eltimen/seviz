@@ -51,6 +51,6 @@ void BookLoaderDialog::showEvent(QShowEvent* event) {
 		ui->okButton->setEnabled(true);
 
 		qDebug() << m_engine->getBookRender().getParagraphText(Position(4, 1, 1));
-
+		m_engine->getBookRender().setParagraphText(Position(4, 1, 1), "This is edited or fixed paragraph");
 	});
 }

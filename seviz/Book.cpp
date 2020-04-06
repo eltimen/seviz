@@ -135,3 +135,7 @@ const Word& Book::getWord(const Position& pos) const {
 void Book::setModelForChapter(int chapterIndex, const QList<Section>& data) {
     m_chapters[chapterIndex].sections = data;
 }
+
+void Book::setModelForParagraph(int chapterIndex, int paragraphIndex, const QList<Sentence>& data) {
+    m_chapters[chapterIndex].sections[0][paragraphIndex] = Paragraph(paragraphIndex+1, data);
+}
