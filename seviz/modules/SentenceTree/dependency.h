@@ -37,6 +37,8 @@ private:
     // word id -> [ {word id, stanford relation}, ...]
     std::multimap<int, std::pair<int, DependencyRelation>> m_tree;
 
-    bool hasLoopWithRelation(int from, int to) const;
+    bool hasLoopWithEdge(int from, int to) const;
+    bool hasLoopWithEdgeUtil(int v, std::vector<bool>& visited, std::vector<bool>& recStack, int from, int to) const;
+
     QString string(DependencyRelation rel) const;
 };

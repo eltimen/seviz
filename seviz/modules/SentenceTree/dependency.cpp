@@ -1,6 +1,7 @@
 #include "dependency.h"
 #include <unordered_set>
 #include <algorithm>
+#include <vector>
 
 DependencyTree::DependencyTree(const Sentence& sent) :
 	m_sentence(sent) 
@@ -16,7 +17,7 @@ bool DependencyTree::insert(int from, int to, DependencyRelation type) {
 	assert(from >= 1);
 	assert(to <= m_sentence.size());
 
-	if (hasLoopWithRelation(from, to)) {
+	if (hasLoopWithEdge(from, to)) {
 		return false;
 	}
 
@@ -37,17 +38,41 @@ void DependencyTree::change(int from, int to, DependencyRelation type) {
 	edge->second.second = type;
 }
 
-bool DependencyTree::hasLoopWithRelation(int from, int to) const {
-	std::unordered_set<int> visited = { to };
-	// если в какой-то из узлов дерева входит больше двух ребер - цикл обнаружен
-	for (const auto& edge : m_tree) {
-		int dest = edge.second.first;
-		if (visited.count(dest) == 0) {
-			visited.insert(dest);
-		} else {
-			return true;
+bool DependencyTree::hasLoopWithEdgeUtil(int v, std::vector<bool>& visited, std::vector<bool>& recStack, int from, int to) const {
+	if (!visited[v]) {
+		visited[v] = true;
+		recStack[v] = true;
+
+		// по всем вершинам, смежным с v 
+		auto iters = m_tree.equal_range(v+1);
+		for (auto& subtreeIter = iters.first; subtreeIter != iters.second; ++subtreeIter) {
+			int i = subtreeIter->second.first - 1; // индекс текущей смежной вершины
+			if (!visited[i] && hasLoopWithEdgeUtil(i, visited, recStack, from, to))
+				return true;
+			else if (recStack[i])
+				return true;
+		}
+		// а также повторяем шаг, если бы действительно существовало ребро от from до to
+		if (v == (from-1)) {
+			if (!visited[to-1] && hasLoopWithEdgeUtil(to-1, visited, recStack, from, to))
+				return true;
+			else if (recStack[to-1])
+				return true;
 		}
 	}
+	recStack[v] = false;  
+	return false;
+}
+
+bool DependencyTree::hasLoopWithEdge(int from, int to) const {
+	int verticesCount = m_sentence.size();
+	std::vector<bool> visited(verticesCount, false);
+	std::vector<bool> recStack(verticesCount, false);
+
+	for (int i = 0; i < verticesCount; i++)
+		if (hasLoopWithEdgeUtil(i, visited, recStack, from, to))
+			return true;
+
 	return false;
 }
 
