@@ -45,7 +45,7 @@ void STWindow::onDepCreateEdge(int from, int to) {
     if (tree.insert(from, to, rel)) {
         renderDependencies(tree);
     } else {
-        QMessageBox::critical(this, "Ошибка", "Дерево зависимостей не должно содержать циклов");
+        QMessageBox::critical(this, "Ошибка", "Дерево зависимостей не может содержать циклов или параллельных связей");
         renderDependencies(tree); // TODO после тестирования убрать 
     } 
 }

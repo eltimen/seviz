@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+#include <algorithm>
 #include <QString>
 #include "BookModels.h"
 
@@ -39,6 +40,8 @@ private:
 
     bool hasLoopWithEdge(int from, int to) const;
     bool hasLoopWithEdgeUtil(int v, std::vector<bool>& visited, std::vector<bool>& recStack, int from, int to) const;
+
+    inline bool hasEdge(int from, int to) const; 
 
     QString string(DependencyRelation rel) const;
 };
