@@ -62,6 +62,12 @@ enum class DependencyRelation {
     DEPENDENCY_RELATION(MAKE_ENUM)
 };
 
+#define MAKE_STRINGS(VAR) QStringLiteral(#VAR),
+const QStringList DependencyRelationStr = {
+    DEPENDENCY_RELATION(MAKE_STRINGS)
+};
+
+#undef MAKE_STRINGS
 #undef MAKE_ENUM
 
 class DependencyTree {
@@ -78,13 +84,9 @@ public:
     // in: ID откуда, ID куда, новый тип связи
     void change(int from, int to, DependencyRelation type);
 
-    QString toBratJson() const;
 
-    #define MAKE_STRINGS(VAR) QStringLiteral(#VAR),
-    QStringList edgeRelationStr = {
-        DEPENDENCY_RELATION(MAKE_STRINGS)
-    };
-    #undef MAKE_STRINGS
+    
+    QString toBratJson() const;
 
 private:
     Sentence m_sentence;
@@ -94,7 +96,5 @@ private:
 
     bool hasLoopWithEdge(int from, int to) const;
     bool hasLoopWithEdgeUtil(int v, std::vector<bool>& visited, std::vector<bool>& recStack, int from, int to) const;
-
     inline bool hasEdge(int from, int to) const; 
-
 };

@@ -43,7 +43,7 @@ void STWindow::showSentence(const Sentence& sent, const SentenceData& data) {
 void STWindow::onDepCreateEdge(int from, int to) {
     DependencyTree& tree = m_core->currentSentenceData().dependency;
 
-    QScopedPointer<EdgeTypeChooseDialog> chooser(new EdgeTypeChooseDialog(this, tree.edgeRelationStr));
+    QScopedPointer<EdgeTypeChooseDialog> chooser(new EdgeTypeChooseDialog(this, DependencyRelationStr));
     if (chooser->exec()) {
         DependencyRelation rel = chooser->getChoosedDepType();
 
@@ -65,7 +65,7 @@ void STWindow::onDepRemoveEdge(int from, int to) {
 void STWindow::onDepChangeEdgeType(int from, int to) {
     DependencyTree& tree = m_core->currentSentenceData().dependency;
 
-    QScopedPointer<EdgeTypeChooseDialog> chooser(new EdgeTypeChooseDialog(this, tree.edgeRelationStr));
+    QScopedPointer<EdgeTypeChooseDialog> chooser(new EdgeTypeChooseDialog(this, DependencyRelationStr));
     if (chooser->exec()) {
         DependencyRelation rel = chooser->getChoosedDepType();
         tree.change(from, to, rel);
