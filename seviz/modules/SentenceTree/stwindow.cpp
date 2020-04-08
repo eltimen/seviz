@@ -38,7 +38,7 @@ void STWindow::showSentence(const Sentence& sent, const SentenceData& data) {
     }
     ui->idLabel->setText(QStringLiteral("ID: %1").arg(sent.id()));
 
-    renderDependencies(data.dependency);
+    renderDependencies(data.dependency); 
 }
 void STWindow::onDepCreateEdge(int from, int to) {
     DependencyTree& tree = m_core->currentSentenceData().dependency;
@@ -57,9 +57,11 @@ void STWindow::onDepCreateEdge(int from, int to) {
 }
 
 void STWindow::onDepRemoveEdge(int from, int to) {
-    QMessageBox::information(this, "Тест", "remove " + QString::number(from) + " " + QString::number(to));
-    renderDependencies(m_core->currentSentenceData().dependency);
+    DependencyTree& tree = m_core->currentSentenceData().dependency;
+    tree.remove(from, to);
+    renderDependencies(tree);
 }
+
 void STWindow::onDepChangeEdgeType(int from, int to) {
     DependencyTree& tree = m_core->currentSentenceData().dependency;
 
@@ -67,6 +69,7 @@ void STWindow::onDepChangeEdgeType(int from, int to) {
     if (chooser->exec()) {
         DependencyRelation rel = chooser->getChoosedDepType();
         tree.change(from, to, rel);
+        // TODO может лучше перерендеривать на уровне JS? например, через forceRedraw() или просто скопипастить код из renderDependencies()
         renderDependencies(tree);
     }
 }

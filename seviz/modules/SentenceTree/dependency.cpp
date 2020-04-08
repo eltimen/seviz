@@ -3,14 +3,9 @@
 #include <algorithm>
 #include <vector>
 
-DependencyTree::DependencyTree(const Sentence& sent) :
-	m_sentence(sent) 
+DependencyTree::DependencyTree(const Sentence& sent)
+	: m_sentence(sent) 
 {
-    // TEST
-	if (sent.size() > 0) {
-		insert(sent.first().id(), sent.last().id(), DependencyRelation::nsubj);
-		change(sent.first().id(), sent.last().id(), DependencyRelation::dobj);
-	}
 }
 
 bool DependencyTree::insert(int from, int to, DependencyRelation type) {
@@ -27,7 +22,7 @@ bool DependencyTree::insert(int from, int to, DependencyRelation type) {
 
 void DependencyTree::remove(int from, int to) {
 	const auto& outs = m_tree.equal_range(from);
-	const auto& relation = std::find_if(outs.first, outs.second, [to](const auto& edge) -> bool { return edge.first == to; });
+	const auto& relation = std::find_if(outs.first, outs.second, [to](const auto& edge) -> bool { return edge.second.first == to; });
 	assert(relation != m_tree.end());
 	m_tree.erase(relation);
 }

@@ -126,6 +126,7 @@
         };
         
         function render() {
+            seviz_inDelete = false;
             var brat = new BratFrontendEditor(document.getElementById("brat"), collData, docData, options);
             brat.dispatcher.on('sglclick', function (data) {
                 console.log(data)
