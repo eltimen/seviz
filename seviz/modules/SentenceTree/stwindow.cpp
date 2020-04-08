@@ -61,8 +61,14 @@ void STWindow::onDepRemoveEdge(int from, int to) {
     renderDependencies(m_core->currentSentenceData().dependency);
 }
 void STWindow::onDepChangeEdgeType(int from, int to) {
-    QMessageBox::information(this, "Тест", "change " + QString::number(from) + " " + QString::number(to));
-    renderDependencies(m_core->currentSentenceData().dependency);
+    DependencyTree& tree = m_core->currentSentenceData().dependency;
+
+    QScopedPointer<EdgeTypeChooseDialog> chooser(new EdgeTypeChooseDialog(this, tree.edgeRelationStr));
+    if (chooser->exec()) {
+        DependencyRelation rel = chooser->getChoosedDepType();
+        tree.change(from, to, rel);
+        renderDependencies(tree);
+    }
 }
 void STWindow::renderDependencies(const DependencyTree& tree) {
     QString docData = tree.toBratJson();

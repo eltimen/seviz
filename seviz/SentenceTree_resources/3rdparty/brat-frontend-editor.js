@@ -10581,6 +10581,7 @@ var AnnotatorUI = (function($, window, undefined) {
 
         // do we edit an arc?
         if (id = target.attr('data-arc-role')) {
+            console.log('executed 1');
           // TODO
           clearSelection();
           var originSpanId = target.attr('data-arc-origin');
@@ -10588,30 +10589,11 @@ var AnnotatorUI = (function($, window, undefined) {
           var type = target.attr('data-arc-role');
           var originSpan = data.spans[originSpanId];
           var targetSpan = data.spans[targetSpanId];
-          arcOptions = {
-            action: 'createArc',
-            origin: originSpanId,
-            target: targetSpanId,
-            old_target: targetSpanId,
-            type: type,
-            old_type: type,
-            collection: coll,
-            'document': doc
-          };
-          var eventDescId = target.attr('data-arc-ed');
-          if (eventDescId) {
-            var eventDesc = data.eventDescs[eventDescId];
-            if (eventDesc.equiv) {
-              arcOptions['left'] = eventDesc.leftSpans.join(',');
-              arcOptions['right'] = eventDesc.rightSpans.join(',');
-            }
-          }
-          $('#arc_origin').text(Util.spanDisplayForm(spanTypes, originSpan.type) + ' ("' + originSpan.text + '")');
-          $('#arc_target').text(Util.spanDisplayForm(spanTypes, targetSpan.type) + ' ("' + targetSpan.text + '")');
-          var arcId = eventDescId || [originSpanId, type, targetSpanId];
-          fillArcTypesAndDisplayForm(evt, originSpan.type, targetSpan.type, type, arcId);
-          // for precise timing, log dialog display to user.
-          dispatcher.post('logAction', ['arcEditSelected']);
+          
+          let from = Number(originSpanId.match(/[\d]+/));
+          let to = Number(targetSpanId.match(/[\d]+/));
+          
+          core.onDepChangeEdgeType(from, to);
 
         // if not an arc, then do we edit a span?
         } else if (id = target.attr('data-span-id')) {
@@ -19471,7 +19453,8 @@ var VisualizerUI = (function($, window, undefined) {
         } else if (dataset.arcOrigin != undefined && dataset.arcTarget != undefined) {
             from = Number(dataset.arcOrigin.match(/[\d]+/));
             to = Number(dataset.arcTarget.match(/[\d]+/));
-            core.onDepChangeEdgeType(from, to);
+            //core.onDepChangeEdgeType(from, to);
+            console.log('single click oon existing relation ');
         }          
         /*
         if (id = target.attr('data-span-id')) {
@@ -19487,6 +19470,7 @@ var VisualizerUI = (function($, window, undefined) {
         var target = $(evt.target);
         var id;
         if (id = target.attr('data-span-id')) {
+          console.log('on POS edouble click');
           window.getSelection().removeAllRanges();
           var span = data.spans[id];
 
