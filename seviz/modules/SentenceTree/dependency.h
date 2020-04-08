@@ -84,8 +84,8 @@ public:
     // in: ID откуда, ID куда, новый тип связи
     void change(int from, int to, DependencyRelation type);
 
+    bool canInsertRelation(int from, int to) const;
 
-    
     QString toBratJson() const;
 
 private:

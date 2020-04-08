@@ -12,7 +12,7 @@ bool DependencyTree::insert(int from, int to, DependencyRelation type) {
 	assert(from >= 1);
 	assert(to <= m_sentence.size());
 
-	if (hasEdge(from, to) || hasLoopWithEdge(from, to)) {
+	if (!canInsertRelation(from, to)) {
 		return false;
 	}
 
@@ -31,6 +31,10 @@ void DependencyTree::change(int from, int to, DependencyRelation type) {
     auto outs = m_tree.equal_range(from);
     auto edge = std::find_if(outs.first, outs.second, [to](const auto& e) -> bool { return e.second.first == to; });
 	edge->second.second = type;
+}
+
+bool DependencyTree::canInsertRelation(int from, int to) const {
+    return !hasEdge(from, to) && !hasLoopWithEdge(from, to);
 }
 
 bool DependencyTree::hasLoopWithEdgeUtil(int v, std::vector<bool>& visited, std::vector<bool>& recStack, int from, int to) const {
