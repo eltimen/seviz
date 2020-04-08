@@ -17,10 +17,10 @@ EdgeTypeChooseDialog::EdgeTypeChooseDialog(QWidget *parent, const QStringList& r
         connect(button, &QPushButton::clicked, this, &EdgeTypeChooseDialog::onTypeButtonClicked);
         button->setProperty("st_dep_index", QVariant(i));
         ui->gridLayout->addWidget(button, row, column);
-        ++column;
-        if (column > 3) {
-            column = 0;
-            ++row;
+        ++row;
+        if (row > 12) {
+            row = 0;
+            ++column;
         }
     }
 }
