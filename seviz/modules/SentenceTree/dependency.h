@@ -5,12 +5,60 @@
 #include <QString>
 #include "BookModels.h"
 
+// taken from "Stanford typed dependencies manual", section 2
 #define DEPENDENCY_RELATION(DO) \
+    DO(acomp) \
+    DO(advcl) \
+    DO(advmod) \
+    DO(agent) \
+    DO(amod) \
+    DO(appos) \
+    DO(aux) \
+    DO(auxpass) \
+    DO(cc) \
+    DO(ccomp) \
+    DO(conj) \
+    DO(cop) \
+    DO(csubj) \
+    DO(csubjpass) \
+    DO(dep) \
+    DO(det) \
+    DO(discourse) \
+    DO(dobj) \
+    DO(expl) \
+    DO(goeswith) \
+    DO(iobj) \
+    DO(mark) \
+    DO(mwe) \
+    DO(neg) \
+    DO(nn) \
+    DO(npadvmod) \
     DO(nsubj) \
-    DO(advd)
+    DO(nsubjpass) \
+    DO(num) \
+    DO(number) \
+    DO(parataxis) \
+    DO(pcomp) \
+    DO(pobj) \
+    DO(poss) \
+    DO(possessive) \
+    DO(preconj) \
+    DO(predet) \
+    DO(prep) \
+    DO(prepc) \
+    DO(prt) \
+    DO(punct) \
+    DO(quantmod) \
+    DO(rcmod) \
+    DO(ref) \
+    DO(root) \
+    DO(tmod) \
+    DO(vmod) \
+    DO(xcomp) \
+    DO(xsubj) 
 
 #define MAKE_ENUM(VAR) VAR,
-enum DependencyRelation {
+enum class DependencyRelation {
     DEPENDENCY_RELATION(MAKE_ENUM)
 };
 
@@ -32,6 +80,12 @@ public:
 
     QString toBratJson() const;
 
+    #define MAKE_STRINGS(VAR) QStringLiteral(#VAR),
+    QStringList edgeRelationStr = {
+        DEPENDENCY_RELATION(MAKE_STRINGS)
+    };
+    #undef MAKE_STRINGS
+
 private:
     Sentence m_sentence;
     // adjacency list
@@ -43,5 +97,4 @@ private:
 
     inline bool hasEdge(int from, int to) const; 
 
-    QString string(DependencyRelation rel) const;
 };

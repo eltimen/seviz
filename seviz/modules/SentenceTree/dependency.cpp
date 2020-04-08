@@ -8,8 +8,8 @@ DependencyTree::DependencyTree(const Sentence& sent) :
 {
     // TEST
 	if (sent.size() > 0) {
-		insert(sent.first().id(), sent.last().id(), nsubj);
-		change(sent.first().id(), sent.last().id(), advd);
+		insert(sent.first().id(), sent.last().id(), DependencyRelation::nsubj);
+		change(sent.first().id(), sent.last().id(), DependencyRelation::dobj);
 	}
 }
 
@@ -103,7 +103,7 @@ QString DependencyTree::toBratJson() const {
 
 		relations += QStringLiteral("\t[\"R%1\", \"%2\", [[\"From\", \"N%3\"], [\"To\", \"N%4\"]]],\n").arg(
 			QString::number(i),
-			string(edge.second),
+			edgeRelationStr[static_cast<int>(edge.second)],
 			QString::number(from),
 			QString::number(edge.first)
 		);
@@ -130,13 +130,4 @@ QString DependencyTree::toBratJson() const {
 
 
 	return docData;
-}
-
-QString DependencyTree::string(DependencyRelation rel) const {
-	#define MAKE_STRINGS(VAR) QStringLiteral(#VAR),
-	QString const relationStrings[] = {
-		DEPENDENCY_RELATION(MAKE_STRINGS)
-	};
-	#undef MAKE_STRINGS
-	return relationStrings[rel];
 }

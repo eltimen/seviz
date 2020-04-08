@@ -7,6 +7,7 @@
 #include "BookModels.h"
 #include "SentenceTree.h"
 #include "dependency.h"
+#include "edgetypechoosedialog.h"
 
 STWindow::STWindow(SentenceTree* core) :
     QWidget(nullptr),
@@ -41,13 +42,18 @@ void STWindow::showSentence(const Sentence& sent, const SentenceData& data) {
 }
 void STWindow::onDepCreateEdge(int from, int to) {
     DependencyTree& tree = m_core->currentSentenceData().dependency;
-    DependencyRelation rel = nsubj; // TODO диалог выбора типа связи
-    if (tree.insert(from, to, rel)) {
-        renderDependencies(tree);
-    } else {
-        QMessageBox::critical(this, "Ошибка", "Дерево зависимостей не может содержать циклов или параллельных связей");
-        renderDependencies(tree); // TODO после тестирования убрать 
-    } 
+
+    QScopedPointer<EdgeTypeChooseDialog> chooser(new EdgeTypeChooseDialog(this, tree.edgeRelationStr));
+    if (chooser->exec()) {
+        DependencyRelation rel = chooser->getChoosedDepType();
+
+        if (tree.insert(from, to, rel)) {
+            renderDependencies(tree);
+        } else {
+            QMessageBox::critical(this, "Ошибка", "Дерево зависимостей не может содержать циклов или параллельных связей");
+            renderDependencies(tree); // TODO после тестирования убрать 
+        }
+    }
 }
 
 void STWindow::onDepRemoveEdge(int from, int to) {

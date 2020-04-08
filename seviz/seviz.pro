@@ -71,6 +71,7 @@ SOURCES += \
         modules/EngineTest/enginetestwidget.cpp \
         modules/SentenceTree/SentenceTree.cpp \
         modules/SentenceTree/dependency.cpp \
+        modules/SentenceTree/edgetypechoosedialog.cpp \
         modules/SentenceTree/stwindow.cpp
 
 HEADERS += \
@@ -92,6 +93,7 @@ HEADERS += \
         modules/EngineTest/enginetestwidget.h \
         modules/SentenceTree/SentenceTree.h \
         modules/SentenceTree/dependency.h \
+        modules/SentenceTree/edgetypechoosedialog.h \
         modules/SentenceTree/stwindow.h \
         modules/modules.h
 
@@ -99,6 +101,7 @@ FORMS += \
         bookloader/bookloaderdialog.ui \
         mainwindow.ui \
         modules/EngineTest/enginetestwidget.ui \
+        modules/SentenceTree/edgetypechoosedialog.ui \
         modules/SentenceTree/stwindow.ui
 
 # Default rules for deployment.
