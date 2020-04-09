@@ -22,7 +22,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-CONFIG += c++14
+CONFIG += c++17
 
 DEFINES += QUAZIP_STATIC
 INCLUDEPATH += 3rdparty/quazip/quazip
@@ -71,6 +71,7 @@ SOURCES += \
         modules/EngineTest/enginetestwidget.cpp \
         modules/SentenceTree/SentenceTree.cpp \
         modules/SentenceTree/dependency.cpp \
+        modules/SentenceTree/edgetypechoosedialog.cpp \
         modules/SentenceTree/stwindow.cpp
 
 HEADERS += \
@@ -92,6 +93,7 @@ HEADERS += \
         modules/EngineTest/enginetestwidget.h \
         modules/SentenceTree/SentenceTree.h \
         modules/SentenceTree/dependency.h \
+        modules/SentenceTree/edgetypechoosedialog.h \
         modules/SentenceTree/stwindow.h \
         modules/modules.h
 
@@ -99,6 +101,7 @@ FORMS += \
         bookloader/bookloaderdialog.ui \
         mainwindow.ui \
         modules/EngineTest/enginetestwidget.ui \
+        modules/SentenceTree/edgetypechoosedialog.ui \
         modules/SentenceTree/stwindow.ui
 
 # Default rules for deployment.

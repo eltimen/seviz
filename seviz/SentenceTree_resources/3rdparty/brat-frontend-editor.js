@@ -1,3 +1,6 @@
+var seviz_hoverEntity;
+var seviz_hoverRelation;
+var seviz_inDelete = false;
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 module.exports = "<div id=\"brat-frontend-editor\">\n    <div id=\"commentpopup\"></div>\n    <div id=\"svg\"></div>\n\n    <!-- Span dialog (view+edit) -->\n    <form id=\"span_form\" class=\"dialog\" title=\"Span\">\n        <!-- Span dialog annotated text -->\n        <fieldset id=\"span_selected_fset\">\n            <legend>Text</legend>\n            <a target=\"brat_linked\" id=\"span_highlight_link\" href=\"#\">Link</a>\n            <div id=\"span_selected\"/>\n        </fieldset>\n        <!-- Span dialog search links -->\n        <fieldset id=\"span_search_fieldset\">\n            <legend>Search</legend>\n            <div id=\"span_search_links\"/>\n        </fieldset>\n        <!-- Span dialog type selector -->\n        <fieldset>\n            <div id=\"entity_and_event_wrapper\" class=\"split_wrapper\">\n                <div id=\"span_entity_section\" class=\"wrapper_half_left\">\n                    <div id=\"entity_label\" class=\"label-like\">\n                        Entity type\n                    </div>\n                    <div id=\"entity_types\" class=\"scroll_wrapper_upper\">\n                        <div class=\"scroller\"></div>\n                    </div>\n                    <!-- NOTE: the attribute labels must be *outside* of the\n                         divs they logically belong to prevent scrollers\n                         overflowing them. -->\n                    <div id=\"entity_attribute_label\" class=\"label-like wrapper_lower_label\">\n                        Entity attributes\n                    </div>\n                    <div id=\"entity_attributes\" class=\"scroll_wrapper_lower\">\n                        <div class=\"scroller small-buttons\"></div>\n                    </div>\n                </div>\n                <div id=\"span_event_section\" class=\"wrapper_half_right\">\n                    <div id=\"event_label\" class=\"label-like\">\n                        Event type\n                    </div>\n                    <div id=\"event_types\" class=\"scroll_wrapper_upper\">\n                        <div class=\"scroller\"></div>\n                    </div>\n                    <div id=\"event_attribute_label\" class=\"wrapper_lower_label label-like\">\n                        Event attributes\n                    </div>\n                    <div id=\"event_attributes\" class=\"scroll_wrapper_lower\">\n                        <div class=\"scroller small-buttons\"></div>\n                    </div>\n                </div>\n            </div>\n        </fieldset>\n        <!-- Span dialog normalization -->\n        <fieldset id=\"norm_fieldset\">\n            <legend>Normalization</legend>\n            <div id=\"norm_container\">\n                <select id=\"span_norm_db\"/>\n                <a id=\"span_norm_db_link\" target=\"brat_linked\" href=\"#\" title=\"Search DB\"><img class=\"brat-fugue-shadowless-magnifier\" src=\"static/img/Fugue-shadowless-magnifier.png\" style=\"vertical-align: middle\"/></a>\n                <span class=\"span_norm_label\">ID:</span>\n                <input id=\"span_norm_id\" class=\"span_norm_id_input\"\n                       style=\"width:20%\"/>\n                <span class=\"span_norm_label\">Ref:</span>\n                <input id=\"span_norm_txt\" class=\"span_norm_txt_input\"\n                       readonly=\"readonly\" style=\"width:45%\"\n                       placeholder=\"Click here to search\"/>\n                <a id=\"span_norm_ref_link\" target=\"brat_linked\" href=\"#\" title=\"See in DB\"><img class=\"brat-fugue-shadowless-external\" src=\"static/img/Fugue-shadowless-external.png\" style=\"vertical-align: middle\"/></a>\n                <input id=\"clear_norm_button\" type=\"button\"\n                       value=\"&#x2715;\" title=\"Clear normalization\"/>\n            </div>\n        </fieldset>\n        <!-- Span dialog notes -->\n        <fieldset>\n            <legend>Notes</legend>\n            <div id=\"notes_container\">\n                <input id=\"span_notes\" class=\"borderless\"/>\n                <input id=\"clear_notes_button\" type=\"button\"\n                       value=\"&#x2715;\" title=\"Clear notes\"/>\n            </div>\n        </fieldset>\n    </form>\n\n    <!-- Rapid mode span dialog -->\n    <form id=\"rapid_span_form\" class=\"dialog\" title=\"Span type\">\n        <fieldset id=\"rapid_span_selected_fset\">\n            <legend>Text</legend>\n            <div id=\"rapid_span_selected\"/>\n        </fieldset>\n        <div id=\"rapid_span_types\" class=\"scroll_fset\" style=\"height:250px\">\n            <fieldset>\n                <legend>Select type</legend>\n                <div class=\"scroller\" id=\"rapid_span_types_div\">\n                    <!-- filled dynamically -->\n                </div>\n            </fieldset>\n        </div>\n    </form>\n\n    <!-- Arc dialog -->\n    <form id=\"arc_form\" class=\"dialog\" title=\"Arc\">\n        <fieldset id=\"arc_origin_fset\">\n            <legend>From</legend>\n            <a target=\"brat_linked\" id=\"arc_highlight_link\" href=\"#\">Link</a>\n            <div id=\"arc_origin\"/>\n        </fieldset>\n\n        <fieldset id=\"arc_target_fset\">\n            <legend>To</legend>\n            <div id=\"arc_target\"/>\n        </fieldset>\n\n        <div id=\"arc_roles\" class=\"scroll_fset\">\n            <fieldset>\n                <legend>Type</legend>\n                <div class=\"scroller\"/>\n            </fieldset>\n        </div>\n\n        <fieldset id=\"arc_notes_fieldset\">\n            <legend>Notes</legend>\n            <input id=\"arc_notes\" class=\"borderless\"/>\n        </fieldset>\n\n    </form>\n\n    <!-- Split span annotation dialog -->\n    <form id=\"split_form\" class=\"dialog\" title=\"Split the Span\">\n        <fieldset>\n            <legend>Split Roles</legend>\n            <div id=\"split_roles\" class=\"scroll_fset\"/>\n        </fieldset>\n    </form>\n\n    <!-- Spinner -->\n    <!--<div id=\"waiter\" class=\"dialog\" title=\"Please wait\">\n        <img class=\"brat-spinner\" src=\"static/img/spinner.gif\"/>\n    </div>-->\n</div>";
 
@@ -10588,30 +10591,11 @@ var AnnotatorUI = (function($, window, undefined) {
           var type = target.attr('data-arc-role');
           var originSpan = data.spans[originSpanId];
           var targetSpan = data.spans[targetSpanId];
-          arcOptions = {
-            action: 'createArc',
-            origin: originSpanId,
-            target: targetSpanId,
-            old_target: targetSpanId,
-            type: type,
-            old_type: type,
-            collection: coll,
-            'document': doc
-          };
-          var eventDescId = target.attr('data-arc-ed');
-          if (eventDescId) {
-            var eventDesc = data.eventDescs[eventDescId];
-            if (eventDesc.equiv) {
-              arcOptions['left'] = eventDesc.leftSpans.join(',');
-              arcOptions['right'] = eventDesc.rightSpans.join(',');
-            }
-          }
-          $('#arc_origin').text(Util.spanDisplayForm(spanTypes, originSpan.type) + ' ("' + originSpan.text + '")');
-          $('#arc_target').text(Util.spanDisplayForm(spanTypes, targetSpan.type) + ' ("' + targetSpan.text + '")');
-          var arcId = eventDescId || [originSpanId, type, targetSpanId];
-          fillArcTypesAndDisplayForm(evt, originSpan.type, targetSpan.type, type, arcId);
-          // for precise timing, log dialog display to user.
-          dispatcher.post('logAction', ['arcEditSelected']);
+          
+          let from = Number(originSpanId.match(/[\d]+/));
+          let to = Number(targetSpanId.match(/[\d]+/));
+          
+          core.onDepChangeEdgeType(from, to);
 
         // if not an arc, then do we edit a span?
         } else if (id = target.attr('data-span-id')) {
@@ -11950,27 +11934,21 @@ var AnnotatorUI = (function($, window, undefined) {
           var origin = arcDragOrigin;
           var targetValid = target.hasClass('reselectTarget');
           stopArcDrag(target);
+          let from;
+          let to;
           if ((id = target.attr('data-span-id')) && origin != id && targetValid) {
             var originSpan = data.spans[origin];
             var targetSpan = data.spans[id];
-            if (arcOptions && arcOptions.old_target) {
-              arcOptions.target = targetSpan.id;
-              dispatcher.post('ajax', [arcOptions, 'edited']);
-            } else {
-              arcOptions = {
-                action: 'createArc',
-                origin: originSpan.id,
-                target: targetSpan.id,
-                collection: coll,
-                'document': doc
-              };
-              $('#arc_origin').text(Util.spanDisplayForm(spanTypes, originSpan.type)+' ("'+originSpan.text+'")');
-              $('#arc_target').text(Util.spanDisplayForm(spanTypes, targetSpan.type)+' ("'+targetSpan.text+'")');
-              fillArcTypesAndDisplayForm(evt, originSpan.type, targetSpan.type);
-              // for precise timing, log dialog display to user.
-              dispatcher.post('logAction', ['arcSelected']);
-            }
+            from = Number(originSpan.id.match(/[\d]+/));
+            to = Number(targetSpan.id.match(/[\d]+/));
+          } else {
+            from = Number(origin.match(/[\d]+/));
+            to = Number(target.context.dataset.spanId.match(/[\d]+/));
           }
+          if (from != to) {
+            core.onDepCreateEdge(from, to);
+          }
+          
         } else if (!evt.ctrlKey) {
           // if not, then is it span selection? (ctrl key cancels)
           var sel = window.getSelection();
@@ -17223,6 +17201,8 @@ Util.profileStart('before render');
         var target = $(evt.target);
         var id;
         if (id = target.attr('data-span-id')) {
+            seviz_hoverEntity = id;
+          // POS-тег
           commentId = id;
           var span = data.spans[id];
           dispatcher.post('displaySpanComment', [
@@ -17272,8 +17252,12 @@ Util.profileStart('before render');
           }
           forceRedraw();
         } else if (!that.arcDragOrigin && (id = target.attr('data-arc-role'))) {
+            
           var originSpanId = target.attr('data-arc-origin');
           var targetSpanId = target.attr('data-arc-target');
+          
+          seviz_hoverRelation = [Number(originSpanId.match(/[\d]+/)), Number(targetSpanId.match(/[\d]+/))];
+          
           var role = target.attr('data-arc-role');
           var symmetric = (relationTypesHash &&
                            relationTypesHash[role] &&
@@ -17316,6 +17300,7 @@ Util.profileStart('before render');
               parent().
               addClass('highlight');
         } else if (id = target.attr('data-sent')) {
+            console.log('hover 3');
           var comment = data.sentComment[id];
           if (comment) {
             dispatcher.post('displaySentComment', [evt, target, comment.text, comment.type]);
@@ -17338,7 +17323,11 @@ Util.profileStart('before render');
           highlightSpans.removeClass('highlight');
           highlightSpans = undefined;
         }
+        
+        seviz_hoverEntity = undefined;
+        seviz_hoverRelation = undefined;
         forceRedraw();
+
       };
 
       var setAbbrevs = function(_abbrevsOn) {
@@ -19019,10 +19008,22 @@ var VisualizerUI = (function($, window, undefined) {
 
       /* END "more collection information" dialog - related */
 
+      $(function(){
+        $(document).on('keyup', function(evt){
+            if (evt.which === $.ui.keyCode.DELETE) {
+                // TODO почему приходят по 2-3 события???
+                if (seviz_hoverRelation != undefined && !seviz_inDelete) {
+                    seviz_inDelete = true;
+                    core.onDepRemoveEdge(seviz_hoverRelation[0], seviz_hoverRelation[1]);
+                }
+                return;
+            }
+        });
+      });
 
       var onKeyDown = function(evt) {
         var code = evt.which;
-
+     
         if (code === $.ui.keyCode.ESCAPE) {
           dispatcher.post('messages', [false]);
           return;
@@ -19468,11 +19469,25 @@ var VisualizerUI = (function($, window, undefined) {
 
       var onSingleClick = function(evt) {
         var target = $(evt.target);
-        var id;
+        //var id;
+        
+        let dataset = target.context.dataset;
+        if (dataset.spanId != undefined) {
+            // если клик на POS-тег
+            // на будущее: если слово, то chunkId
+        } else if (dataset.arcOrigin != undefined && dataset.arcTarget != undefined) {
+            from = Number(dataset.arcOrigin.match(/[\d]+/));
+            to = Number(dataset.arcTarget.match(/[\d]+/));
+            //core.onDepChangeEdgeType(from, to);
+            console.log('single click oon existing relation ');
+        }          
+        /*
         if (id = target.attr('data-span-id')) {
           var span = data.spans[id];
+          console.log('span ', span);
           dispatcher.post('sglclick', [span]);
         }
+        */
       };
 
       var onDblClick = function(evt) {
@@ -19480,6 +19495,7 @@ var VisualizerUI = (function($, window, undefined) {
         var target = $(evt.target);
         var id;
         if (id = target.attr('data-span-id')) {
+          console.log('on POS edouble click');
           window.getSelection().removeAllRanges();
           var span = data.spans[id];
 
