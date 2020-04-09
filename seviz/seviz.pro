@@ -83,6 +83,7 @@ HEADERS += \
         BookModels.h \
         DomChapter.h \
         EventModels.h \
+        IEngine.h \
         ModuleManager.h \
         bookloader/bookloader.h \
         bookloader/bookloaderdialog.h \
