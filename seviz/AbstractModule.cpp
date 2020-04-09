@@ -1,7 +1,7 @@
 #include "AbstractModule.h"
 #include "ModuleManager.h"
 
-AbstractModule::AbstractModule(ModuleManager* engine, const QString& id) :
+AbstractModule::AbstractModule(IEngine* engine, const QString& id) :
     QObject(nullptr),
     m_id(id),
     m_engine(engine)

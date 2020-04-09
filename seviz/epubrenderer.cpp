@@ -1,5 +1,4 @@
 #include "epubrenderer.h"
-#include "Book.h"
 
 #include <QWebChannel>
 #include <QWebEngineSettings>
@@ -7,6 +6,8 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QMap>
+#include "Book.h"
+#include "exceptions.h"
 
 EpubRenderer::EpubRenderer() :
     QObject(nullptr), //parent 

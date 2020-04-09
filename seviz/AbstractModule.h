@@ -3,18 +3,16 @@
 #include <QSet>
 #include <QString>
 #include <QDir>
-#include "Feature.h"
-#include "BookModels.h"
-#include "DomChapter.h"
+#include "IEngine.h"
 
-class ModuleManager;
+class IEngine;
 
 class AbstractModule : public QObject
 {
     Q_OBJECT
 
 public:
-    AbstractModule(ModuleManager* engine, const QString& id);
+    AbstractModule(IEngine* engine, const QString& id);
     virtual ~AbstractModule();
 
     virtual const QString& id() const;
@@ -28,7 +26,7 @@ public slots:
     virtual void render(const Position& from, const Position& to, DomChapter& dom, const QVector<Feature*>& activeFeatures);
 
 protected:
-    ModuleManager* m_engine = nullptr;
+    IEngine* m_engine = nullptr;
 
 private:
     QString m_id;

@@ -1,8 +1,6 @@
 #include "SentenceTree.h"
-#include "ModuleManager.h"
-#include "Book.h"
 
-SentenceTree::SentenceTree(ModuleManager* engine) :
+SentenceTree::SentenceTree(IEngine* engine) :
     AbstractModule(engine, "SentenceTree"),
     m_feature("Деревья предложений", QIcon(":/st/icon.png"), new QDockWidget(), this, true),
     m_widget(this),
@@ -10,7 +8,7 @@ SentenceTree::SentenceTree(ModuleManager* engine) :
 {
     m_feature.window()->setWidget(&m_widget);
     
-    m_engine->registerHandler(EventType::MOUSE_OVER, ElementType::SENTENCE, CTRL, m_feature, POSSLOT(onSentenceChanged));
+    m_engine->registerHandler(EventType::MOUSE_OVER, ElementType::SENTENCE, CTRL, m_feature, SLOTPOS(onSentenceChanged));
 }
 
 SentenceTree::~SentenceTree() {

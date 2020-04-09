@@ -2,7 +2,6 @@
 
 #include <QObject>
 #include "AbstractModule.h"
-#include "Feature.h"
 #include "stwindow.h"
 #include "dependency.h"
 
@@ -20,7 +19,7 @@ class SentenceTree : public AbstractModule
     Q_OBJECT
 
 public:
-    SentenceTree(ModuleManager* engine);
+    SentenceTree(IEngine* engine);
     ~SentenceTree();
 
     virtual QList<Feature> features() override;

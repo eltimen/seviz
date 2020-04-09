@@ -1,9 +1,9 @@
 #include "EngineTest.h"
+
 #include <QMessageBox>
 #include <QMenu>
-#include "Book.h"
 
-EngineTest::EngineTest(ModuleManager* engine)
+EngineTest::EngineTest(IEngine* engine)
     : AbstractModule(engine, "EngineTest"),
       m_widget(*this),
       m_feat("Тесты движка", QIcon(), new QDockWidget(), this, true, new QMenu("Тест")) {
@@ -12,7 +12,7 @@ EngineTest::EngineTest(ModuleManager* engine)
     m_feat.menu()->addAction("Тест", [this]() { QMessageBox::information(m_feat.window(), "Сообщение", "Тест"); });
     m_feat.setDockLocation(Qt::RightDockWidgetArea);
 
-    m_engine->registerHotkey(QKeySequence("Shift+A"), m_feat, VOIDSLOT(EngineTest::handler));
+    m_engine->registerHotkey(QKeySequence("Shift+A"), m_feat, SLOTVOID(EngineTest::handler));
 
     m_engine->registerHandler(EventType::MOUSE_OVER, ElementType::WORD, ALT, m_feat, [this](const Position& pos) {
         Word w = m_engine->getBook().getWord(pos);

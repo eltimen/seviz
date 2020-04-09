@@ -4,9 +4,10 @@
 #include <QStringList>
 #include <QWebEngineView>
 #include <QTemporaryDir>
-#include "epubrenderer.h"
-#include "ModuleManager.h"
 #include "BookModels.h"
+
+class EpubRenderer;
+class ModuleManager;
 
 class Book : public QObject
 {

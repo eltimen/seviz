@@ -3,6 +3,8 @@
 #include <JLCompress.h>
 #include <QDir>
 #include "exceptions.h"
+#include "epubrenderer.h"
+#include "ModuleManager.h"
 
 #pragma warning(disable:4129)
 

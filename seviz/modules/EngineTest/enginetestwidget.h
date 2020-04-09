@@ -2,7 +2,8 @@
 #define ENGINETESTWIDGET_H
 
 #include <QWidget>
-#include "ModuleManager.h"
+
+class IEngine;
 
 namespace Ui {
 class EngineTestWidget;
@@ -22,7 +23,7 @@ public:
 
 private:
     Ui::EngineTestWidget *ui;
-    ModuleManager* m_engine = nullptr;
+    IEngine* m_engine = nullptr;
     EngineTest& m_main;
 
 };

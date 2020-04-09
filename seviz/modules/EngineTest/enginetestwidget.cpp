@@ -1,6 +1,5 @@
 #include "enginetestwidget.h"
 #include "ui_enginetestwidget.h"
-#include "Book.h"
 #include "EngineTest.h"
 
 EngineTestWidget::EngineTestWidget(EngineTest& facade) :

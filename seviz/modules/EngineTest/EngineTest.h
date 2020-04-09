@@ -2,7 +2,6 @@
 
 #include <QObject>
 #include "AbstractModule.h"
-#include "Feature.h"
 #include "enginetestwidget.h"
 
 class EngineTest : public AbstractModule
@@ -10,7 +9,7 @@ class EngineTest : public AbstractModule
     Q_OBJECT
 
 public:
-    EngineTest(ModuleManager* engine);
+    EngineTest(IEngine* engine);
     ~EngineTest();
 
     virtual QList<Feature> features() override;
