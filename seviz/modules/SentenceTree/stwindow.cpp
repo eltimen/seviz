@@ -17,12 +17,19 @@ STWindow::STWindow(SentenceTree* core) :
 {
     ui->setupUi(this);
 
+    m_webchannel->registerObject("core", this);
+
     ui->dependencyView->page()->settings()->setAttribute(QWebEngineSettings::LocalContentCanAccessRemoteUrls, true);
-    ui->dependencyView->page()->settings()->setAttribute(QWebEngineSettings::LocalContentCanAccessFileUrls, true);
-    m_webchannel->registerObject(QStringLiteral("core"), this);
+    ui->dependencyView->page()->settings()->setAttribute(QWebEngineSettings::LocalContentCanAccessFileUrls, true);  
     ui->dependencyView->setContextMenuPolicy(Qt::NoContextMenu);
     ui->dependencyView->page()->setWebChannel(m_webchannel);
     ui->dependencyView->setUrl(QUrl("file:///SentenceTree_resources/dep.html"));
+
+    ui->constituencyView->page()->settings()->setAttribute(QWebEngineSettings::LocalContentCanAccessRemoteUrls, true);
+    ui->constituencyView->page()->settings()->setAttribute(QWebEngineSettings::LocalContentCanAccessFileUrls, true); 
+    ui->constituencyView->setContextMenuPolicy(Qt::NoContextMenu);
+    ui->constituencyView->page()->setWebChannel(m_webchannel);
+    ui->constituencyView->setUrl(QUrl("file:///SentenceTree_resources/constituency.html"));
 }
 
 STWindow::~STWindow()
