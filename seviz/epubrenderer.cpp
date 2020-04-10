@@ -55,8 +55,9 @@ QString EpubRenderer::serializeTokenizedChapters() const {
     QString ret;
 
     QString cmd = QStringLiteral("window.render.serializeTokenizedChapters();");
-    m_view->page()->runJavaScript(cmd, [&](const QVariant& array) {
-        ret = array.toString();
+    m_view->page()->runJavaScript(cmd, [&](const QVariant& json) {
+        QJsonObject parsed = QJsonObject::fromVariantMap(json.toMap());
+        ret = QJsonDocument(parsed).toJson(QJsonDocument::Compact);
         loop.exit(0);
     });
     loop.exec();

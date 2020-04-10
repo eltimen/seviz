@@ -182,6 +182,8 @@ class Render {
     alreadyOpened;
     viewer;
     chapters;
+    chapterData;
+    model;
 
     constructor() {
         this.alreadyOpened = false;
@@ -314,32 +316,29 @@ class Render {
         for (let i = 0; i < this.chapterData.length; ++i) {
             arr.push(this.chapterData[i].outerHTML);
         }
-        return JSON.stringify({
-            model: JSON.stringify(this.model),
-            dom: JSON.stringify(arr)
-        });
+
+        return {
+            model: this.model,
+            dom: arr
+        };
     }
 
     deserializeTokenizedChapters(json) {
-        json.model = JSON.parse(json.model);
         for (let i = 0; i < json.model.length; ++i) {
             window.core.setModelDataForChapter(i, json.model[i]);
         }
 
-        this.chapterData = JSON.parse(json.dom, (key, value) => {
-            if (Array.isArray(value)) {
-                return value;
-            }
-
+        for (let i = 0; i < json.dom.length; ++i) {
             var el = document.createElement('div');
-            el.innerHTML = value;
-            return el.firstChild;
-        });
+            el.innerHTML = json.dom[i];
+            this.chapterData[i] = el.firstChild;
+        }
     }
 }
 
 function closeBook() {
     window.render = new Render();
+    render = window.render;
     document.getElementById("help").style.display = "visible";
     document.getElementById("viewer").style.visibility = "none";
 }
