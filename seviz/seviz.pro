@@ -70,6 +70,7 @@ SOURCES += \
         modules/EngineTest/EngineTest.cpp \
         modules/EngineTest/enginetestwidget.cpp \
         modules/SentenceTree/SentenceTree.cpp \
+        modules/SentenceTree/constituency.cpp \
         modules/SentenceTree/dependency.cpp \
         modules/SentenceTree/edgetypechoosedialog.cpp \
         modules/SentenceTree/stwindow.cpp
@@ -93,6 +94,7 @@ HEADERS += \
         modules/EngineTest/EngineTest.h \
         modules/EngineTest/enginetestwidget.h \
         modules/SentenceTree/SentenceTree.h \
+        modules/SentenceTree/constituency.h \
         modules/SentenceTree/dependency.h \
         modules/SentenceTree/edgetypechoosedialog.h \
         modules/SentenceTree/stwindow.h \

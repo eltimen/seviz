@@ -3,8 +3,7 @@
 SentenceTree::SentenceTree(IEngine* engine) :
     AbstractModule(engine, "SentenceTree"),
     m_feature("Деревья предложений", QIcon(":/st/icon.png"), new QDockWidget(), this, true),
-    m_widget(this),
-    m_currentSentenceData(m_currentSentence)
+    m_widget(this)
 {
     m_feature.window()->setWidget(&m_widget);
     
@@ -12,6 +11,7 @@ SentenceTree::SentenceTree(IEngine* engine) :
 }
 
 SentenceTree::~SentenceTree() {
+    delete m_currentSentenceData;
 }
 
 QList<Feature> SentenceTree::features() {
@@ -33,7 +33,7 @@ void SentenceTree::render(const Position& from, const Position& to, DomChapter& 
 }
 
 SentenceData& SentenceTree::currentSentenceData() {
-    return m_currentSentenceData;
+    return *m_currentSentenceData;
 }
 
 void SentenceTree::onSentenceChanged(const Position& pos) {
@@ -42,10 +42,13 @@ void SentenceTree::onSentenceChanged(const Position& pos) {
 
     // иначе
     m_currentSentence = m_engine->getBook().getSentence(pos);
-    SentenceData trees(m_currentSentence);
-    m_currentSentenceData = trees;
-    m_storage.insert(pos, trees);
-    m_widget.showSentence(m_currentSentence, trees);
+    m_currentSentenceData = new SentenceData(m_currentSentence);
+    m_storage.insert(pos, *m_currentSentenceData);
+    m_widget.showSentence(m_currentSentence, *m_currentSentenceData);
+
+
+    //test constituency
+    m_currentSentenceData->constituency.insert(std::make_pair(1, 3), ConstituencyLabel::NP);
 }
 
 
