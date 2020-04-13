@@ -44,16 +44,17 @@ void SentenceTree::onSentenceChanged(const Position& pos) {
     // иначе
     m_currentSentence = m_engine->getBook().getSentence(pos);
     m_currentSentenceData = new SentenceData(m_currentSentence);
-    //m_storage.insert(pos, *m_currentSentenceData);
-    m_widget.showSentence(m_currentSentence, *m_currentSentenceData);
 
-    //test constituency
+    //test constituency TODO remove
     int newId = m_currentSentenceData->constituency.insert(std::make_pair(1, 3), ConstituencyLabel::NP);
     qDebug() << m_currentSentenceData->constituency.toBracedString();
     m_currentSentenceData->constituency.change(newId, ConstituencyLabel::SBAR);
     qDebug() << m_currentSentenceData->constituency.toBracedString();
-    m_currentSentenceData->constituency.remove(newId);
-    qDebug() << m_currentSentenceData->constituency.toBracedString();
+
+
+    //m_storage.insert(pos, *m_currentSentenceData);
+    m_widget.showSentence(m_currentSentence, *m_currentSentenceData);
+
 }
 
 

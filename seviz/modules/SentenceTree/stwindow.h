@@ -7,6 +7,7 @@
 class SentenceTree;
 class Sentence;
 struct SentenceData;
+class ConstituencyTree;
 class DependencyTree;
 
 namespace Ui {
@@ -35,6 +36,7 @@ private:
     SentenceTree* m_core;
     QString m_sentenceText;
 
+    void renderConstituency(const ConstituencyTree& tree);
     void renderDependencies(const DependencyTree& tree);
 };
 

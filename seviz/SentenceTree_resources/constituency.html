@@ -14,10 +14,14 @@
 	
 	<script src="./3rdparty/vendor/raphael.js"></script>
 	<script src="./3rdparty/Treant.js"></script>
-	<script src="super-simple.js"></script>
+
+	<div id="help">Наведите курсор мыши на предложение при нажатом Ctrl, чтобы просмотреть его дерево</div>
 
 	<script>
-		new Treant( simple_chart_config );
+        function render(config) {
+            document.getElementById("help").style.display = "none";
+            new Treant(config);
+        }
 	</script>
 
 </body>

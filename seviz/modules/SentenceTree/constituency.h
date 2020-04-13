@@ -51,6 +51,7 @@ public:
     ConstituencyTreeNode* find(int nodeId);
 
     QString toBracedString(const QString& sep = "[]") const;
+    QString toTreantJson(QString& ret) const;
 
 private:
     int m_id;
@@ -79,6 +80,7 @@ public:
     bool remove(int nodeId);
 
     QString toBracedString(const QString& sep = "[]") const;
+    QString toTreantJson() const;
 
 private:
     int m_lastId = 0;

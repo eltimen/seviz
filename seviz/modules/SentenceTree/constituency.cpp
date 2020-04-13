@@ -1,5 +1,7 @@
 #include "constituency.h"
 
+#include <QString>
+
 using std::make_pair;
 
 ConstituencyTree::ConstituencyTree(const Sentence& sent) {
@@ -47,6 +49,29 @@ bool ConstituencyTree::remove(int nodeId) {
 
 QString ConstituencyTree::toBracedString(const QString& sep) const {
     return m_root->toBracedString(sep);
+}
+
+QString ConstituencyTree::toTreantJson() const {
+    QString ret = QStringLiteral(R"(
+    {
+    "chart": {
+        "container": "#OrganiseChart-simple",
+        "levelSeparation": 14,
+        "siblingSeparation": 5,
+        "subTeeSeparation": 10,
+        "connectors": {
+            "type": "step",
+            "style": {
+                "arrow-end": "open-wide-long"
+            }
+        }
+    },
+    "nodeStructure": 
+
+    )");
+    m_root->toTreantJson(ret);
+    ret += "}";
+    return ret;
 }
 
 // ----------------------------------------------------------------------------------------
@@ -171,6 +196,31 @@ QString ConstituencyTreeNode::toBracedString(const QString& sep) const {
         ret.append(sep[1]);
         return ret;
     }
+}
+
+QString ConstituencyTreeNode::toTreantJson(QString& ret) const {
+    ret += QStringLiteral(R"(
+        {
+        "text": { "name": "%1" },
+        "HTMLclass": "noselect",
+        "HTMLid": "%2",
+        "childrenDropLevel": %3,
+        "children": [
+    )").arg(m_isTerminal ? m_token.text() : ConstituencyLabelStr[m_label])
+        .arg(QString::number(m_id))
+        .arg(QString::number(0));
+
+    for (const ConstituencyTreeNode* child : m_children) {
+        child->toTreantJson(ret);
+        ret += ",";
+    }
+
+    ret += QStringLiteral(R"(
+        ]
+        }
+    )").arg(QString::number(m_id));
+
+    return ret;
 }
 
 bool ConstituencyTreeNode::isIncludesRange(const std::pair<int, int>& range) const {

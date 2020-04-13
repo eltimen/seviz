@@ -6,6 +6,7 @@
 #include <QMessageBox>
 #include "BookModels.h"
 #include "SentenceTree.h"
+#include "constituency.h"
 #include "dependency.h"
 #include "edgetypechoosedialog.h"
 
@@ -45,6 +46,7 @@ void STWindow::showSentence(const Sentence& sent, const SentenceData& data) {
     }
     ui->idLabel->setText(QStringLiteral("ID: %1").arg(sent.id()));
 
+    renderConstituency(data.constituency);
     renderDependencies(data.dependency); 
 }
 void STWindow::onDepCreateEdge(int from, int to) {
@@ -79,6 +81,10 @@ void STWindow::onDepChangeEdgeType(int from, int to) {
         // TODO может лучше перерендеривать на уровне JS? например, через forceRedraw() или просто скопипастить код из renderDependencies()
         renderDependencies(tree);
     }
+}
+void STWindow::renderConstituency(const ConstituencyTree& tree) {
+    QString data = tree.toTreantJson();
+    ui->constituencyView->page()->runJavaScript("var constituency = " + data + "; render(constituency);");
 }
 void STWindow::renderDependencies(const DependencyTree& tree) {
     QString docData = tree.toBratJson();
