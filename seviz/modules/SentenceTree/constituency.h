@@ -32,19 +32,20 @@ const QStringList ConstituencyLabelStr = {
     CONSTITUENCY_LABEL(MAKE_STRINGS)
 };
 
-
 class ConstituencyTreeNode {
 public:
-    using ChildrenContainer = std::vector<std::shared_ptr<ConstituencyTreeNode>>;
+    using ChildrenContainer = std::vector<ConstituencyTreeNode*>;
 
     ConstituencyTreeNode(ConstituencyLabel label, int id);
     ConstituencyTreeNode(const Word& token, int id);
     ~ConstituencyTreeNode();
 
+    int id() const;
     std::pair<int, int> tokenRange() const;
+
     void setChildren(ChildrenContainer children);
     void setLabel(ConstituencyLabel label);
-
+    void removeNode(int nodeId);
     void replaceChildrenToNode(const std::pair<int, int>& range, ConstituencyTreeNode* node);
     ConstituencyTreeNode* findParentFor(const std::pair<int, int>& range);
     ConstituencyTreeNode* find(int nodeId);
@@ -74,8 +75,8 @@ public:
     ~ConstituencyTree();
 
     int insert(const std::pair<int, int>& range, ConstituencyLabel label);
-    void change(int nodeId, ConstituencyLabel label);
-    void remove(int nodeId);
+    bool change(int nodeId, ConstituencyLabel label);
+    bool remove(int nodeId);
 
     QString toBracedString(const QString& sep = "[]") const;
 

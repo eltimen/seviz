@@ -5,7 +5,7 @@ using std::make_pair;
 ConstituencyTree::ConstituencyTree(const Sentence& sent) {
     ChildrenContainer tokens;
     for (const Word& token : sent) {
-        tokens.push_back(std::make_shared<ConstituencyTreeNode>(token, ++m_lastId));
+        tokens.push_back(new ConstituencyTreeNode(token, ++m_lastId));
     }
     m_root = new ConstituencyTreeNode(S, ++m_lastId);
     m_root->setChildren(tokens);
@@ -26,9 +26,23 @@ int ConstituencyTree::insert(const std::pair<int, int>& range, ConstituencyLabel
     return m_lastId;
 }
 
-void ConstituencyTree::change(int nodeId, ConstituencyLabel label) {
-    ConstituencyTreeNode* node = m_root->find(nodeId);
-    node->setLabel(label);
+bool ConstituencyTree::change(int nodeId, ConstituencyLabel label) {
+    if (nodeId != m_root->id()) {
+        ConstituencyTreeNode* node = m_root->find(nodeId);
+        node->setLabel(label);
+        return true;
+    } else {
+        return false;
+    }
+}
+
+bool ConstituencyTree::remove(int nodeId) {
+    if (nodeId != m_root->id()) {
+        m_root->removeNode(nodeId);
+        return true;
+    } else {
+        return false;
+    }
 }
 
 QString ConstituencyTree::toBracedString(const QString& sep) const {
@@ -56,6 +70,13 @@ ConstituencyTreeNode::ConstituencyTreeNode(const Word& token, int id)
 }
 
 ConstituencyTreeNode::~ConstituencyTreeNode() {
+    for (ConstituencyTreeNode* child : m_children) {
+        delete child;
+    }
+}
+
+int ConstituencyTreeNode::id() const {
+    return m_id;
 }
 
 std::pair<int, int> ConstituencyTreeNode::tokenRange() const {
@@ -72,6 +93,22 @@ void ConstituencyTreeNode::setLabel(ConstituencyLabel label) {
     m_label = label;
 }
 
+void ConstituencyTreeNode::removeNode(int nodeId) {
+    for (ChildrenContainer::iterator it = m_children.begin(); it != m_children.end(); ++it) {
+        ConstituencyTreeNode* child = *it;
+        if (child->m_id == nodeId) {
+            // когда удаляемый потомок найден, забираем у него его дочерние узлы
+            ChildrenContainer children = child->m_children;
+            // и вставляем их вместо данного узла
+            it = m_children.erase(it);
+            it = m_children.insert(it, children.begin(), children.end());
+            break;
+        } else {
+            child->removeNode(nodeId);
+        }
+    }
+}
+
 void ConstituencyTreeNode::replaceChildrenToNode(const std::pair<int, int>& range, ConstituencyTreeNode* node) {
     assert(!m_isTerminal);
     ChildrenContainer newNodeChildren;
@@ -82,7 +119,7 @@ void ConstituencyTreeNode::replaceChildrenToNode(const std::pair<int, int>& rang
 
     newNodeChildren.push_back(*it);
     it = m_children.erase(it);
-    it = m_children.insert(it, std::unique_ptr<ConstituencyTreeNode>(node));
+    it = m_children.insert(it, node);
     it++;
     
     while (it != m_children.end() && (*it)->isInsideOfRange(range)) {

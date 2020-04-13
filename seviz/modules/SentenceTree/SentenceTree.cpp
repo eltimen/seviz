@@ -49,7 +49,10 @@ void SentenceTree::onSentenceChanged(const Position& pos) {
 
     //test constituency
     int newId = m_currentSentenceData->constituency.insert(std::make_pair(1, 3), ConstituencyLabel::NP);
+    qDebug() << m_currentSentenceData->constituency.toBracedString();
     m_currentSentenceData->constituency.change(newId, ConstituencyLabel::SBAR);
+    qDebug() << m_currentSentenceData->constituency.toBracedString();
+    m_currentSentenceData->constituency.remove(newId);
     qDebug() << m_currentSentenceData->constituency.toBracedString();
 }
 
