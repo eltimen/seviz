@@ -7,7 +7,7 @@ ConstituencyTree::ConstituencyTree(const Sentence& sent) {
     for (const Word& token : sent) {
         tokens.push_back(std::make_shared<ConstituencyTreeNode>(token, ++m_lastId));
     }
-    m_root = new ConstituencyTreeNode(ConstituencyLabel::S, ++m_lastId);
+    m_root = new ConstituencyTreeNode(S, ++m_lastId);
     m_root->setChildren(tokens);
 }
 
@@ -25,6 +25,17 @@ int ConstituencyTree::insert(const std::pair<int, int>& range, ConstituencyLabel
 
     return m_lastId;
 }
+
+void ConstituencyTree::change(int nodeId, ConstituencyLabel label) {
+    ConstituencyTreeNode* node = m_root->find(nodeId);
+    node->setLabel(label);
+}
+
+QString ConstituencyTree::toBracedString(const QString& sep) const {
+    return m_root->toBracedString(sep);
+}
+
+// ----------------------------------------------------------------------------------------
 
 ConstituencyTreeNode::ConstituencyTreeNode(ConstituencyLabel label, int id)
     : m_id(id),
@@ -54,6 +65,11 @@ std::pair<int, int> ConstituencyTreeNode::tokenRange() const {
 void ConstituencyTreeNode::setChildren(ChildrenContainer children) {
     m_children = children;
     m_range = make_pair(children[0]->m_range.first, children[children.size()-1]->m_range.second);
+}
+
+void ConstituencyTreeNode::setLabel(ConstituencyLabel label) {
+    assert(!m_isTerminal);
+    m_label = label;
 }
 
 void ConstituencyTreeNode::replaceChildrenToNode(const std::pair<int, int>& range, ConstituencyTreeNode* node) {
@@ -87,6 +103,37 @@ ConstituencyTreeNode* ConstituencyTreeNode::findParentFor(const std::pair<int, i
     }
     assert(!found->m_isTerminal);
     return found;
+}
+
+ConstituencyTreeNode* ConstituencyTreeNode::find(int nodeId) {
+    if (this->m_id == nodeId) {
+        return this;
+    }
+    for (const auto& child : m_children) {
+        ConstituencyTreeNode* found = nullptr;
+        if (found = child->find(nodeId)) {
+            return found;
+        }
+    }
+    return nullptr;
+}
+
+QString ConstituencyTreeNode::toBracedString(const QString& sep) const {
+    assert(sep.size() == 2);
+
+    if (m_isTerminal) {
+        return m_token.text();
+    } else {
+        QString ret = sep[0];
+        ret.append(ConstituencyLabelStr[m_label] + " ");
+
+        for (const auto& child : m_children) {
+            ret.append(child->toBracedString(sep));
+            ret.append(" ");
+        }
+        ret.append(sep[1]);
+        return ret;
+    }
 }
 
 bool ConstituencyTreeNode::isIncludesRange(const std::pair<int, int>& range) const {

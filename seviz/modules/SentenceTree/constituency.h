@@ -23,7 +23,7 @@
     DO(WHPP)
 
 #define MAKE_ENUM(VAR) VAR,
-enum class ConstituencyLabel {
+enum ConstituencyLabel {
     CONSTITUENCY_LABEL(MAKE_ENUM)
 };
 
@@ -43,8 +43,13 @@ public:
 
     std::pair<int, int> tokenRange() const;
     void setChildren(ChildrenContainer children);
+    void setLabel(ConstituencyLabel label);
+
     void replaceChildrenToNode(const std::pair<int, int>& range, ConstituencyTreeNode* node);
     ConstituencyTreeNode* findParentFor(const std::pair<int, int>& range);
+    ConstituencyTreeNode* find(int nodeId);
+
+    QString toBracedString(const QString& sep = "[]") const;
 
 private:
     int m_id;
@@ -71,6 +76,8 @@ public:
     int insert(const std::pair<int, int>& range, ConstituencyLabel label);
     void change(int nodeId, ConstituencyLabel label);
     void remove(int nodeId);
+
+    QString toBracedString(const QString& sep = "[]") const;
 
 private:
     int m_lastId = 0;
