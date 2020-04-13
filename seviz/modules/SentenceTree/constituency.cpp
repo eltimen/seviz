@@ -3,9 +3,9 @@
 using std::make_pair;
 
 ConstituencyTree::ConstituencyTree(const Sentence& sent) {
-    std::vector<ConstituencyTreeNode*> tokens;
+    ChildrenContainer tokens;
     for (const Word& token : sent) {
-        tokens.push_back(new ConstituencyTreeNode(token, ++m_lastId));
+        tokens.push_back(std::make_shared<ConstituencyTreeNode>(token, ++m_lastId));
     }
     m_root = new ConstituencyTreeNode(ConstituencyLabel::S, ++m_lastId);
     m_root->setChildren(tokens);
@@ -45,9 +45,6 @@ ConstituencyTreeNode::ConstituencyTreeNode(const Word& token, int id)
 }
 
 ConstituencyTreeNode::~ConstituencyTreeNode() {
-    for (ConstituencyTreeNode* child : m_children) {
-        delete child;
-    }
 }
 
 std::pair<int, int> ConstituencyTreeNode::tokenRange() const {
@@ -61,7 +58,7 @@ void ConstituencyTreeNode::setChildren(ChildrenContainer children) {
 
 void ConstituencyTreeNode::replaceChildrenToNode(const std::pair<int, int>& range, ConstituencyTreeNode* node) {
     assert(!m_isTerminal);
-    std::vector<ConstituencyTreeNode*> newNodeChildren;
+    ChildrenContainer newNodeChildren;
 
     decltype(m_children)::iterator it = std::find_if(m_children.begin(), m_children.end(), [&range](const auto& child) { 
         return child->isInsideOfRange(range); 
@@ -69,7 +66,7 @@ void ConstituencyTreeNode::replaceChildrenToNode(const std::pair<int, int>& rang
 
     newNodeChildren.push_back(*it);
     it = m_children.erase(it);
-    it = m_children.insert(it, node);
+    it = m_children.insert(it, std::unique_ptr<ConstituencyTreeNode>(node));
     it++;
     
     while (it != m_children.end() && (*it)->isInsideOfRange(range)) {
@@ -82,7 +79,7 @@ void ConstituencyTreeNode::replaceChildrenToNode(const std::pair<int, int>& rang
 
 ConstituencyTreeNode* ConstituencyTreeNode::findParentFor(const std::pair<int, int>& range) {
     ConstituencyTreeNode* found = this;
-    for (ConstituencyTreeNode* child : m_children) {
+    for (auto& child : m_children) {
         if (child->isIncludesRange(range)) {
             found = child->findParentFor(range);
             break;

@@ -2,6 +2,8 @@
 #define CONSTITUENCY_H
 
 #include <utility>
+#include <memory>
+#include <vector>
 #include "BookModels.h"
 
 // taken from penn treebank
@@ -32,9 +34,9 @@ const QStringList ConstituencyLabelStr = {
 
 
 class ConstituencyTreeNode {
-    using ChildrenContainer=std::vector<ConstituencyTreeNode*>;
-
 public:
+    using ChildrenContainer = std::vector<std::shared_ptr<ConstituencyTreeNode>>;
+
     ConstituencyTreeNode(ConstituencyLabel label, int id);
     ConstituencyTreeNode(const Word& token, int id);
     ~ConstituencyTreeNode();
@@ -61,6 +63,7 @@ private:
 
 class ConstituencyTree
 {
+    using ChildrenContainer = ConstituencyTreeNode::ChildrenContainer;
 public:
     ConstituencyTree(const Sentence& sent);
     ~ConstituencyTree();

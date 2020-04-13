@@ -11,6 +11,7 @@ SentenceTree::SentenceTree(IEngine* engine) :
 }
 
 SentenceTree::~SentenceTree() {
+    // TODO
     delete m_currentSentenceData;
 }
 
@@ -25,9 +26,9 @@ void SentenceTree::render(const Position& from, const Position& to, DomChapter& 
     for (const Paragraph& par : ch.sections.first()) {
         for (const Sentence& sent : par) {
             Position pos = Position(ch.id(), 1, par.id(), sent.id());
-            if (!m_storage.contains(pos) || m_storage.value(pos, SentenceData(sent)).dependencyState == NODATA) {
+            //if (!m_storage.contains(pos) || m_storage.value(pos, SentenceData(sent)).dependencyState == NODATA) {
                 dom.addStyle(pos, "background-color: #ffe6e6;");
-            }
+            //}
         }
     }
 }
@@ -43,7 +44,7 @@ void SentenceTree::onSentenceChanged(const Position& pos) {
     // иначе
     m_currentSentence = m_engine->getBook().getSentence(pos);
     m_currentSentenceData = new SentenceData(m_currentSentence);
-    m_storage.insert(pos, *m_currentSentenceData);
+    //m_storage.insert(pos, *m_currentSentenceData);
     m_widget.showSentence(m_currentSentence, *m_currentSentenceData);
 
 

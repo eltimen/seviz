@@ -42,6 +42,6 @@ private:
 
     Sentence m_currentSentence;
     SentenceData *m_currentSentenceData = nullptr;
-    QMap<Position, SentenceData> m_storage;
+    //QMap<Position, SentenceData> m_storage;
 };
 
