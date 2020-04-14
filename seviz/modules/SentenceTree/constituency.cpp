@@ -215,10 +215,11 @@ void ConstituencyTreeNode::toTreantJson(QString& ret, int depth, int maxDepth) c
     ret += QStringLiteral(R"(
         {
         "text": { "name": "%1" },
-        "HTMLclass": "noselect",
-        "HTMLid": "%2",
+        "HTMLclass": "%2",
+        "HTMLid": "%3",
         "children": [
     )").arg(m_isTerminal ? m_token.text() : ConstituencyLabelStr[m_label])
+        .arg(m_isTerminal ? "token" : (depth == 0 ? "label root" : "label"))
         .arg(QString::number(m_id));
 
     for (const ConstituencyTreeNode* child : m_children) {
