@@ -31,11 +31,26 @@
                 new Treant(config);
 
                 // setup handlers
+                var hoverNode;
+
+                window.onkeyup = function (e) {
+                    //del
+                    if (e.keyCode == 46 && hoverNode) {
+                        core.onConstituencyDeleteNode(hoverNode.id);
+                    }
+                }
+
                 let nodes = document.getElementsByClassName('node');
                 for (let i = 0; i < nodes.length; i++) {
                     let node = nodes[i];
                     node.ondblclick = function () {
                         core.onConstituencyChangeNodeType(node.id);
+                    }
+                    node.onmouseover = function () {
+                        hoverNode = node;
+                    }
+                    node.onmouseleave = function () {
+                        hoverNode = undefined;
                     }
                 }
             }

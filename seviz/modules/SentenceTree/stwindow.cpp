@@ -65,6 +65,17 @@ void STWindow::onConstituencyChangeNodeType(int id) {
     }
 }
 
+void STWindow::onConstituencyDeleteNode(int id) {
+    ConstituencyTree& tree = m_core->currentSentenceData().constituency;
+
+    if (tree.canChangeOrDelete(id)) {
+         tree.remove(id);
+         renderConstituency(tree);
+    } else {
+        QMessageBox::warning(this, "Ошибка", "Нельзя удалить корень или элемент предложения");
+    }
+}
+
 // ------------------ dependency tree event handlers ---------------------
 void STWindow::onDepCreateEdge(int from, int to) {
     DependencyTree& tree = m_core->currentSentenceData().dependency;

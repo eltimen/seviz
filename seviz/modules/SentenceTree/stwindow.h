@@ -26,6 +26,7 @@ public:
 
 public slots:
     void onConstituencyChangeNodeType(int id);
+    void onConstituencyDeleteNode(int id);
     void onDepCreateEdge(int from, int to);
     void onDepRemoveEdge(int from, int to);
     void onDepChangeEdgeType(int from, int to);
