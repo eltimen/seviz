@@ -1,6 +1,7 @@
 #include "constituency.h"
 
 #include <QString>
+#include <QDebug>
 
 using std::make_pair;
 
@@ -18,10 +19,10 @@ ConstituencyTree::~ConstituencyTree() {
 }
 
 int ConstituencyTree::insert(const std::pair<int, int>& range, ConstituencyLabel label) {
-    // TODO ïðîâåðèòü íà öèêë (ïåðåñå÷åíèå äèàïàçîíîâ èëè ñîâïàäåíèå äèàïàçîíîâ)
+    // TODO Ð¿Ñ€Ð¾Ð²ÐµÑ€Ð¸Ñ‚ÑŒ Ð½Ð° Ñ†Ð¸ÐºÐ» (Ð¿ÐµÑ€ÐµÑÐµÑ‡ÐµÐ½Ð¸Ðµ Ð´Ð¸Ð°Ð¿Ð°Ð·Ð¾Ð½Ð¾Ð² Ð¸Ð»Ð¸ ÑÐ¾Ð²Ð¿Ð°Ð´ÐµÐ½Ð¸Ðµ Ð´Ð¸Ð°Ð¿Ð°Ð·Ð¾Ð½Ð¾Ð²)
 
     ConstituencyTreeNode* newNode = new ConstituencyTreeNode(label, ++m_lastId);
-    // ïîèñê áëèæàéøåãî ïðåäêà äëÿ äîáàâëÿåìîé âåðøèíû è âñòàâêà â íåãî
+    // Ð¿Ð¾Ð¸ÑÐº Ð±Ð»Ð¸Ð¶Ð°Ð¹ÑˆÐµÐ³Ð¾ Ð¿Ñ€ÐµÐ´ÐºÐ° Ð´Ð»Ñ Ð´Ð¾Ð±Ð°Ð²Ð»ÑÐµÐ¼Ð¾Ð¹ Ð²ÐµÑ€ÑˆÐ¸Ð½Ñ‹ Ð¸ Ð²ÑÑ‚Ð°Ð²ÐºÐ° Ð² Ð½ÐµÐ³Ð¾
     ConstituencyTreeNode* parent = m_root->findParentFor(range);
     parent->replaceChildrenToNode(range, newNode);
 
@@ -61,15 +62,12 @@ QString ConstituencyTree::toTreantJson() const {
         "subTeeSeparation": 10,
         "connectors": {
             "type": "step",
-            "style": {
-                "arrow-end": "open-wide-long"
-            }
+            "style": { "arrow-end": "open-wide-long" }
         }
     },
     "nodeStructure": 
-
     )");
-    m_root->toTreantJson(ret);
+    m_root->toTreantJson(ret, 0, m_root->maxDepth());
     ret += "}";
     return ret;
 }
@@ -122,9 +120,9 @@ void ConstituencyTreeNode::removeNode(int nodeId) {
     for (ChildrenContainer::iterator it = m_children.begin(); it != m_children.end(); ++it) {
         ConstituencyTreeNode* child = *it;
         if (child->m_id == nodeId) {
-            // êîãäà óäàëÿåìûé ïîòîìîê íàéäåí, çàáèðàåì ó íåãî åãî äî÷åðíèå óçëû
+            // ÐºÐ¾Ð³Ð´Ð° ÑƒÐ´Ð°Ð»ÑÐµÐ¼Ñ‹Ð¹ Ð¿Ð¾Ñ‚Ð¾Ð¼Ð¾Ðº Ð½Ð°Ð¹Ð´ÐµÐ½, Ð·Ð°Ð±Ð¸Ñ€Ð°ÐµÐ¼ Ñƒ Ð½ÐµÐ³Ð¾ ÐµÐ³Ð¾ Ð´Ð¾Ñ‡ÐµÑ€Ð½Ð¸Ðµ ÑƒÐ·Ð»Ñ‹
             ChildrenContainer children = child->m_children;
-            // è âñòàâëÿåì èõ âìåñòî äàííîãî óçëà
+            // Ð¸ Ð²ÑÑ‚Ð°Ð²Ð»ÑÐµÐ¼ Ð¸Ñ… Ð²Ð¼ÐµÑÑ‚Ð¾ Ð´Ð°Ð½Ð½Ð¾Ð³Ð¾ ÑƒÐ·Ð»Ð°
             it = m_children.erase(it);
             it = m_children.insert(it, children.begin(), children.end());
             break;
@@ -180,6 +178,15 @@ ConstituencyTreeNode* ConstituencyTreeNode::find(int nodeId) {
     return nullptr;
 }
 
+int ConstituencyTreeNode::maxDepth() const {
+    int depth = 0;
+    for (const auto& child : m_children) {
+        int d = child->maxDepth();
+        depth = std::max(depth, d);
+    }
+    return depth + 1;
+}
+
 QString ConstituencyTreeNode::toBracedString(const QString& sep) const {
     assert(sep.size() == 2);
 
@@ -198,29 +205,32 @@ QString ConstituencyTreeNode::toBracedString(const QString& sep) const {
     }
 }
 
-QString ConstituencyTreeNode::toTreantJson(QString& ret) const {
+void ConstituencyTreeNode::toTreantJson(QString& ret, int depth, int maxDepth) const {
+    
+    int dropLevel = m_isTerminal ? maxDepth - 1 - depth : 0;
+    for (int i = 0; i < dropLevel; ++i) {
+        ret.append("{ pseudo: true, children: [");
+    }
+
     ret += QStringLiteral(R"(
         {
         "text": { "name": "%1" },
         "HTMLclass": "noselect",
         "HTMLid": "%2",
-        "childrenDropLevel": %3,
         "children": [
     )").arg(m_isTerminal ? m_token.text() : ConstituencyLabelStr[m_label])
-        .arg(QString::number(m_id))
-        .arg(QString::number(0));
+        .arg(QString::number(m_id));
 
     for (const ConstituencyTreeNode* child : m_children) {
-        child->toTreantJson(ret);
+        child->toTreantJson(ret, depth+1, maxDepth);
         ret += ",";
     }
 
-    ret += QStringLiteral(R"(
-        ]
-        }
-    )").arg(QString::number(m_id));
+    ret += "]} \n";
 
-    return ret;
+    for (int i = 0; i < dropLevel; ++i) {
+        ret.append("]}");
+    }
 }
 
 bool ConstituencyTreeNode::isIncludesRange(const std::pair<int, int>& range) const {
@@ -230,7 +240,7 @@ bool ConstituencyTreeNode::isIncludesRange(const std::pair<int, int>& range) con
     assert(a.first <= a.second);
     assert(b.first <= b.second);
 
-    //b âíóòðè a
+    //b Ð²Ð½ÑƒÑ‚Ñ€Ð¸ a
     return b.first >= a.first && b.second <= a.second;
 }
 
@@ -241,6 +251,6 @@ bool ConstituencyTreeNode::isInsideOfRange(const std::pair<int, int>& range) con
     assert(a.first <= a.second);
     assert(b.first <= b.second);
 
-    //a âíóòðè b
+    //a Ð²Ð½ÑƒÑ‚Ñ€Ð¸ b
     return a.first >= b.first && a.second <= b.second;
 }

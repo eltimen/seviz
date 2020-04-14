@@ -49,9 +49,10 @@ public:
     void replaceChildrenToNode(const std::pair<int, int>& range, ConstituencyTreeNode* node);
     ConstituencyTreeNode* findParentFor(const std::pair<int, int>& range);
     ConstituencyTreeNode* find(int nodeId);
+    int maxDepth() const;
 
     QString toBracedString(const QString& sep = "[]") const;
-    QString toTreantJson(QString& ret) const;
+    void toTreantJson(QString& ret, int depth, int maxDepth) const;
 
 private:
     int m_id;
