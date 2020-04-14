@@ -72,7 +72,7 @@ SOURCES += \
         modules/SentenceTree/SentenceTree.cpp \
         modules/SentenceTree/constituency.cpp \
         modules/SentenceTree/dependency.cpp \
-        modules/SentenceTree/edgetypechoosedialog.cpp \
+        modules/SentenceTree/choosepalettedialog.cpp \
         modules/SentenceTree/stwindow.cpp
 
 HEADERS += \
@@ -96,7 +96,7 @@ HEADERS += \
         modules/SentenceTree/SentenceTree.h \
         modules/SentenceTree/constituency.h \
         modules/SentenceTree/dependency.h \
-        modules/SentenceTree/edgetypechoosedialog.h \
+        modules/SentenceTree/choosepalettedialog.h \
         modules/SentenceTree/stwindow.h \
         modules/modules.h
 
@@ -104,7 +104,7 @@ FORMS += \
         bookloader/bookloaderdialog.ui \
         mainwindow.ui \
         modules/EngineTest/enginetestwidget.ui \
-        modules/SentenceTree/edgetypechoosedialog.ui \
+        modules/SentenceTree/choosepalettedialog.ui \
         modules/SentenceTree/stwindow.ui
 
 # Default rules for deployment.

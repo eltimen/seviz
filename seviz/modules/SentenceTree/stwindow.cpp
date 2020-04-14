@@ -8,7 +8,7 @@
 #include "SentenceTree.h"
 #include "constituency.h"
 #include "dependency.h"
-#include "edgetypechoosedialog.h"
+#include "choosepalettedialog.h"
 
 STWindow::STWindow(SentenceTree* core) :
     QWidget(nullptr),
@@ -48,20 +48,35 @@ void STWindow::showSentence(const Sentence& sent, const SentenceData& data) {
 
     renderConstituency(data.constituency);
     renderDependencies(data.dependency); 
-}
+}// ------------------ constituency tree event handlers ---------------------
+void STWindow::onConstituencyChangeNodeType(int id) {
+    ConstituencyTree& tree = m_core->currentSentenceData().constituency;
+
+    if (tree.canChangeOrDelete(id)) {
+        QScopedPointer<ChoosePaletteDialog> chooser(new ChoosePaletteDialog(this, ConstituencyLabelStr, 4));
+        chooser->setWindowTitle("Выберите тип узла");
+        if (chooser->exec()) {
+            ConstituencyLabel rel = static_cast<ConstituencyLabel>(chooser->getChoosedIndex());
+            tree.change(id, rel);
+            renderConstituency(tree);
+        }
+    } else {
+        QMessageBox::warning(this, "Ошибка", "Нельзя менять тип узла корня или элементов предложения");
+    }
+}
+
+// ------------------ dependency tree event handlers ---------------------
 void STWindow::onDepCreateEdge(int from, int to) {
     DependencyTree& tree = m_core->currentSentenceData().dependency;
     if (tree.canInsertRelation(from, to)) {
-        QScopedPointer<EdgeTypeChooseDialog> chooser(new EdgeTypeChooseDialog(this, DependencyRelationStr));
+        QScopedPointer<ChoosePaletteDialog> chooser(new ChoosePaletteDialog(this, DependencyRelationStr));
         if (chooser->exec()) {
-            DependencyRelation rel = chooser->getChoosedDepType();
-            if (tree.canInsertRelation(from, to)) {
-                tree.insert(from, to, rel);
-                renderDependencies(tree);
-            }
+            DependencyRelation rel = static_cast<DependencyRelation>(chooser->getChoosedIndex());
+            tree.insert(from, to, rel);
+            renderDependencies(tree);
         }
     } else {
-        QMessageBox::critical(this, "Ошибка", "Дерево зависимостей не может содержать циклов или параллельных связей");
+        QMessageBox::warning(this, "Ошибка", "Дерево зависимостей не может содержать циклов или параллельных связей");
     }
 }
 
@@ -74,14 +89,16 @@ void STWindow::onDepRemoveEdge(int from, int to) {
 void STWindow::onDepChangeEdgeType(int from, int to) {
     DependencyTree& tree = m_core->currentSentenceData().dependency;
 
-    QScopedPointer<EdgeTypeChooseDialog> chooser(new EdgeTypeChooseDialog(this, DependencyRelationStr));
+    QScopedPointer<ChoosePaletteDialog> chooser(new ChoosePaletteDialog(this, DependencyRelationStr));
     if (chooser->exec()) {
-        DependencyRelation rel = chooser->getChoosedDepType();
+        DependencyRelation rel = static_cast<DependencyRelation>(chooser->getChoosedIndex());
         tree.change(from, to, rel);
         // TODO может лучше перерендеривать на уровне JS? например, через forceRedraw() или просто скопипастить код из renderDependencies()
         renderDependencies(tree);
     }
 }
+
+// --------------------- render methods ----------------------------
 void STWindow::renderConstituency(const ConstituencyTree& tree) {
     QString data = tree.toTreantJson();
     ui->constituencyView->page()->runJavaScript("var constituency = " + data + "; render(constituency);");

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
     <head>
     <meta charset="utf-8">
@@ -8,21 +8,37 @@
 	<link rel="stylesheet" href="./3rdparty/Treant.css">
 	<link rel="stylesheet" href="constituency.css">
 </head>
-<body>
-	<div class="chart" id="OrganiseChart-simple">
-	</div>
-	
-	<script src="./3rdparty/vendor/raphael.js"></script>
-	<script src="./3rdparty/Treant.js"></script>
+    <body>
+        <div class="chart" id="OrganiseChart-simple">
+        </div>
 
-	<div id="help">Наведите курсор мыши на предложение при нажатом Ctrl, чтобы просмотреть его дерево</div>
+        <script type="text/javascript" src="qrc:///qtwebchannel/qwebchannel.js"></script>
+        <script src="./3rdparty/vendor/raphael.js"></script>
+        <script src="./3rdparty/Treant.js"></script>
 
-	<script>
-        function render(config) {
-            document.getElementById("help").style.display = "none";
-            new Treant(config);
-        }
-	</script>
+        <div id="help">Наведите курсор мыши на предложение при нажатом Ctrl, чтобы просмотреть его дерево</div>
 
-</body>
+        <script>
+            window.channel = new QWebChannel(qt.webChannelTransport,
+                function (channel) {
+                    console.log("init");
+                    window.core = channel.objects.core;
+                    //window.core.setPageLoadedState(false);
+                });
+
+            function render(config) {
+                document.getElementById("help").style.display = "none";
+                new Treant(config);
+
+                // setup handlers
+                let nodes = document.getElementsByClassName('node');
+                for (let i = 0; i < nodes.length; i++) {
+                    let node = nodes[i];
+                    node.ondblclick = function () {
+                        core.onConstituencyChangeNodeType(node.id);
+                    }
+                }
+            }
+        </script>
+    </body>
 </html>

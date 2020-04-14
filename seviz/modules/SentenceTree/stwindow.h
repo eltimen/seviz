@@ -25,6 +25,7 @@ public:
     void showSentence(const Sentence& sent, const SentenceData& data);
 
 public slots:
+    void onConstituencyChangeNodeType(int id);
     void onDepCreateEdge(int from, int to);
     void onDepRemoveEdge(int from, int to);
     void onDepChangeEdgeType(int from, int to);

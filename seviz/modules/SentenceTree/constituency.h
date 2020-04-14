@@ -42,6 +42,7 @@ public:
 
     int id() const;
     std::pair<int, int> tokenRange() const;
+    bool isSentenceToken() const;
 
     void setChildren(ChildrenContainer children);
     void setLabel(ConstituencyLabel label);
@@ -77,6 +78,9 @@ public:
     ~ConstituencyTree();
 
     int insert(const std::pair<int, int>& range, ConstituencyLabel label);
+
+    bool canChangeOrDelete(int nodeId) const;
+
     bool change(int nodeId, ConstituencyLabel label);
     bool remove(int nodeId);
 
