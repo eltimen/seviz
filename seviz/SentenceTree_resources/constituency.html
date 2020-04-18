@@ -53,20 +53,24 @@
                 }
             
             }).on('stop', ({ inst, selected }) => {
-                let from = Number(selected[0].id);
-                let to = Number(selected[0].id);
+                if (selected.length == 0) {
+                    inst.cancel();
+                } else {
+                    let from = Number(selected[0].id);
+                    let to = Number(selected[0].id);
 
-                selected[0].classList.remove('selected');
-                for (let i = 1; i < selected.length; ++i) {
-                    selected[i].classList.remove('selected');
+                    selected[0].classList.remove('selected');
+                    for (let i = 1; i < selected.length; ++i) {
+                        selected[i].classList.remove('selected');
 
-                    if (from > Number(selected[i].id))
-                        from = Number(selected[i].id);
-                    if (to < Number(selected[selected.length-1].id))
-                        to = Number(selected[selected.length-1].id);
+                        if (from > Number(selected[i].id))
+                            from = Number(selected[i].id);
+                        if (to < Number(selected[selected.length-1].id))
+                            to = Number(selected[selected.length-1].id);
+                    }
+
+                    core.onConstituencyCreateNode(from, to);
                 }
-
-                core.onConstituencyCreateNode(from, to);
             });
 
             //render function
