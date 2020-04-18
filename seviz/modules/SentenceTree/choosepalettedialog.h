@@ -18,6 +18,11 @@ public:
 
     int getChoosedIndex() const;
 
+    template <typename T>
+    T getChoosedAsEnum() const {
+        return static_cast<T>(m_result);
+    }
+
 private slots:
     void onTypeButtonClicked();
 

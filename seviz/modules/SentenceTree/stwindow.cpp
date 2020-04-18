@@ -4,6 +4,7 @@
 #include <QWebEngineSettings>
 #include <QWebChannel>
 #include <QMessageBox>
+#include <QDebug>
 #include "BookModels.h"
 #include "SentenceTree.h"
 #include "constituency.h"
@@ -49,10 +50,28 @@ void STWindow::showSentence(const Sentence& sent, const SentenceData& data) {
     renderConstituency(data.constituency);
     renderDependencies(data.dependency); 
 }// ------------------ constituency tree event handlers ---------------------
+void STWindow::onConstituencyCreateNode(int from, int to) {
+    ConstituencyTree& tree = m_core->currentSentenceData().constituency;
+
+    if (tree.canInsertNodeWithRange(from, to)) {
+        QScopedPointer<ChoosePaletteDialog> chooser(new ChoosePaletteDialog(this, ConstituencyLabelStr, 4));
+        chooser->setWindowTitle("Выберите тип узла");
+        if (chooser->exec()) {
+            ConstituencyLabel label = chooser->getChoosedAsEnum<ConstituencyLabel>();
+            tree.insert(std::make_pair(from, to), label);
+            renderConstituency(tree);
+        }
+    } else {
+        QMessageBox::warning(this, "Ошибка", "Нельзя менять тип узла корня или элементов предложения");
+    }
+
+    qDebug() << tree.toBracedString();
+}
+
 void STWindow::onConstituencyChangeNodeType(int id) {
     ConstituencyTree& tree = m_core->currentSentenceData().constituency;
 
-    if (tree.canChangeOrDelete(id)) {
+    if (tree.canChangeOrDeleteNode(id)) {
         QScopedPointer<ChoosePaletteDialog> chooser(new ChoosePaletteDialog(this, ConstituencyLabelStr, 4));
         chooser->setWindowTitle("Выберите тип узла");
         if (chooser->exec()) {
@@ -68,7 +87,7 @@ void STWindow::onConstituencyChangeNodeType(int id) {
 void STWindow::onConstituencyDeleteNode(int id) {
     ConstituencyTree& tree = m_core->currentSentenceData().constituency;
 
-    if (tree.canChangeOrDelete(id)) {
+    if (tree.canChangeOrDeleteNode(id)) {
          tree.remove(id);
          renderConstituency(tree);
     } else {

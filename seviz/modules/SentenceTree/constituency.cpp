@@ -29,12 +29,16 @@ int ConstituencyTree::insert(const std::pair<int, int>& range, ConstituencyLabel
     return m_lastId;
 }
 
-bool ConstituencyTree::canChangeOrDelete(int nodeId) const {
+bool ConstituencyTree::canInsertNodeWithRange(int from, int to) const {
+    return true;
+}
+
+bool ConstituencyTree::canChangeOrDeleteNode(int nodeId) const {
     return m_root->id() != nodeId && !m_root->find(nodeId)->isSentenceToken();
 }
 
 bool ConstituencyTree::change(int nodeId, ConstituencyLabel label) {
-    if (canChangeOrDelete(nodeId)) {
+    if (canChangeOrDeleteNode(nodeId)) {
         ConstituencyTreeNode* node = m_root->find(nodeId);
         node->setLabel(label);
         return true;
@@ -44,7 +48,7 @@ bool ConstituencyTree::change(int nodeId, ConstituencyLabel label) {
 }
 
 bool ConstituencyTree::remove(int nodeId) {
-    if (canChangeOrDelete(nodeId)) {
+    if (canChangeOrDeleteNode(nodeId)) {
         m_root->removeNode(nodeId);
         return true;
     } else {
@@ -145,7 +149,7 @@ void ConstituencyTreeNode::replaceChildrenToNode(const std::pair<int, int>& rang
     ChildrenContainer newNodeChildren;
 
     decltype(m_children)::iterator it = std::find_if(m_children.begin(), m_children.end(), [&range](const auto& child) { 
-        return child->isInsideOfRange(range); 
+        return child->isInsideOfRange(range) && child->tokenRange().first == range.first; 
     });
 
     newNodeChildren.push_back(*it);

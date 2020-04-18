@@ -78,11 +78,11 @@ public:
     ~ConstituencyTree();
 
     int insert(const std::pair<int, int>& range, ConstituencyLabel label);
-
-    bool canChangeOrDelete(int nodeId) const;
-
     bool change(int nodeId, ConstituencyLabel label);
     bool remove(int nodeId);
+
+    bool canInsertNodeWithRange(int from, int to) const;
+    bool canChangeOrDeleteNode(int nodeId) const;
 
     QString toBracedString(const QString& sep = "[]") const;
     QString toTreantJson() const;
