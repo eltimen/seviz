@@ -1,5 +1,6 @@
 #include "constituency.h"
 
+#include <algorithm>
 #include <QString>
 #include <QDebug>
 
@@ -19,18 +20,24 @@ ConstituencyTree::~ConstituencyTree() {
 }
 
 int ConstituencyTree::insert(const std::pair<int, int>& range, ConstituencyLabel label) {
-    // TODO проверить на цикл (пересечение диапазонов или совпадение диапазонов)
-
-    ConstituencyTreeNode* newNode = new ConstituencyTreeNode(label, ++m_lastId);
-    // поиск ближайшего предка для добавляемой вершины и вставка в него
-    ConstituencyTreeNode* parent = m_root->findParentFor(range);
-    parent->replaceChildrenToNode(range, newNode);
-
-    return m_lastId;
+    try {
+        ConstituencyTreeNode* newNode = new ConstituencyTreeNode(label, ++m_lastId);
+        NodeInsertPosition pos = m_root->findPositionToInsertNode(range);
+        pos.parent->replaceChildrenToNode(pos.childrenRange, range, newNode);
+        return m_lastId;
+    } catch (int) {
+        return -1;
+    }
 }
 
 bool ConstituencyTree::canInsertNodeWithRange(int from, int to) const {
-    return true;
+    try {
+        NodeInsertPosition pos = m_root->findPositionToInsertNode(std::make_pair(from, to));
+
+        return true;
+    } catch (int) {
+        return false;
+    }
 }
 
 bool ConstituencyTree::canChangeOrDeleteNode(int nodeId) const {
@@ -144,37 +151,48 @@ void ConstituencyTreeNode::removeNode(int nodeId) {
     }
 }
 
-void ConstituencyTreeNode::replaceChildrenToNode(const std::pair<int, int>& range, ConstituencyTreeNode* node) {
-    assert(!m_isTerminal);
-    ChildrenContainer newNodeChildren;
+NodeInsertPosition ConstituencyTreeNode::findPositionToInsertNode(const std::pair<int, int>& range) {
+    ConstituencyTreeNode* parent = findParentFor(range);
+    if (parent) {
+        decltype(m_children)::iterator it = std::find_if(parent->m_children.begin(), parent->m_children.end(), [&range](const auto& child) {
+            return child->tokenRange().first == range.first && child->isInsideOfRange(range);
+        });
 
-    decltype(m_children)::iterator it = std::find_if(m_children.begin(), m_children.end(), [&range](const auto& child) { 
-        return child->isInsideOfRange(range) && child->tokenRange().first == range.first; 
-    });
+        if (it == parent->m_children.end()) {
+            throw -2;
+        }
 
-    newNodeChildren.push_back(*it);
-    it = m_children.erase(it);
-    it = m_children.insert(it, node);
-    it++;
-    
-    while (it != m_children.end() && (*it)->isInsideOfRange(range)) {
-        newNodeChildren.push_back(*it);
-        it = m_children.erase(it);
+        ChildrenContainer::iterator from = it;
+        while (it != parent->m_children.end() && (*it)->isInsideOfRange(range)) {
+            it++;
+            if (it != parent->m_children.end() && range.second >= (*it)->m_range.first && range.second < (*it)->m_range.second) {
+                throw -3;
+            }
+        }
+
+        return NodeInsertPosition(parent, from, it);
     }
+    throw -1;
+}
 
+void ConstituencyTreeNode::replaceChildrenToNode(const ItersPair& iters, const std::pair<int, int>& range, ConstituencyTreeNode* node) {
+    assert(!m_isTerminal);
+    ChildrenContainer newNodeChildren(iters.first, iters.second);
+    ChildrenContainer::iterator it = m_children.erase(iters.first, iters.second);
+    m_children.insert(it, node);
     node->setChildren(newNodeChildren);
 }
 
-ConstituencyTreeNode* ConstituencyTreeNode::findParentFor(const std::pair<int, int>& range) {
-    ConstituencyTreeNode* found = this;
+ConstituencyTreeNode* ConstituencyTreeNode::findParentFor(const std::pair<int, int>& range) const {
+    const ConstituencyTreeNode* found = this;
     for (auto& child : m_children) {
-        if (child->isIncludesRange(range)) {
+        if (child->isIncludesRange(range) && !child->m_isTerminal) {
             found = child->findParentFor(range);
             break;
         }
     }
     assert(!found->m_isTerminal);
-    return found;
+    return (ConstituencyTreeNode*)found;
 }
 
 ConstituencyTreeNode* ConstituencyTreeNode::find(int nodeId) {

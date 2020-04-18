@@ -23,18 +23,34 @@
     DO(WHPP)
 
 #define MAKE_ENUM(VAR) VAR,
+#define MAKE_STRINGS(VAR) QStringLiteral(#VAR),
 enum ConstituencyLabel {
     CONSTITUENCY_LABEL(MAKE_ENUM)
 };
 
-#define MAKE_STRINGS(VAR) QStringLiteral(#VAR),
 const QStringList ConstituencyLabelStr = {
     CONSTITUENCY_LABEL(MAKE_STRINGS)
+};
+
+class ConstituencyTreeNode;
+
+struct NodeInsertPosition {
+    using ChildrenContainer = std::vector<ConstituencyTreeNode*>;
+    NodeInsertPosition(ConstituencyTreeNode* parent, ChildrenContainer::iterator& from, ChildrenContainer::iterator& to) 
+        : parent(parent),
+          childrenRange(std::make_pair(from, to))
+    {
+        assert(from <= to);
+    }
+
+    ConstituencyTreeNode* parent;
+    std::pair<ChildrenContainer::iterator, ChildrenContainer::iterator> childrenRange;
 };
 
 class ConstituencyTreeNode {
 public:
     using ChildrenContainer = std::vector<ConstituencyTreeNode*>;
+    using ItersPair = std::pair<ChildrenContainer::iterator, ChildrenContainer::iterator>;
 
     ConstituencyTreeNode(ConstituencyLabel label, int id);
     ConstituencyTreeNode(const Word& token, int id);
@@ -47,8 +63,8 @@ public:
     void setChildren(ChildrenContainer children);
     void setLabel(ConstituencyLabel label);
     void removeNode(int nodeId);
-    void replaceChildrenToNode(const std::pair<int, int>& range, ConstituencyTreeNode* node);
-    ConstituencyTreeNode* findParentFor(const std::pair<int, int>& range);
+    void replaceChildrenToNode(const ItersPair&, const std::pair<int, int>& range, ConstituencyTreeNode* node);
+    NodeInsertPosition findPositionToInsertNode(const std::pair<int, int>& range);
     ConstituencyTreeNode* find(int nodeId);
     int maxDepth() const;
 
@@ -66,6 +82,7 @@ private:
 
     ChildrenContainer m_children;
 
+    ConstituencyTreeNode* findParentFor(const std::pair<int, int>& range) const;
     bool isIncludesRange(const std::pair<int, int>& range) const;
     bool isInsideOfRange(const std::pair<int, int>& range) const;
 };

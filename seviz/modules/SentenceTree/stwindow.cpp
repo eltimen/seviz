@@ -62,7 +62,7 @@ void STWindow::onConstituencyCreateNode(int from, int to) {
             renderConstituency(tree);
         }
     } else {
-        QMessageBox::warning(this, "Ошибка", "Нельзя менять тип узла корня или элементов предложения");
+        QMessageBox::warning(this, "Ошибка", "Дерево составляющих не может содержать пересекающиеся узлы");
     }
 
     qDebug() << tree.toBracedString();
