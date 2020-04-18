@@ -19,21 +19,27 @@ ConstituencyTree::~ConstituencyTree() {
     delete m_root;
 }
 
-int ConstituencyTree::insert(const std::pair<int, int>& range, ConstituencyLabel label) {
+int ConstituencyTree::insert(const std::pair<int, int>& range, ConstituencyLabel label, NodeInsertPosition* position) {
     try {
         ConstituencyTreeNode* newNode = new ConstituencyTreeNode(label, ++m_lastId);
-        NodeInsertPosition pos = m_root->findPositionToInsertNode(range);
-        pos.parent->replaceChildrenToNode(pos.childrenRange, range, newNode);
+        if (position) {
+            position->parent->replaceChildrenToNode(position->childrenRange, range, newNode);
+        } else {
+            NodeInsertPosition pos = m_root->findPositionToInsertNode(range);
+            pos.parent->replaceChildrenToNode(pos.childrenRange, range, newNode);
+        }
         return m_lastId;
     } catch (int) {
         return -1;
     }
 }
 
-bool ConstituencyTree::canInsertNodeWithRange(int from, int to) const {
+bool ConstituencyTree::canInsertNodeWithRange(int from, int to, NodeInsertPosition* position) const {
     try {
         NodeInsertPosition pos = m_root->findPositionToInsertNode(std::make_pair(from, to));
-
+        if (position) {
+            *position = pos;
+        }
         return true;
     } catch (int) {
         return false;

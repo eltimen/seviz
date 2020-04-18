@@ -36,6 +36,7 @@ class ConstituencyTreeNode;
 
 struct NodeInsertPosition {
     using ChildrenContainer = std::vector<ConstituencyTreeNode*>;
+    NodeInsertPosition() = default;
     NodeInsertPosition(ConstituencyTreeNode* parent, ChildrenContainer::iterator& from, ChildrenContainer::iterator& to) 
         : parent(parent),
           childrenRange(std::make_pair(from, to))
@@ -94,11 +95,11 @@ public:
     ConstituencyTree(const Sentence& sent);
     ~ConstituencyTree();
 
-    int insert(const std::pair<int, int>& range, ConstituencyLabel label);
+    int insert(const std::pair<int, int>& range, ConstituencyLabel label, NodeInsertPosition* position = nullptr);
     bool change(int nodeId, ConstituencyLabel label);
     bool remove(int nodeId);
 
-    bool canInsertNodeWithRange(int from, int to) const;
+    bool canInsertNodeWithRange(int from, int to, NodeInsertPosition* position = nullptr) const;
     bool canChangeOrDeleteNode(int nodeId) const;
 
     QString toBracedString(const QString& sep = "[]") const;

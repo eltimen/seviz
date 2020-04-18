@@ -53,12 +53,13 @@ void STWindow::showSentence(const Sentence& sent, const SentenceData& data) {
 void STWindow::onConstituencyCreateNode(int from, int to) {
     ConstituencyTree& tree = m_core->currentSentenceData().constituency;
 
-    if (tree.canInsertNodeWithRange(from, to)) {
+    NodeInsertPosition pos;
+    if (tree.canInsertNodeWithRange(from, to, &pos)) {
         QScopedPointer<ChoosePaletteDialog> chooser(new ChoosePaletteDialog(this, ConstituencyLabelStr, 4));
         chooser->setWindowTitle("Выберите тип узла");
         if (chooser->exec()) {
             ConstituencyLabel label = chooser->getChoosedAsEnum<ConstituencyLabel>();
-            tree.insert(std::make_pair(from, to), label);
+            tree.insert(std::make_pair(from, to), label, &pos);
             renderConstituency(tree);
         }
     } else {
