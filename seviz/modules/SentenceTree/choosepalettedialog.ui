@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>EdgeTypeChooseDialog</class>
- <widget class="QDialog" name="EdgeTypeChooseDialog">
+ <class>ChoosePaletteDialog</class>
+ <widget class="QDialog" name="ChoosePaletteDialog">
   <property name="geometry">
    <rect>
     <x>0</x>

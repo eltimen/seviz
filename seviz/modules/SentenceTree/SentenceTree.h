@@ -3,14 +3,20 @@
 #include <QObject>
 #include "AbstractModule.h"
 #include "stwindow.h"
+#include "constituency.h"
 #include "dependency.h"
 
 enum SentenceState {NODATA, PARTIAL, DONE};
 
 struct SentenceData {
-    SentenceData(const Sentence& sent) : dependency(sent) {}
+    SentenceData(const Sentence& sent)
+        : constituency(sent),
+        dependency(sent) {}
 
+    ConstituencyTree constituency;
     DependencyTree dependency;
+
+    SentenceState constituencyState = NODATA;
     SentenceState dependencyState = NODATA;
 };
 
@@ -35,7 +41,7 @@ private:
     STWindow m_widget;
 
     Sentence m_currentSentence;
-    SentenceData m_currentSentenceData;
-    QMap<Position, SentenceData> m_storage;
+    SentenceData *m_currentSentenceData = nullptr;
+    //QMap<Position, SentenceData> m_storage;
 };
 

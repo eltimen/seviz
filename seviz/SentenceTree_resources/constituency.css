@@ -1,0 +1,31 @@
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,textarea,p,blockquote,th,td { margin:0; padding:0; }
+
+body { background: #fff; }
+
+/* optional Container STYLES */
+/* .chart { height: 500px; width: 500px; margin: 5px; margin: 5px auto; border: 3px solid #DDD; border-radius: 3px; } */
+.chart { margin: 5px; margin: 5px auto; }
+
+.node {
+    user-select: none;
+    padding: 3px;
+}
+
+.node :hover { 
+    font-weight: bold
+}
+
+.selection {
+    background: rgba(46, 115, 252, 0.11);
+    border-radius: 0.1em;
+    border: 2px solid rgba(98, 155, 255, 0.81);
+}
+
+.node.selected {
+    border: 1px solid blue;
+    border-radius: 2px;
+    padding: 2px;
+}
+
+/* .node { color: #9CB5ED; border: 2px solid #C8C8C8; border-radius: 3px; } */
+/* .node p { font-size: 15px; line-height: 20px; height: 20px; font-weight: bold; padding: 3px; margin: 0; } */
