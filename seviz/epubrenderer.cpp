@@ -240,20 +240,23 @@ void EpubRenderer::processEvent(const QByteArray& mouseEvent) {
         }
     }
 
-    Position pos(m_book->getCurrentChapter().id(), 1, parId, sentId, wordId);
-    QString type = eventData["type"].toString();
-    bool alt = eventData["altKey"].toBool();
-    bool shift = eventData["shiftKey"].toBool();
-    bool ctrl = eventData["ctrlKey"].toBool();
-    
-    for (const auto& h : m_handlers.values(type)) {
-        if ((alt == (h.modifierKey == ALT)) && 
-            (shift == (h.modifierKey == SHIFT)) && 
-            (ctrl == (h.modifierKey == CTRL)) &&
-            pos.hasElement(h.onElements)) 
-        {
-            h.slot(pos);
+    try {
+        Position pos(m_book->getCurrentChapter().id(), 1, parId, sentId, wordId);
+        QString type = eventData["type"].toString();
+        bool alt = eventData["altKey"].toBool();
+        bool shift = eventData["shiftKey"].toBool();
+        bool ctrl = eventData["ctrlKey"].toBool();
+
+        for (const auto& h : m_handlers.values(type)) {
+            if ((alt == (h.modifierKey == ALT)) &&
+                (shift == (h.modifierKey == SHIFT)) &&
+                (ctrl == (h.modifierKey == CTRL)) &&
+                pos.hasElement(h.onElements)) {
+                h.slot(pos);
+            }
         }
+    } catch (int) {
+
     }
 }
 

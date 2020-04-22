@@ -86,6 +86,9 @@ const QList<Chapter>& Book::chapters() const {
 }
 
 const Chapter& Book::getCurrentChapter() const {
+    if (m_currentChapterIndex == -1) {
+        throw -1;
+    }
     return m_chapters[m_currentChapterIndex];
 }
 
