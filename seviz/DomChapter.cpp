@@ -22,7 +22,6 @@ void DomChapter::addStyleToSpan(const Position& from, const Position& to, const 
     }
 
     Position iter(from);
-    iter.setBook(m_chapter.book());
 
     // TODO refactor
 
