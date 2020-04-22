@@ -24,7 +24,7 @@ enum TailPosition {
 
 class Position {
 public:
-    Position(int idChapter, int idSection = -1, int idParagraph = -1, int idSentence = -1, int idWord = -1, TailPosition tail = NOT_TAIL, const Book* book = nullptr);
+    Position(int idChapter, int idSection = -1, int idParagraph = -1, int idSentence = -1, int idWord = -1, TailPosition tail = NOT_TAIL);
     Position() : Position(1) {}
 
     bool operator<(const Position& o) const;
@@ -49,7 +49,7 @@ public:
 
     bool hasElement(ElementType type);
 
-    void setBook(const Book* book) { m_book = book; }
+    static void setBook(const Book* book) { m_book = book; }
 
     // !!! для функций-итераторов предварительно нужно задать книгу через setBook
     Position prevChapter() const;
@@ -89,8 +89,7 @@ private:
     int m_idWord;
     TailPosition m_tail;
 
-
-    const Book* m_book;
+    static const Book* m_book;
 };
 
 class Section : public QList<Paragraph> {

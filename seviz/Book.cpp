@@ -27,9 +27,9 @@ void Book::open() {
         if (!files.empty()) {
             // TODO взять путь к opf из META_INF/container.xml. пока берем первый попавшийся opf из epub
             QString opf = files.filter(QRegularExpression(".\.opf$"))[0];
+            Position::setBook(this);
             m_chapters = m_renderer->open(this, opf);
             m_moduleManager.bookOpened(this, m_epubDir, m_chapters);
-
         } else {
             throw InvalidEpubException();
         }
