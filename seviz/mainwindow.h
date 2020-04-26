@@ -24,6 +24,7 @@ private slots:
 
     void onChapterChanged(int index);
 
+    void disableConfictFeatures();
 private:
     void setupModules();
 

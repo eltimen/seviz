@@ -6,7 +6,9 @@
 EngineTest::EngineTest(IEngine* engine)
     : AbstractModule(engine, "EngineTest"),
       m_widget(*this),
-      m_feat("Тесты", QIcon(), new QDockWidget(), this, true, new QMenu("Тест")) {
+      m_feat("Тесты", QIcon(), new QDockWidget(), this, true, new QMenu("Тест")),
+      m_feat2("Тесты 2", QIcon(), new QDockWidget(), this, true, new QMenu("Тест 2"))
+{
     m_widget.m_engine = m_engine;
     m_feat.window()->setWidget(&m_widget);
     m_feat.menu()->addAction("Тест", [this]() { QMessageBox::information(m_feat.window(), "Сообщение", "Тест"); });
@@ -18,6 +20,15 @@ EngineTest::EngineTest(IEngine* engine)
         Word w = m_engine->getBook().getWord(pos);
         QMessageBox::information(m_feat.window(), "Обработчик", w.text());
     });
+
+    // для тестирование болкировки/разблокировки конфликтущих feature
+    m_engine->registerHandler(EventType::MOUSE_OVER, ElementType::WORD, ALT, m_feat2, [this](const Position& pos) {
+        Word w = m_engine->getBook().getWord(pos);
+        QMessageBox::information(m_feat2.window(), "Обработчик из второй feature", w.text());
+    });
+    m_engine->registerHotkey(QKeySequence("Shift+A"), m_feat2, [this]() {
+        QMessageBox::information(m_feat2.window(), "Обработчик из второй feature", "Shift+A");
+    });
 }
 
 EngineTest::~EngineTest() {
@@ -25,7 +36,8 @@ EngineTest::~EngineTest() {
 
 QList<Feature> EngineTest::features() {
     return { 
-        m_feat
+        m_feat,
+        m_feat2
     };
 }
 

@@ -24,8 +24,10 @@ public:
 
     // методы для ядра
     void bookOpened(Book* book, QTemporaryDir& epubDir, QList<Chapter>& chapters);
-    QList<Feature*> featureEnabled(const Feature& feature);
+    void featureEnabled(const Feature& feature);
     void featureDisabled(const Feature& feature);
+    // возвращает функции, которые имеют конфликтующие обработчики или хоткеи с f
+    QMultiMap<Feature, QString> getConflictFeaturesFor(const Feature& f);
 
     // для загрузчика книги (BookLoader)
     EpubRenderer& getBookRender();
@@ -52,11 +54,10 @@ private:
     Book* m_book = nullptr;
     QMultiMap<const AbstractModule*, Feature*> m_enabledFeatures;
 
-    QMultiMap<Feature, QPair<Handler, bool>> m_handlers;
+    QMultiMap<Feature, Handler> m_handlers;
     QMultiMap<Feature, QShortcut*> m_hotkeys;
 
-    // возвращает функции, которые имеют конфликтующие обработчики или хоткеи с указанной
-    QList<Feature*> getConflictFeaturesFor(const Feature& f);
+    QString handlerToString(const Handler& h);
 
     void destroy();
     std::vector<AbstractModule*> registrar();

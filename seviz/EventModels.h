@@ -32,6 +32,7 @@ struct Handler {
     ElementType onElements;
     Button modifierKey;
     std::function<void(const Position&)> slot;
+    bool isActive = false;
 
     Handler(EventType onEvent, ElementType onElements, Button modifierKey, const std::function<void(const Position&)>& slot) :
         onEvent(onEvent), onElements(onElements), modifierKey(modifierKey), slot(slot)
@@ -39,7 +40,7 @@ struct Handler {
 
     bool operator==(const Handler& other) const {
         return onEvent == other.onEvent &&
-            onElements == other.onElements &&
+            // onElements == other.onElements &&
             modifierKey == other.modifierKey;
     };
 };

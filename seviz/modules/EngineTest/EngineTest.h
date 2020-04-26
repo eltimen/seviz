@@ -25,5 +25,6 @@ private slots:
 
 private:
     Feature m_feat;
+    Feature m_feat2;
     EngineTestWidget m_widget;
 };

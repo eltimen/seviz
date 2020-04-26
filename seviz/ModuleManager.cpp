@@ -66,16 +66,36 @@ EpubRenderer& ModuleManager::getBookRender() {
     return m_render;
 }
 
-QList<Feature*> ModuleManager::getConflictFeaturesFor(const Feature& f) {
-    // для каждого хоткея из f
-    for (decltype(m_hotkeys)::iterator it = m_hotkeys.begin(); it != m_hotkeys.end(); ++it) {
-        // ищем его среди относящихся к другой функции
-        // TODO
+QMultiMap<Feature, QString> ModuleManager::getConflictFeaturesFor(const Feature& f) {
+    QMultiMap<Feature, QString> ret;
+    QList<Handler> featureHandlers = m_handlers.values(f);
+    QList<QKeySequence> featureHotkeys;
+    for (const QShortcut* sh : m_hotkeys.values(f)) {
+        featureHotkeys << sh->key();
     }
 
-    // TODO аналогично для обработчиков
+    // для всех зарегистрированных обработчиков
+    for (decltype(m_handlers)::iterator i = m_handlers.begin(); i != m_handlers.end(); ++i) {
+        // если он не относится к f и совпадает с каким-нибудь обработчиком, относящимся к f
+        if (i.key() != f && featureHandlers.contains(i.value())) {
+            ret.insert(i.key(), handlerToString(i.value()));
+        }
+    }
 
-    return {};
+    // для всех зарегистрированных хоткеев
+    for (decltype(m_hotkeys)::iterator i = m_hotkeys.begin(); i != m_hotkeys.end(); ++i) {
+        // если он не относится к f и совпадает с каким-нибудь обработчиком, относящимся к f
+        if (i.key() != f && featureHotkeys.contains(i.value()->key())) {
+            ret.insert(i.key(), i.value()->key().toString());
+        }
+    }
+
+    return ret;
+}
+
+QString ModuleManager::handlerToString(const Handler& h) {
+    // TODO выводить, какой обработчик (хранить строковое значение для каждого enum в event handlers?)
+    return "событие"; /// "обработчик на ..."
 }
 
 void ModuleManager::destroy() {
@@ -111,9 +131,7 @@ void ModuleManager::triggerRerendering(const Position& from, const Position& to)
     m_render.updateChapterView(styles);
 }
 
-QList<Feature*> ModuleManager::featureEnabled(const Feature& feature) {
-    QList<Feature*> conflicts = getConflictFeaturesFor(feature);
-
+void ModuleManager::featureEnabled(const Feature& feature) {
     m_enabledFeatures.insert(feature.owner(), const_cast<Feature*>(&feature));
 
     if (feature.affectsView()) {
@@ -123,11 +141,9 @@ QList<Feature*> ModuleManager::featureEnabled(const Feature& feature) {
         i->setEnabled(true);
     }
     for (auto& h : m_handlers.values(feature)) {
-        m_render.addHandler(h.first);
-        h.second = true;
+        m_render.addHandler(h);
+        h.isActive = true;
     }
-
-    return conflicts;
 }
 
 void ModuleManager::featureDisabled(const Feature& feature) {
@@ -141,8 +157,8 @@ void ModuleManager::featureDisabled(const Feature& feature) {
         i->setEnabled(false);
     }
     for (auto& h : m_handlers.values(feature)) {
-        m_render.removeHandler(h.first);
-        h.second = false;
+        m_render.removeHandler(h);
+        h.isActive = false;
     }
 }
 
@@ -151,7 +167,7 @@ void ModuleManager::registerHandler(EventType onEvent, ElementType onElements, B
 
     // TODO проверка
 
-    m_handlers.insert(feature, qMakePair(h, false));
+    m_handlers.insert(feature, h);
 }
 
 void ModuleManager::registerHotkey(const QKeySequence& hotkey, const Feature& feature, const std::function<void()>& slot) {
