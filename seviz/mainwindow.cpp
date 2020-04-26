@@ -55,9 +55,11 @@ void MainWindow::setupModules() {
                 if (checked) {
                     // TODO сделать неактивными все фичи, конфликтующие с включенной
                     m_manager.featureEnabled(f);
+                    disableConfictFeatures();
                     f.window()->show();
                 } else {
                     f.window()->hide();
+                    disableConfictFeatures();
                     m_manager.featureDisabled(f);
                 }
             };
@@ -106,4 +108,28 @@ void MainWindow::onAbout() {
 void MainWindow::onChapterChanged(int index) {
     if (index >= 0)
         m_book->showChapter(index);
+}
+
+void MainWindow::disableConfictFeatures() {
+    for (decltype(m_actions)::iterator it = m_actions.begin(); it != m_actions.end(); ++it) {
+        it->first->setEnabled(true);
+        it->second->setEnabled(true);
+        it->first->setToolTip(it.key().name());
+        it->second->setToolTip(it.key().name());
+    }
+
+    for (decltype(m_actions)::iterator it = m_actions.begin(); it != m_actions.end(); ++it) {
+        // если эта feature активна 
+        if (it->first->isChecked()) {
+            // получаем для нее все конфликтные feature и блокируем их кнопки и меню
+            QMultiMap<Feature, QString> conflicts = m_manager.getConflictFeaturesFor(it.key());
+            for (Feature& f : conflicts.uniqueKeys()) {
+                m_actions.value(f).first->setEnabled(false);
+                m_actions.value(f).second->setEnabled(false);
+                // TODO выводить почему конфликтует
+                m_actions.value(f).first->setToolTip(QString("Функция отключена, т.к. конфликтует с функцией \"%1\"").arg(it.key().name()));
+                m_actions.value(f).second->setToolTip(QString("Функция отключена, т.к. конфликтует с функцией \"%1\"").arg(it.key().name()));
+            }
+        }
+    }
 }

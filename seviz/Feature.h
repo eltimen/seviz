@@ -27,11 +27,16 @@ public:
 	//Feature(const Feature& other) = delete;
 
 	inline bool operator== (const Feature& other) const {
-		return m_name == other.m_name && m_owner == other.m_owner;
+		return m_name == other.m_name;
+	}
+
+	inline bool operator!= (const Feature& other) const {
+		return !(*this == other);
 	}
 
 	inline friend bool operator< (const Feature& first, const Feature& second) {
-		return first.m_name < second.m_name && first.m_owner < second.m_owner;
+		// TODO сравнение еще и по owner'ам
+		return first.m_name < second.m_name;
 	}
 
 	const QString& name() const { return m_name; }
