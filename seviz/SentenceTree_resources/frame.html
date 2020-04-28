@@ -1,0 +1,136 @@
+﻿<!DOCTYPE html>
+<html>
+    <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width">
+    <title> Chart emulation </title>
+    <link rel="stylesheet" href="./3rdparty/Treant.css">
+    <link rel="stylesheet" href="frame.css">
+</head>
+    <body>
+        <div class="chart" id="OrganiseChart-simple">
+        </div>
+
+        <script type="text/javascript" src="qrc:///qtwebchannel/qwebchannel.js"></script>
+        <script src="./3rdparty/vendor/raphael.js"></script>
+        <script src="./3rdparty/Treant.js"></script>
+
+        <div id="help">Наведите курсор мыши на предложение при нажатом Ctrl, чтобы просмотреть его дерево</div>
+        
+        <script>
+        var config = {
+	chart: {
+		container: "#OrganiseChart-simple",
+        levelSeparation: 14,
+        siblingSeparation: 5,
+        subTeeSeparation: 10,
+        connectors: {
+            type: "step", 
+            style: {
+                "arrow-end": "classic-wide-long"
+            } 
+        }
+	},
+	
+	nodeStructure: {
+        HTMLClass: "frame",
+        text: { name: "Visiting"},
+        children: [ 
+        
+           { pseudo: true, children: [
+           { pseudo: true, children: [{
+                        HTMLclass: "word",
+                        text: { title: "Agent", name: "He" }, 
+           }] }] }, 
+        
+            { pseudo: true, children: [
+           { pseudo: true, children: [
+           {
+                        HTMLclass: "word",
+                        text: { title: "LU", name: "visited" }, 
+           } ]} ]}, 
+        
+        {
+            HTMLClass: "frame",
+            text: { title: "Entity", name: "Spatial_collocation"},
+            children: [
+            { pseudo: true, children: [
+                {
+                        HTMLclass: "word",
+                        text: { title: "Figure", name: "the office" }, 
+                }, ]},
+        
+        { pseudo: true, children: [
+                {
+                        HTMLclass: "word",
+                        text: { title: "LU", name: "where" }, 
+                }, ]},
+        
+                {HTMLClass: "frame",
+                text: { title: "Ground", name: "Event"},
+                
+                children: [
+                    {
+                        HTMLclass: "word",
+                        text: { title: "Event", name: "a fire" }, 
+                    },
+                    {
+                        HTMLclass: "word",
+                        text: { title: "Time", name: "recently" }, 
+                    },
+                    {
+                        HTMLclass: "word",
+                        text: { title: "LU", name: "ocurred" }, 
+                    },
+                ]}
+            ]}
+        ] 
+	}
+};
+        </script>
+
+        <script>
+        
+            // qt
+            window.channel = new QWebChannel(qt.webChannelTransport,
+                function (channel) {
+                    console.log("init");
+                    window.core = channel.objects.core;
+                    //window.core.setPageLoadedState(false);
+                });
+            
+            //render function
+            function render(config) {
+                document.getElementById("help").style.display = "none";
+                new Treant(config);
+
+                // setup handlers
+                var hoverNode;
+
+                window.onkeyup = function (e) {
+                    //del
+                    if (e.keyCode == 46 && hoverNode) {
+                        //core.onConstituencyDeleteNode(hoverNode.id);
+                    }
+                }
+
+                let nodes = document.getElementsByClassName('node');
+                for (let i = 0; i < nodes.length; i++) {
+                    let node = nodes[i];
+                    node.ondblclick = function () {
+                        //core.onConstituencyChangeNodeType(node.id);
+                    }
+                    node.onmouseover = function () {
+                        hoverNode = node;
+                    }
+                    node.onmouseleave = function () {
+                        hoverNode = undefined;
+                    }
+                }
+            }
+            
+            window.onload = render(config); ////
+        </script>
+    </body>
+</html>

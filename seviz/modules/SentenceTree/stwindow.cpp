@@ -32,6 +32,12 @@ STWindow::STWindow(SentenceTree* core) :
     ui->constituencyView->setContextMenuPolicy(Qt::NoContextMenu);
     ui->constituencyView->page()->setWebChannel(m_webchannel);
     ui->constituencyView->setUrl(QUrl("file:///SentenceTree_resources/constituency.html"));
+
+    ui->framenetView->page()->settings()->setAttribute(QWebEngineSettings::LocalContentCanAccessRemoteUrls, true);
+    ui->framenetView->page()->settings()->setAttribute(QWebEngineSettings::LocalContentCanAccessFileUrls, true);
+    ui->framenetView->setContextMenuPolicy(Qt::NoContextMenu);
+    ui->framenetView->page()->setWebChannel(m_webchannel);
+    ui->framenetView->setUrl(QUrl("file:///SentenceTree_resources/frame.html"));
 }
 
 STWindow::~STWindow()
