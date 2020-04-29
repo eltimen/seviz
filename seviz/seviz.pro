@@ -73,7 +73,12 @@ SOURCES += \
         modules/SentenceTree/constituency.cpp \
         modules/SentenceTree/dependency.cpp \
         modules/SentenceTree/choosepalettedialog.cpp \
-        modules/SentenceTree/stwindow.cpp
+        modules/SentenceTree/frameeditdialog.cpp \
+        modules/SentenceTree/frameelement.cpp \
+        modules/SentenceTree/framenet.cpp \
+        modules/SentenceTree/framenetmodel.cpp \
+        modules/SentenceTree/stwindow.cpp \
+        modules/SentenceTree/wordrange.cpp
 
 HEADERS += \
         3rdparty/quazip/quazip/quagzipfile.h \ #for moc
@@ -97,7 +102,12 @@ HEADERS += \
         modules/SentenceTree/constituency.h \
         modules/SentenceTree/dependency.h \
         modules/SentenceTree/choosepalettedialog.h \
+        modules/SentenceTree/frameeditdialog.h \
+        modules/SentenceTree/frameelement.h \
+        modules/SentenceTree/framenet.h \
+        modules/SentenceTree/framenetmodel.h \
         modules/SentenceTree/stwindow.h \
+        modules/SentenceTree/wordrange.h \
         modules/modules.h
 
 FORMS += \
@@ -105,6 +115,7 @@ FORMS += \
         mainwindow.ui \
         modules/EngineTest/enginetestwidget.ui \
         modules/SentenceTree/choosepalettedialog.ui \
+        modules/SentenceTree/frameeditdialog.ui \
         modules/SentenceTree/stwindow.ui
 
 # Default rules for deployment.

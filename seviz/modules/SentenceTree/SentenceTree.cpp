@@ -1,4 +1,5 @@
 #include "SentenceTree.h"
+#include "frameelement.h" // TEST=====
 
 SentenceTree::SentenceTree(IEngine* engine) :
     AbstractModule(engine, "SentenceTree"),
@@ -37,6 +38,10 @@ SentenceData& SentenceTree::currentSentenceData() {
     return *m_currentSentenceData;
 }
 
+const FrameNetModel& SentenceTree::framesModel() {
+    return m_framesModel;
+}
+
 void SentenceTree::onSentenceChanged(const Position& pos) {
     // TODO проверка на наличие несохраненных изменений
     // TODO если для такой pos предложение было загружено, показать его
@@ -48,6 +53,15 @@ void SentenceTree::onSentenceChanged(const Position& pos) {
     //m_storage.insert(pos, *m_currentSentenceData);
     m_widget.showSentence(m_currentSentence, *m_currentSentenceData);
 
+
+    /// TEST ---
+    Frame* event = new Frame("Event", 5, WordRange(4, 6), framesModel());
+    event->setElement("Event", FrameElement(m_currentSentence.mid(4 - 1, 1)));
+    event->setElement("Time", FrameElement(m_currentSentence.mid(6 - 1, 1)));
+    m_currentSentenceData->framenet.insertFrame(event);
+
+    Frame* visiting = new Frame("Visiting", 2, WordRange(1, 6), framesModel());
+    m_currentSentenceData->framenet.insertFrame(visiting, "Entity");
 }
 
 

@@ -55,6 +55,7 @@ void STWindow::showSentence(const Sentence& sent, const SentenceData& data) {
 
     renderConstituency(data.constituency);
     renderDependencies(data.dependency); 
+
 }// ------------------ constituency tree event handlers ---------------------
 void STWindow::onConstituencyCreateNode(int from, int to) {
     ConstituencyTree& tree = m_core->currentSentenceData().constituency;

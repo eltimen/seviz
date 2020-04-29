@@ -5,19 +5,24 @@
 #include "stwindow.h"
 #include "constituency.h"
 #include "dependency.h"
+#include "framenet.h"
+#include "framenetmodel.h"
 
 enum SentenceState {NODATA, PARTIAL, DONE};
 
 struct SentenceData {
     SentenceData(const Sentence& sent)
         : constituency(sent),
-        dependency(sent) {}
+        dependency(sent),
+        framenet(sent) {}
 
     ConstituencyTree constituency;
     DependencyTree dependency;
+    FrameTree framenet;
 
     SentenceState constituencyState = NODATA;
     SentenceState dependencyState = NODATA;
+    SentenceState framenetState = NODATA;
 };
 
 class SentenceTree : public AbstractModule
@@ -32,6 +37,7 @@ public:
     virtual void render(const Position& from, const Position& to, DomChapter& dom, const QVector<Feature*>& activeFeatures) override;
 
     SentenceData& SentenceTree::currentSentenceData();
+    const FrameNetModel& framesModel();
 
 private slots:
     void onSentenceChanged(const Position& pos);
@@ -42,6 +48,7 @@ private:
 
     Sentence m_currentSentence;
     SentenceData *m_currentSentenceData = nullptr;
+    FrameNetModel m_framesModel;
     //QMap<Position, SentenceData> m_storage;
 };
 
