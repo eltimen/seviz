@@ -13,21 +13,24 @@ class FrameElement;
 class Frame {
 
 public:
-    Frame(const QString& name, int luWordId, const WordRange& range, const FrameNetModel& frameNetDb);
+    Frame(const QString& name, const Word& lu, const WordRange& range, const FrameNetModel& frameNetDb);
 
     WordRange range() const;
-    void setElement(const QString& name, const FrameElement& val);
+    void setElement(const FrameElement& val);
 
     Frame* findParentToInsertFrame(const WordRange& range);
 
+    void toTreantJson(QString& ret, int depth, int maxDepth, const QString& parentFe = "") const;
+    int maxDepth() const;
 private:
     WordRange m_range;// borders in sentence
 
     QString m_name; // name 
     const QStringList m_allowedElements; // allowed FEs
 
-    int m_lu; // LU - word id
-    std::map<QString, FrameElement> m_elements; // FEs
+    Word m_lu; // LU - word id
+    std::map<WordRange, FrameElement> m_elements; // FEs
+    // TODO FE in order of sentence words (ranges?)
 };
 
 class FrameTree {
@@ -35,7 +38,7 @@ public:
     FrameTree(const Sentence& sent);
     ~FrameTree();
 
-    int insertFrame(Frame* frame, const QString& fe = "");
+    int insertFrame(Frame* frame, const QString& parentFe = "");
     bool editFrame(int nodeId);
     bool remove(int nodeId);
 

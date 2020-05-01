@@ -9,6 +9,7 @@
 #include "SentenceTree.h"
 #include "constituency.h"
 #include "dependency.h"
+#include "framenet.h"
 #include "choosepalettedialog.h"
 
 STWindow::STWindow(SentenceTree* core) :
@@ -55,6 +56,7 @@ void STWindow::showSentence(const Sentence& sent, const SentenceData& data) {
 
     renderConstituency(data.constituency);
     renderDependencies(data.dependency); 
+    renderFrameNet(data.framenet); 
 
 }// ------------------ constituency tree event handlers ---------------------
 void STWindow::onConstituencyCreateNode(int from, int to) {
@@ -144,4 +146,9 @@ void STWindow::renderConstituency(const ConstituencyTree& tree) {
 void STWindow::renderDependencies(const DependencyTree& tree) {
     QString docData = tree.toBratJson();
     ui->dependencyView->page()->runJavaScript("docData=" + docData + "; render();");
+}
+
+void STWindow::renderFrameNet(const FrameTree& tree) {
+    QString data = tree.toTreantJson();
+    ui->framenetView->page()->runJavaScript("config=" + data + "; render(config);");
 }

@@ -28,6 +28,10 @@ public:
         return !(*this==other);
     }
 
+    bool operator<(int val) const {
+        return second < val;
+    }
+
     bool contains(int val) const {
         return first <= val && val <= second;
     }

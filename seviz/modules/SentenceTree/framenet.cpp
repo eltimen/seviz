@@ -16,11 +16,11 @@ int FrameTree::insertFrame(Frame* frame, const QString& fe) {
         assert(fe.isEmpty());
         m_rootFrame = frame;
     } else if(m_rootFrame->range().isInsideOf(frame->range())) {
-        // ˝ÚÓ ‡Ò¯ËÂÌËÂ ÍÓÌÂ‚Ó„Ó ÙÂÈÏ‡? 
-        frame->setElement(fe, m_rootFrame);
+        // —ç—Ç–æ —Ä–∞—Å—à–∏—Ä–µ–Ω–∏–µ –∫–æ—Ä–Ω–µ–≤–æ–≥–æ —Ñ—Ä–µ–π–º–∞? 
+        frame->setElement(FrameElement(fe, m_rootFrame));
         m_rootFrame = frame;
     } else if (false) {
-        // ˝ÚÓ ‚ÒÚ‡‚Í‡ ‚ÌÛÚ¸ ÍÓÌÂ‚Ó„Ó ÙÂÈÏ‡?
+        // —ç—Ç–æ –≤—Å—Ç–∞–≤–∫–∞ –≤–Ω—É—Ç—Ä—å –∫–æ—Ä–Ω–µ–≤–æ–≥–æ —Ñ—Ä–µ–π–º–∞?
         //  m_rootFrame->setElement(parentFE, FrameElement(frame));
     } else {
         throw -1;
@@ -29,39 +29,67 @@ int FrameTree::insertFrame(Frame* frame, const QString& fe) {
 }
 
 bool FrameTree::canInsertFrameWithRange(const WordRange& range) {
-    // true, ÂÒÎË ‰ÂÂ‚Ó ÙÂÈÏÓ‚ ÔÛÒÚÓÂ 
-    // ËÎË ‰Ë‡Ô‡ÁÓÌ ‚ÍÎ˛˜‡ÂÚ ‚ ÒÂ·ˇ ‰Ë‡Ô‡ÁÓÌ Ó‰ËÚÂÎ¸ÒÍÓ„Ó ÙÂÈÏ‡
-    // ËÎË ‚ ‰ÂÂ‚Â ÂÒÚ¸ ÙÂÈÏ, ‰Ë‡Ô‡ÁÓÌ ÍÓÚÓÓ„Ó ‚ÍÎ˛˜‡ÂÚ ‚ ÒÂ·ˇ ‰‡ÌÌ˚È ÙÂÈÏ 
-    //      Ë ‚ÒÚ‡‚ÎˇÂÏ˚È ‰Ë‡Ô‡ÁÓÌ ÌÂ ÔÂÂÒÂÍ‡ÂÚÒˇ Ò ‰Ë‡Ô‡ÁÓÌÓÏ ÌË Ó‰ÌÓ„Ó ÙÂÈÏ‡ ‚ ‰ÂÂ‚Â
-    //      Ë ‚ÒÚ‡‚ÎˇÂÏ˚È ‰Ë‡Ô‡ÁÓÌ Ò‚Ó·Ó‰ÂÌ (ÌÂ Á‡ÌˇÚ LU Ë ÌÂ ‚ıÓ‰ËÚ ‚ Í‡ÍËÂ-ÌË·Û‰¸ FE)
+    // true, –µ—Å–ª–∏ –¥–µ—Ä–µ–≤–æ —Ñ—Ä–µ–π–º–æ–≤ –ø—É—Å—Ç–æ–µ 
+    // –∏–ª–∏ –¥–∏–∞–ø–∞–∑–æ–Ω –≤–∫–ª—é—á–∞–µ—Ç –≤ —Å–µ–±—è –¥–∏–∞–ø–∞–∑–æ–Ω —Ä–æ–¥–∏—Ç–µ–ª—å—Å–∫–æ–≥–æ —Ñ—Ä–µ–π–º–∞
+    // –∏–ª–∏ –≤ –¥–µ—Ä–µ–≤–µ –µ—Å—Ç—å —Ñ—Ä–µ–π–º, –¥–∏–∞–ø–∞–∑–æ–Ω –∫–æ—Ç–æ—Ä–æ–≥–æ –≤–∫–ª—é—á–∞–µ—Ç –≤ —Å–µ–±—è –¥–∞–Ω–Ω—ã–π —Ñ—Ä–µ–π–º 
+    //      –∏ –≤—Å—Ç–∞–≤–ª—è–µ–º—ã–π –¥–∏–∞–ø–∞–∑–æ–Ω –Ω–µ –ø–µ—Ä–µ—Å–µ–∫–∞–µ—Ç—Å—è —Å –¥–∏–∞–ø–∞–∑–æ–Ω–æ–º –Ω–∏ –æ–¥–Ω–æ–≥–æ —Ñ—Ä–µ–π–º–∞ –≤ –¥–µ—Ä–µ–≤–µ
+    //      –∏ –≤—Å—Ç–∞–≤–ª—è–µ–º—ã–π –¥–∏–∞–ø–∞–∑–æ–Ω —Å–≤–æ–±–æ–¥–µ–Ω (–Ω–µ –∑–∞–Ω—è—Ç LU –∏ –Ω–µ –≤—Ö–æ–¥–∏—Ç –≤ –∫–∞–∫–∏–µ-–Ω–∏–±—É–¥—å FE)
     return !m_rootFrame || m_rootFrame->range().isOutsideOf(range) ||
         false; // TODO
 }
 
+QString FrameTree::toTreantJson() const {
+    QString ret = QStringLiteral(R"(
+    {
+    "chart": {
+        "container": "#OrganiseChart-simple",
+        "levelSeparation": 14,
+        "siblingSeparation": 5,
+        "subTeeSeparation": 10,
+        "connectors": {
+            "type": "step",
+            "style": { "arrow-end": "open-wide-long" }
+        }
+    },
+    "nodeStructure": 
+    )");
+
+    if (!m_rootFrame) {
+        ret += "{";
+    } else {
+        m_rootFrame->toTreantJson(ret, 0, m_rootFrame->maxDepth());
+    }
+    ret += "}";
+    return ret;
+}
+
 // --------- frame classes -------------------------------------------------------
 
-Frame::Frame(const QString& name, int luWordId, const WordRange& range, const FrameNetModel& frameNetDb) 
+Frame::Frame(const QString& name, const Word& lu, const WordRange& range, const FrameNetModel& frameNetDb) 
     : m_name(name),
-    m_lu(luWordId),
+    m_lu(lu),
     m_allowedElements(frameNetDb.frameElementsFor("name")),
     m_range(range)
 {
+    // –¥–ª—è —É–ø—Ä–æ—â–µ–Ω–∏—è –≤—ã–≤–æ–¥–∞ –¥–µ—Ä–µ–≤–∞ LU –∑–∞–Ω–æ—Å–∏—Ç—Å—è –∫–∞–∫ FE "LU"
+    assert(WordRange(lu.id(), lu.id()) == FrameElement("LU", { lu }).range());
+    m_elements.emplace(WordRange(lu.id(), lu.id()), FrameElement("LU", {lu}));
 }
 
 WordRange Frame::range() const {
     return m_range;
 }
 
-void Frame::setElement(const QString& name, const FrameElement& val) {
-    assert(m_allowedElements.contains(name));
-    assert(!val.range().contains(m_lu));
+void Frame::setElement(const FrameElement& val) {
+    assert(m_allowedElements.contains(val.name()));
+    assert(!val.range().contains(m_lu.id()));
 
-    m_elements[name] = val;
+    m_elements[val.range()] = val;
 }
 
 Frame* Frame::findParentToInsertFrame(const WordRange& range) {
     Frame* found = this;
-    for (const std::pair<QString, FrameElement>& fe : m_elements) {
+    for (const std::pair<WordRange, FrameElement>& fe : m_elements) {
         if (fe.second.isFrame() && fe.second.childFrame()->range().isInsideOf(range)) {
             found = fe.second.childFrame();
             break;
@@ -71,4 +99,34 @@ Frame* Frame::findParentToInsertFrame(const WordRange& range) {
     return m_range.isInsideOf(range) 
         ? found
         : nullptr;
+}
+
+void Frame::toTreantJson(QString& ret, int depth, int maxDepth, const QString& parentFe) const {
+    ret += QStringLiteral(R"(
+        {
+        "text": { title: "%1", name: "%2" }, 
+        "HTMLclass": "frame",
+        "children": [
+    )").arg(parentFe)
+        .arg(m_name);
+
+    for (const std::pair<WordRange, FrameElement>& fe : m_elements) {
+        fe.second.toTreantJson(ret, depth + 1, maxDepth);
+        ret += ",";
+    }
+
+    ret += "]} \n";
+}
+
+int Frame::maxDepth() const {
+    int depth = 0;
+    for (const std::pair<WordRange, FrameElement>& fe : m_elements) {
+        if (fe.second.isFrame()) {
+            int d = fe.second.childFrame()->maxDepth();
+            depth = std::max(depth, d);
+        } else {
+            depth = std::max(depth, 1);
+        }
+    }
+    return depth + 1;
 }

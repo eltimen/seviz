@@ -51,17 +51,20 @@ void SentenceTree::onSentenceChanged(const Position& pos) {
     m_currentSentenceData = new SentenceData(m_currentSentence);
 
     //m_storage.insert(pos, *m_currentSentenceData);
-    m_widget.showSentence(m_currentSentence, *m_currentSentenceData);
-
 
     /// TEST ---
-    Frame* event = new Frame("Event", 5, WordRange(4, 6), framesModel());
-    event->setElement("Event", FrameElement(m_currentSentence.mid(4 - 1, 1)));
-    event->setElement("Time", FrameElement(m_currentSentence.mid(6 - 1, 1)));
+    Frame* event = new Frame("Event", m_currentSentence[5 - 1], WordRange(4, 6), framesModel());
+    event->setElement(FrameElement("Event", m_currentSentence.mid(4 - 1, 1)));
+    event->setElement(FrameElement("Time", m_currentSentence.mid(6 - 1, 1)));
     m_currentSentenceData->framenet.insertFrame(event);
 
-    Frame* visiting = new Frame("Visiting", 2, WordRange(1, 6), framesModel());
+    Frame* spatialColloc = new Frame("Spatial_collocation", m_currentSentence[3 - 1], WordRange(3, 6), framesModel());
+    m_currentSentenceData->framenet.insertFrame(spatialColloc, "Ground");
+
+    Frame* visiting = new Frame("Visiting", m_currentSentence[2 - 1], WordRange(1, 6), framesModel());
     m_currentSentenceData->framenet.insertFrame(visiting, "Entity");
+
+    m_widget.showSentence(m_currentSentence, *m_currentSentenceData);
 }
 
 

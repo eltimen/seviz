@@ -11,26 +11,30 @@ class FrameElement {
 public:
     FrameElement() = default;
 
-    FrameElement(Frame* child)
-        : m_subFrame(child) 
+    FrameElement(const QString& name, Frame* child)
+        : m_subFrame(child),
+        m_name(name)
     { }
 
-    FrameElement(const QList<Word>& phrase)
-        : m_words(phrase) 
+    FrameElement(const QString& name, const QList<Word>& phrase)
+        : m_words(phrase),
+        m_name(name)
     {
         assert(phrase.size() > 0);
-        // TODO assert слова в фразе должны быть соседями
+        // TODO assert СЃР»РѕРІР° РІ С„СЂР°Р·Рµ РґРѕР»Р¶РЅС‹ Р±С‹С‚СЊ СЃРѕСЃРµРґСЏРјРё
     }
 
     bool isWord() const;
     bool isFrame() const;
 
+    QString name() const;
     WordRange range() const;
     Frame* childFrame() const;
     QList<Word> words() const;
 
-    QString toTreantJson() const;
+    void toTreantJson(QString& ret, int depth, int maxDepth) const;
 private:
+    QString m_name;
     // value - frame or word id
     Frame* m_subFrame = nullptr;
     QList<Word> m_words;

@@ -9,6 +9,7 @@ class Sentence;
 struct SentenceData;
 class ConstituencyTree;
 class DependencyTree;
+class FrameTree;
 
 namespace Ui {
 class STWindow;
@@ -41,6 +42,7 @@ private:
 
     void renderConstituency(const ConstituencyTree& tree);
     void renderDependencies(const DependencyTree& tree);
+    void renderFrameNet(const FrameTree& tree);
 };
 
 #endif // STWINDOW_H
