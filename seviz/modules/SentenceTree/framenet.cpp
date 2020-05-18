@@ -12,6 +12,7 @@ FrameTree::~FrameTree() {
 }
 
 int FrameTree::insertFrame(Frame* frame, const QString& fe) {
+    frame->setTreeId(++m_lastId);
     if (!m_rootFrame) {
         assert(fe.isEmpty());
         m_rootFrame = frame;
@@ -19,13 +20,17 @@ int FrameTree::insertFrame(Frame* frame, const QString& fe) {
         // это расширение корневого фрейма? 
         frame->setElement(FrameElement(fe, m_rootFrame));
         m_rootFrame = frame;
-    } else if (false) {
-        // это вставка внутрь корневого фрейма?
+    } else if (m_rootFrame->range().isOutsideOf(frame->range())) {
+        // это уточнение корневого фрейма?
+        // найти самый узкий родительский фрейм (проверяя на пересечения)
         //  m_rootFrame->setElement(parentFE, FrameElement(frame));
+        //
     } else {
+        // попытка добавить фрейм на одном уровне с корневым?
+        // в этой версии такое не реализовано
         throw -1;
     }
-    return 0;
+    return m_lastId;
 }
 
 bool FrameTree::canInsertFrameWithRange(const WordRange& range) {
@@ -34,7 +39,8 @@ bool FrameTree::canInsertFrameWithRange(const WordRange& range) {
     // или в дереве есть фрейм, диапазон которого включает в себя данный фрейм 
     //      и вставляемый диапазон не пересекается с диапазоном ни одного фрейма в дереве
     //      и вставляемый диапазон свободен (не занят LU и не входит в какие-нибудь FE)
-    return !m_rootFrame || m_rootFrame->range().isOutsideOf(range) ||
+    return !m_rootFrame || 
+        m_rootFrame->range().isInsideOf(range) ||
         false; // TODO
 }
 
@@ -55,7 +61,7 @@ QString FrameTree::toTreantJson() const {
     )");
 
     if (!m_rootFrame) {
-        ret += "{";
+        ret += "{}";
     } else {
         m_rootFrame->toTreantJson(ret, 0, m_rootFrame->maxDepth());
     }
@@ -87,28 +93,34 @@ void Frame::setElement(const FrameElement& val) {
     m_elements[val.range()] = val;
 }
 
-Frame* Frame::findParentToInsertFrame(const WordRange& range) {
-    Frame* found = this;
-    for (const std::pair<WordRange, FrameElement>& fe : m_elements) {
-        if (fe.second.isFrame() && fe.second.childFrame()->range().isInsideOf(range)) {
-            found = fe.second.childFrame();
-            break;
-        }
-    }
-
-    return m_range.isInsideOf(range) 
-        ? found
-        : nullptr;
+void Frame::setTreeId(int id) {
+    m_treeId = id;
 }
+
+//Frame* Frame::findParentToInsertFrame(const WordRange& range) {
+//    Frame* found = this;
+//    for (const std::pair<WordRange, FrameElement>& fe : m_elements) {
+//        if (fe.second.isFrame() && fe.second.childFrame()->range().isInsideOf(range)) {
+//            found = fe.second.childFrame();
+//            break;
+//        }
+//    }
+//
+//    return m_range.isInsideOf(range) 
+//        ? found
+//        : nullptr;
+//}
 
 void Frame::toTreantJson(QString& ret, int depth, int maxDepth, const QString& parentFe) const {
     ret += QStringLiteral(R"(
         {
         "text": { title: "%1", name: "%2" }, 
         "HTMLclass": "frame",
+        "HTMLid": "%3",
         "children": [
     )").arg(parentFe)
-        .arg(m_name);
+        .arg(m_name)
+        .arg(QString::number(m_treeId));
 
     for (const std::pair<WordRange, FrameElement>& fe : m_elements) {
         fe.second.toTreantJson(ret, depth + 1, maxDepth);
@@ -116,6 +128,18 @@ void Frame::toTreantJson(QString& ret, int depth, int maxDepth, const QString& p
     }
 
     ret += "]} \n";
+}
+
+Frame* Frame::findLeastParentForRange(const WordRange& range) const {
+    const Frame* found = this;
+    for (const std::pair<WordRange, FrameElement>& fe : m_elements) {
+        if (fe.second.isFrame() && fe.first.isInsideOf(range)) {
+            found = fe.second.childFrame()->findLeastParentForRange(range);
+            break;
+        }
+    }
+    //assert(!found->m_isTerminal);
+    return (Frame*)found;
 }
 
 int Frame::maxDepth() const {

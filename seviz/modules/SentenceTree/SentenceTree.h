@@ -41,7 +41,7 @@ public:
     SentenceData& SentenceTree::currentSentenceData();
     const FrameNetModel& framesModel();
 
-private slots:
+public slots:
     void onSentenceChanged(const Position& pos);
 
 private:

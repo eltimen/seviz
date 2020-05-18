@@ -9,11 +9,13 @@ SentenceTree::SentenceTree(IEngine* engine) :
     m_feature.window()->setWidget(&m_widget);
     
     m_engine->registerHandler(EventType::MOUSE_OVER, ElementType::SENTENCE, CTRL, m_feature, SLOTPOS(onSentenceChanged));
+    m_engine->registerHotkey(QKeySequence("Ctrl+F"), m_feature, [this]() {
+        m_widget.onFrameInsert(m_engine);
+    });
 }
 
 SentenceTree::~SentenceTree() {
     // TODO
-    delete m_currentSentenceData;
 }
 
 QList<Feature> SentenceTree::features() {

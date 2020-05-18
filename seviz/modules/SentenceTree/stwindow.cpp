@@ -58,6 +58,71 @@ void STWindow::showSentence(const Sentence& sent, const SentenceData& data) {
     renderDependencies(data.dependency); 
     renderFrameNet(data.framenet); 
 
+}
+
+void STWindow::onFrameInsert(IEngine* engine) {
+    try {
+        QPair<Position, Position> frameBorders = engine->selectedTextPos();
+        m_core->onSentenceChanged(frameBorders.first);
+        Position& from = frameBorders.first;
+        Position& to = frameBorders.second;
+
+        if (from.chapterId() == to.chapterId() &&
+            from.sectionId() == to.sectionId() &&
+            from.paragraphId() == to.paragraphId() &&
+            from.sentenceId() == to.sentenceId() &&
+            from.wordId() > 0 && to.wordId() > 0) {
+
+            // извлечение списка слов, которые будут внутри фрейма
+            std::vector<Word> frameWords;
+            while (from < to || from == to) {
+                Word w = engine->getBook().getWord(from);
+                if (!w.isPunct()) {
+                    frameWords.emplace_back(engine->getBook().getWord(from));
+                }
+                if (from.hasNextWord()) {
+                    from = from.nextWord();
+                } else {
+                    break;
+                }
+            }
+
+            if (frameWords.size() > 0) {
+                //QMessageBox::information(nullptr, "", QStringLiteral("%1 %2").arg(frameWords[0].text(), frameWords[frameWords.size() - 1].text()));
+                std::vector<std::pair<Word, QString>> possibleFrames;
+                QStringList paletteButtons;
+                for (const Word& w : frameWords) {
+                    QStringList framesForWord = m_core->framesModel().frameNamesForLexicalUnit(w.text());
+                    for (QString& frame : framesForWord) {
+                        possibleFrames.emplace_back(std::make_pair(w, frame));
+                        paletteButtons << QString("%1 (\"%2\")").arg(frame, w.text());
+                    }
+                }
+
+                FrameTree& tree = m_core->currentSentenceData().framenet;
+                WordRange range(frameWords[0].id(), frameWords[frameWords.size() - 1].id());
+                if (tree.canInsertFrameWithRange(range)) {
+                    QScopedPointer<ChoosePaletteDialog> chooser(new ChoosePaletteDialog(this, paletteButtons, 4));
+                    chooser->setWindowTitle("Выберите тип узла");
+                    if (chooser->exec()) {
+                        int index = chooser->getChoosedIndex();
+                        tree.insertFrame(new Frame(possibleFrames[index].second, possibleFrames[index].first, range, m_core->framesModel()));
+                        renderFrameNet(tree);
+                    }
+                } else {
+                    QMessageBox::warning(this, "Ошибка", "Дерево фреймов не может содержать пересекающихся узлов");
+                }
+                
+            } else {
+                throw EmptySelectionException();
+            }
+        } else {
+            throw EmptySelectionException();
+        }
+    } catch (EmptySelectionException&) {
+        QMessageBox::warning(this, "Ошибка", "Для добавления фрейма нужно выделить диапазон слов ВНУТРИ ОДНОГО предложения");
+    }
+   
 }// ------------------ constituency tree event handlers ---------------------
 void STWindow::onConstituencyCreateNode(int from, int to) {
     ConstituencyTree& tree = m_core->currentSentenceData().constituency;

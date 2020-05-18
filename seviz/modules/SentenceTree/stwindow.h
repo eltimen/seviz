@@ -10,6 +10,7 @@ struct SentenceData;
 class ConstituencyTree;
 class DependencyTree;
 class FrameTree;
+class IEngine;
 
 namespace Ui {
 class STWindow;
@@ -24,6 +25,7 @@ public:
     ~STWindow();
 
     void showSentence(const Sentence& sent, const SentenceData& data);
+    void onFrameInsert(IEngine* engine);
 
 public slots:
     void onConstituencyCreateNode(int from, int to);

@@ -140,6 +140,8 @@ public:
 
     int id() const { return m_id; }
     const QString& text() const { return m_text; }
+
+    bool isPunct() const { return m_text.length() == 1 && !QRegExp("\\w+").exactMatch(m_text); }
 };
 
 class Chapter {

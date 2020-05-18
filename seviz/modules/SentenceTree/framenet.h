@@ -17,20 +17,21 @@ public:
 
     WordRange range() const;
     void setElement(const FrameElement& val);
-
-    Frame* findParentToInsertFrame(const WordRange& range);
+    void setTreeId(int id);
 
     void toTreantJson(QString& ret, int depth, int maxDepth, const QString& parentFe = "") const;
+
+    Frame* findLeastParentForRange(const WordRange& range) const;
     int maxDepth() const;
 private:
     WordRange m_range;// borders in sentence
+    int m_treeId = -1;
 
     QString m_name; // name 
     const QStringList m_allowedElements; // allowed FEs
-
     Word m_lu; // LU - word id
     std::map<WordRange, FrameElement> m_elements; // FEs
-    // TODO FE in order of sentence words (ranges?)
+    // TODO FE in order of sentence words (ranges?) 
 };
 
 class FrameTree {
@@ -47,9 +48,9 @@ public:
     QString toTreantJson() const;
 private:
     Sentence m_sentence;
+    int m_lastId = 0;
 
     Frame* m_rootFrame = nullptr;
-
     // adjacency list
     // frame name -> [ {FE, }, ...] ?
     // word_id_range -> [Frame] ?
