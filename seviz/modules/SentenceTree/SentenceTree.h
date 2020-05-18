@@ -1,6 +1,8 @@
 #pragma once
 
 #include <QObject>
+#include <memory>
+#include <map>
 #include "AbstractModule.h"
 #include "stwindow.h"
 #include "constituency.h"
@@ -49,6 +51,6 @@ private:
     Sentence m_currentSentence;
     SentenceData *m_currentSentenceData = nullptr;
     FrameNetModel m_framesModel;
-    //QMap<Position, SentenceData> m_storage;
+    std::map<Position, std::unique_ptr<SentenceData>> m_storage;
 };
 

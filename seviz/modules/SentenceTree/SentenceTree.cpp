@@ -44,13 +44,15 @@ const FrameNetModel& SentenceTree::framesModel() {
 
 void SentenceTree::onSentenceChanged(const Position& pos) {
     // TODO проверка на наличие несохраненных изменений
-    // TODO если для такой pos предложение было загружено, показать его
 
-    // иначе
-    m_currentSentence = m_engine->getBook().getSentence(pos);
-    m_currentSentenceData = new SentenceData(m_currentSentence);
-
-    //m_storage.insert(pos, *m_currentSentenceData);
+    Position sentPos = pos.firstWord();
+    m_currentSentence = m_engine->getBook().getSentence(sentPos);
+    if (m_storage.count(sentPos)) {
+        m_currentSentenceData = m_storage.at(sentPos).get();
+    } else {
+        m_currentSentenceData = new SentenceData(m_currentSentence);
+        m_storage.emplace(sentPos, std::unique_ptr<SentenceData>(m_currentSentenceData));
+    }
 
     /// TEST ---
     Frame* event = new Frame("Event", m_currentSentence[5 - 1], WordRange(4, 6), framesModel());
