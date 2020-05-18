@@ -6,7 +6,7 @@
 EngineTest::EngineTest(IEngine* engine)
     : AbstractModule(engine, "EngineTest"),
       m_widget(*this),
-      m_feat("Тесты движка", QIcon(), new QDockWidget(), this, true, new QMenu("Тест")) {
+      m_feat("Тесты", QIcon(), new QDockWidget(), this, true, new QMenu("Тест")) {
     m_widget.m_engine = m_engine;
     m_feat.window()->setWidget(&m_widget);
     m_feat.menu()->addAction("Тест", [this]() { QMessageBox::information(m_feat.window(), "Сообщение", "Тест"); });
