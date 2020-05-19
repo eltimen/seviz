@@ -5,6 +5,7 @@
 #include <QWebChannel>
 #include <QMessageBox>
 #include <QDebug>
+#include <QInputDialog>
 #include "BookModels.h"
 #include "SentenceTree.h"
 #include "constituency.h"
@@ -101,13 +102,25 @@ void STWindow::onFrameInsert(IEngine* engine) {
 
                 FrameTree& tree = m_core->currentSentenceData().framenet;
                 WordRange range(frameWords[0].id(), frameWords[frameWords.size() - 1].id());
-                if (tree.canInsertFrameWithRange(range)) {
+                FrameInsertionData insertPos;
+                if (tree.canInsertFrameWithRange(range, &insertPos)) {
                     QScopedPointer<ChoosePaletteDialog> chooser(new ChoosePaletteDialog(this, paletteButtons, 4));
-                    chooser->setWindowTitle("Выберите тип узла");
+                    chooser->setWindowTitle("Выберите фрейм и LU");
                     if (chooser->exec()) {
                         int index = chooser->getChoosedIndex();
-                        tree.insertFrame(new Frame(possibleFrames[index].second, possibleFrames[index].first, range, m_core->framesModel()));
-                        renderFrameNet(tree);
+                        Frame* f = new Frame(possibleFrames[index].second, possibleFrames[index].first, range, m_core->framesModel());
+
+                        QString subframeFE;
+                        bool ok = false;
+                        if (insertPos.hasSubframe) {
+                            subframeFE = QInputDialog::getItem(this, "Вставка фрейма", "Выберите элемент для подфрейма: ", f->getFreeElementsList(), 0, false, &ok);
+                        }
+                        
+                        if (!insertPos.hasSubframe || (ok && !subframeFE.isEmpty())) {
+                            tree.insertFrame(f, subframeFE);
+                            renderFrameNet(tree);
+                        }
+
                     }
                 } else {
                     QMessageBox::warning(this, "Ошибка", "Дерево фреймов не может содержать пересекающихся узлов");

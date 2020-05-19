@@ -33,15 +33,24 @@ int FrameTree::insertFrame(Frame* frame, const QString& fe) {
     return m_lastId;
 }
 
-bool FrameTree::canInsertFrameWithRange(const WordRange& range) {
+bool FrameTree::canInsertFrameWithRange(const WordRange& range, FrameInsertionData* data) {
+    bool res = false;
     // true, если дерево фреймов пустое 
     // или диапазон включает в себя диапазон родительского фрейма
     // или в дереве есть фрейм, диапазон которого включает в себя данный фрейм 
     //      и вставляемый диапазон не пересекается с диапазоном ни одного фрейма в дереве
     //      и вставляемый диапазон свободен (не занят LU и не входит в какие-нибудь FE)
-    return !m_rootFrame || 
-        m_rootFrame->range().isInsideOf(range) ||
-        false; // TODO
+    if (!m_rootFrame) {
+        res = true;
+    } else if (m_rootFrame->range().isInsideOf(range)) {
+        res = true;
+        if (data) {
+            data->hasSubframe = true;
+        }
+    } else if (false) { //TODO
+    }
+
+    return res;
 }
 
 QString FrameTree::toTreantJson() const {
@@ -84,6 +93,14 @@ Frame::Frame(const QString& name, const Word& lu, const WordRange& range, const 
 
 WordRange Frame::range() const {
     return m_range;
+}
+
+QStringList Frame::getFreeElementsList() const {
+    QSet<QString> fes;
+    for (const auto& fe : m_elements) {
+        fes << fe.second.name();
+    }
+    return QStringList::fromSet(m_allowedElements.toSet() - fes);
 }
 
 void Frame::setElement(const FrameElement& val) {

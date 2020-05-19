@@ -8,6 +8,10 @@
 #include "framenetmodel.h"
 #include "wordrange.h"
 
+struct FrameInsertionData {
+    bool hasSubframe = false;
+};
+
 class FrameElement;
 
 class Frame {
@@ -16,6 +20,7 @@ public:
     Frame(const QString& name, const Word& lu, const WordRange& range, const FrameNetModel& frameNetDb);
 
     WordRange range() const;
+    QStringList getFreeElementsList() const;
     void setElement(const FrameElement& val);
     void setTreeId(int id);
 
@@ -43,7 +48,7 @@ public:
     bool editFrame(int nodeId);
     bool remove(int nodeId);
 
-    bool canInsertFrameWithRange(const WordRange& range); // may be pos (to check sentence borders)
+    bool canInsertFrameWithRange(const WordRange& range, FrameInsertionData* data = nullptr); // may be pos (to check sentence borders)
 
     QString toTreantJson() const;
 private:
