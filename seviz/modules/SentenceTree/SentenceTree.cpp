@@ -25,14 +25,15 @@ QList<Feature> SentenceTree::features() {
 }
 
 void SentenceTree::render(const Position& from, const Position& to, DomChapter& dom, const QVector<Feature*>& activeFeatures) {
-    const Chapter& ch = m_engine->getBook().getCurrentChapter();
-    for (const Paragraph& par : ch.sections.first()) {
-        for (const Sentence& sent : par) {
-            Position pos = Position(ch.id(), 1, par.id(), sent.id());
-            //if (!m_storage.contains(pos) || m_storage.value(pos, SentenceData(sent)).dependencyState == NODATA) {
-                dom.addStyle(pos, "background-color: #ffe6e6;");
-            //}
+    if (m_currentSentenceData) {
+        dom.addStyle(m_currentSentencePos.firstWord(), "border-left: 1px solid black;");
+        Position pos = m_currentSentencePos.firstWord();
+        while (pos.hasNextWord()) {
+            pos = pos.nextWord();
         }
+        dom.addStyle(pos, "border-right: 1px solid black;");
+
+        dom.addStyle(m_currentSentencePos, "font-weight: bold;");
     }
 }
 
@@ -47,13 +48,13 @@ const FrameNetModel& SentenceTree::framesModel() {
 void SentenceTree::onSentenceChanged(const Position& pos) {
     // TODO проверка на наличие несохраненных изменений
 
-    Position sentPos = pos.firstWord();
-    m_currentSentence = m_engine->getBook().getSentence(sentPos);
-    if (m_storage.count(sentPos)) {
-        m_currentSentenceData = m_storage.at(sentPos).get();
+    m_currentSentencePos = pos.trimmedTo(ElementType::SENTENCE);
+    m_currentSentence = m_engine->getBook().getSentence(m_currentSentencePos);
+    if (m_storage.count(m_currentSentencePos)) {
+        m_currentSentenceData = m_storage.at(m_currentSentencePos).get();
     } else {
         m_currentSentenceData = new SentenceData(m_currentSentence);
-        m_storage.emplace(sentPos, std::unique_ptr<SentenceData>(m_currentSentenceData));
+        m_storage.emplace(m_currentSentencePos, std::unique_ptr<SentenceData>(m_currentSentenceData));
     }
 
     /// TEST ---
@@ -69,6 +70,7 @@ void SentenceTree::onSentenceChanged(const Position& pos) {
     m_currentSentenceData->framenet.insertFrame(visiting, "Entity");
 
     m_widget.showSentence(m_currentSentence, *m_currentSentenceData);
+    m_engine->triggerRerendering(m_currentSentencePos, m_currentSentencePos);
 }
 
 

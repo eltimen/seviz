@@ -47,6 +47,8 @@ public:
     int wordId() const { return m_idWord; }
     TailPosition tail() const { return m_tail; }
 
+    Position trimmedTo(ElementType type) const;
+
     bool hasElement(ElementType type);
 
     static void setBook(const Book* book) { m_book = book; }

@@ -47,10 +47,11 @@ public slots:
 private:
     Feature m_feature;
     STWindow m_widget;
+    FrameNetModel m_framesModel;
 
+    Position m_currentSentencePos;
     Sentence m_currentSentence;
     SentenceData *m_currentSentenceData = nullptr;
-    FrameNetModel m_framesModel;
-    std::map<Position, std::unique_ptr<SentenceData>> m_storage;
+    std::map<Position, std::unique_ptr<SentenceData>> m_storage; 
 };
 
