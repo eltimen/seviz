@@ -25,7 +25,6 @@ public:
     ~STWindow();
 
     void showSentence(const Sentence& sent, const SentenceData& data);
-    void onFrameInsert(IEngine* engine);
 
 public slots:
     void onConstituencyCreateNode(int from, int to);
@@ -34,6 +33,8 @@ public slots:
     void onDepCreateEdge(int from, int to);
     void onDepRemoveEdge(int from, int to);
     void onDepChangeEdgeType(int from, int to);
+    void onFrameInsert(IEngine* engine);
+    void onFrameEdit(int id);
 
 private:
     Ui::STWindow *ui;

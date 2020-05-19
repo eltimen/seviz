@@ -33,6 +33,10 @@ int FrameTree::insertFrame(Frame* frame, const QString& fe) {
     return m_lastId;
 }
 
+Frame* FrameTree::findByTreeId(int id) {
+    return m_rootFrame->find(id);
+}
+
 bool FrameTree::canInsertFrameWithRange(const WordRange& range, FrameInsertionData* data) {
     bool res = false;
     // true, если дерево фреймов пустое 
@@ -80,9 +84,10 @@ QString FrameTree::toTreantJson() const {
 
 // --------- frame classes -------------------------------------------------------
 
-Frame::Frame(const QString& name, const Word& lu, const WordRange& range, const FrameNetModel& frameNetDb) 
+Frame::Frame(const QString& name, const Word& lu, const WordRange& range, const std::vector<Word>& words, const FrameNetModel& frameNetDb)
     : m_name(name),
     m_lu(lu),
+    m_words(words),
     m_allowedElements(frameNetDb.frameElementsFor("name")),
     m_range(range)
 {
@@ -91,8 +96,20 @@ Frame::Frame(const QString& name, const Word& lu, const WordRange& range, const 
     m_elements.emplace(WordRange(lu.id(), lu.id()), FrameElement("LU", {lu}));
 }
 
+QString Frame::name() const {
+    return m_name;
+}
+
+const std::vector<Word>& Frame::words() const {
+    return m_words;
+}
+
 WordRange Frame::range() const {
     return m_range;
+}
+
+QStringList Frame::elementsList() const {
+    return m_allowedElements;
 }
 
 QStringList Frame::getFreeElementsList() const {
@@ -101,6 +118,10 @@ QStringList Frame::getFreeElementsList() const {
         fes << fe.second.name();
     }
     return QStringList::fromSet(m_allowedElements.toSet() - fes);
+}
+
+std::map<WordRange, FrameElement>& Frame::elements() {
+    return m_elements;
 }
 
 void Frame::setElement(const FrameElement& val) {
@@ -145,6 +166,19 @@ void Frame::toTreantJson(QString& ret, int depth, int maxDepth, const QString& p
     }
 
     ret += "]} \n";
+}
+
+Frame* Frame::find(int id) {
+    if (this->m_treeId == id) {
+        return this;
+    }
+    for (const auto& child : m_elements) {
+        Frame* found = child.second.childFrame();
+        if (child.second.isFrame() && found) {
+            return found;
+        }
+    }
+    return nullptr;
 }
 
 Frame* Frame::findLeastParentForRange(const WordRange& range) const {

@@ -70,9 +70,13 @@
                 let nodes = document.getElementsByClassName('node');
                 for (let i = 0; i < nodes.length; i++) {
                     let node = nodes[i];
-                    node.ondblclick = function () {
-                        //core.onConstituencyChangeNodeType(node.id);
+
+                    if (node.classList.contains('frame')) {
+                        node.ondblclick = function () {
+                            core.onFrameEdit(node.id);
+                        }
                     }
+                    
                     node.onmouseover = function () {
                         hoverNode = node;
                     }

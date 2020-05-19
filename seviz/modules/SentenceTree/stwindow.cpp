@@ -12,6 +12,7 @@
 #include "dependency.h"
 #include "framenet.h"
 #include "choosepalettedialog.h"
+#include "frameelementseditor.h"
 
 STWindow::STWindow(SentenceTree* core) :
     QWidget(nullptr),
@@ -108,7 +109,7 @@ void STWindow::onFrameInsert(IEngine* engine) {
                     chooser->setWindowTitle("Выберите фрейм и LU");
                     if (chooser->exec()) {
                         int index = chooser->getChoosedIndex();
-                        Frame* f = new Frame(possibleFrames[index].second, possibleFrames[index].first, range, m_core->framesModel());
+                        Frame* f = new Frame(possibleFrames[index].second, possibleFrames[index].first, range, frameWords, m_core->framesModel());
 
                         QString subframeFE;
                         bool ok = false;
@@ -213,6 +214,18 @@ void STWindow::onDepChangeEdgeType(int from, int to) {
         tree.change(from, to, rel);
         // TODO может лучше перерендеривать на уровне JS? например, через forceRedraw() или просто скопипастить код из renderDependencies()
         renderDependencies(tree);
+    }
+}
+
+// ------------------ Berkeley FrameNet tree event handlers ---------------------
+
+void STWindow::onFrameEdit(int id) {
+    FrameTree& tree = m_core->currentSentenceData().framenet;
+    Frame* f = tree.findByTreeId(id);
+    QScopedPointer<FrameElementsEditor> chooser(new FrameElementsEditor(this, f));
+    if (chooser->exec()) {
+
+        renderFrameNet(tree);
     }
 }
 
