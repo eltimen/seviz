@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
     <head>
     <meta charset="utf-8">
@@ -9,89 +9,35 @@
     <link rel="stylesheet" href="frame.css">
 </head>
     <body>
-        <div class="chart" id="OrganiseChart-simple">
-        </div>
+        <div id="help">Наведите курсор мыши на предложение при нажатом Ctrl, чтобы просмотреть его дерево</div>
+        <div id="help-empty-tree">Для добавления фрейма выделите участок предложения и нажмите <i>Ctrl+F</i></div>
+        <div class="chart" id="OrganiseChart-simple"> </div>
 
         <script type="text/javascript" src="qrc:///qtwebchannel/qwebchannel.js"></script>
         <script src="./3rdparty/vendor/raphael.js"></script>
         <script src="./3rdparty/Treant.js"></script>
 
-        <div id="help">Наведите курсор мыши на предложение при нажатом Ctrl, чтобы просмотреть его дерево</div>
-        
         <script>
-        var config = {
-	chart: {
-		container: "#OrganiseChart-simple",
-        levelSeparation: 14,
-        siblingSeparation: 5,
-        subTeeSeparation: 10,
-        connectors: {
-            type: "step", 
-            style: {
-                "arrow-end": "classic-wide-long"
-            } 
-        }
-	},
-	
-	nodeStructure: {
-        HTMLClass: "frame",
-        text: { name: "Visiting"},
-        children: [ 
-        
-           { pseudo: true, children: [
-           { pseudo: true, children: [{
-                        HTMLclass: "word",
-                        text: { title: "Agent", name: "He" }, 
-           }] }] }, 
-        
-            { pseudo: true, children: [
-           { pseudo: true, children: [
-           {
-                        HTMLclass: "word",
-                        text: { title: "LU", name: "visited" }, 
-           } ]} ]}, 
-        
-        {
-            HTMLClass: "frame",
-            text: { title: "Entity", name: "Spatial_collocation"},
-            children: [
-            { pseudo: true, children: [
-                {
-                        HTMLclass: "word",
-                        text: { title: "Figure", name: "the_office" }, 
-                }, ]},
-        
-        { pseudo: true, children: [
-                {
-                        HTMLclass: "word",
-                        text: { title: "LU", name: "where" }, 
-                }, ]},
-        
-                {HTMLClass: "frame",
-                text: { title: "Ground", name: "Event"},
-                
-                children: [
-                    {
-                        HTMLclass: "word",
-                        text: { title: "Event", name: "a_fire" }, 
-                    },
-                    {
-                        HTMLclass: "word",
-                        text: { title: "Time", name: "recently" }, 
-                    },
-                    {
-                        HTMLclass: "word",
-                        text: { title: "LU", name: "ocurred" }, 
-                    },
-                ]}
-            ]}
-        ] 
-	}
-};
+            var config = {
+                chart: {
+                    container: "#OrganiseChart-simple",
+                    levelSeparation: 14,
+                    siblingSeparation: 5,
+                    subTeeSeparation: 10,
+                    connectors: {
+                        type: "step",
+                        style: {
+                            "arrow-end": "classic-wide-long"
+                        }
+                    }
+                },
+
+                nodeStructure: {}
+            };
         </script>
 
         <script>
-        
+
             // qt
             window.channel = new QWebChannel(qt.webChannelTransport,
                 function (channel) {
@@ -99,10 +45,16 @@
                     window.core = channel.objects.core;
                     //window.core.setPageLoadedState(false);
                 });
-            
+
             //render function
             function render(config) {
                 document.getElementById("help").style.display = "none";
+                if (Object.keys(config.nodeStructure).length === 0 && config.nodeStructure.constructor === Object) {
+                    document.getElementById("help-empty-tree").style.display = "block";
+                } else {
+                    document.getElementById("help-empty-tree").style.display = "none";
+                }
+
                 new Treant(config);
 
                 // setup handlers
@@ -129,8 +81,13 @@
                     }
                 }
             }
-            
-            window.onload = render(config); ////
+
+            function init() {
+                document.getElementById("help").style.display = "block";
+                document.getElementById("help-empty-tree").style.display = "none";
+            }
+
+            window.onload = init(); ////
         </script>
     </body>
 </html>
