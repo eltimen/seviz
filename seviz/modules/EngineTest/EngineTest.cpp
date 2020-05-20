@@ -68,20 +68,17 @@ void EngineTest::render(const Position& from, const Position& to, DomChapter& do
             renderStateChanged = false;
         }
         Position first = m_engine->getBook().getCurrentChapter().firstPos();
-        dom.addStyle(first, "color: green;");
-        dom.addTailContent(first, TOPLEFT, "topleft");
-        dom.addTailContent(first, TOPRIGHT, "topright");
-        dom.addTailContent(first, BOTTOMLEFT, "bottomleft");
-        dom.addTailContent(first, BOTTOMRIGHT, "bottomright");
+        dom.addStyle(first.nextParagraph().firstWord(), "color: green;");
+        dom.addTailContent(first, BOTTOMRIGHT, "bottomright info");
 
-        dom.addTooltip(first, BOTTOMRIGHT, "bottom right tail tooltip");
-        dom.addTooltip(first.firstSentence(), "first sentence");
+        dom.addTooltip(first.firstSentence(), "Подсказка: это первое предложение");
 
-        dom.addTooltip(Position(m_engine->getBook().getCurrentChapter().id(), 1, 1, 1, 3), "Третье слово");
         dom.addTailContent(Position(m_engine->getBook().getCurrentChapter().id(), 1, 1, 1, 3), BOTTOMRIGHT, "test");
 
         dom.addStyle(m_engine->getBook().getCurrentChapter().lastPos(), "color: blue; border: 1px solid black");
-    } catch (std::out_of_range&) {}
+    } catch (std::out_of_range&) {
+    } catch (std::range_error&) {}
+
 }
 
 void EngineTest::handler() {

@@ -159,7 +159,7 @@
         <item>
          <widget class="QPushButton" name="getInfoButton">
           <property name="text">
-           <string>Получить</string>
+           <string>Получить текущее выделение</string>
           </property>
          </widget>
         </item>
@@ -206,7 +206,7 @@
         <item>
          <widget class="QPushButton" name="renderButton">
           <property name="text">
-           <string>Обновить стили</string>
+           <string>Тест выделения</string>
           </property>
          </widget>
         </item>
