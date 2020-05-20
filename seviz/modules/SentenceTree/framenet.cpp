@@ -1,4 +1,6 @@
 #include "framenet.h"
+
+#include <QSet>
 #include "frameelement.h"
 
 // ---------- FrameNet tree methods ------------------------------
@@ -98,6 +100,10 @@ Frame::Frame(const QString& name, const Word& lu, const WordRange& range, const 
 
 QString Frame::name() const {
     return m_name;
+}
+
+const Word& Frame::lu() const {
+    return m_lu;
 }
 
 const std::vector<Word>& Frame::words() const {

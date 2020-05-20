@@ -2,6 +2,7 @@
 #define FRAMEELEMENTSEDITOR_H
 
 #include <QDialog>
+#include "BookModels.h"
 
 class Frame;
 
@@ -17,9 +18,13 @@ public:
     explicit FrameElementsEditor(QWidget* parent, Frame* frame);
     ~FrameElementsEditor();
 
+private slots:
+    void onSave();
+
 private:
     Ui::FrameElementsEditor *ui;
     Frame* m_frame;
+    std::vector<Word> m_words;
 
     void fillWindow();
 };

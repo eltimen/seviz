@@ -20,6 +20,7 @@ public:
     Frame(const QString& name, const Word& lu, const WordRange& range, const std::vector<Word>& words, const FrameNetModel& frameNetDb);
 
     QString name() const;
+    const Word& lu() const;
     const std::vector<Word>& words() const;
     WordRange range() const;
     QStringList elementsList() const;
