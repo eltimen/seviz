@@ -18,16 +18,18 @@ class Frame {
 
 public:
     Frame(const QString& name, const Word& lu, const WordRange& range, const std::vector<Word>& words, const FrameNetModel& frameNetDb);
+    void setTreeId(int id);
 
     QString name() const;
+    const Word& lu() const;
     const std::vector<Word>& words() const;
     WordRange range() const;
+
     QStringList elementsList() const;
     QStringList getFreeElementsList() const;
-
-    std::map<WordRange, FrameElement>& elements();
+    FrameElement& operator[] (const QString& feName);
     void setElement(const FrameElement& val);
-    void setTreeId(int id);
+    void clearElements();
 
     void toTreantJson(QString& ret, int depth, int maxDepth, const QString& parentFe = "") const;
 
@@ -42,6 +44,7 @@ private:
     const QStringList m_allowedElements; // allowed FEs
     Word m_lu; // LU - word id
     std::map<WordRange, FrameElement> m_elements; // FEs
+    std::map<QString, FrameElement> m_elementsByNames; // FEs
     // TODO FE in order of sentence words (ranges?) 
     int m_treeId = -1;
 };

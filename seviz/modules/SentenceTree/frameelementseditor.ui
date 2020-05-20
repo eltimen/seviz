@@ -26,11 +26,11 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="feGroupBox">
+    <widget class="QGroupBox" name="feContainer">
      <property name="title">
       <string>Элементы:</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_3"/>
+     <layout class="QGridLayout" name="feContainerLayout"/>
     </widget>
    </item>
    <item>

@@ -24,13 +24,15 @@ public:
         // TODO assert слова в фразе должны быть соседями
     }
 
+
     bool isWord() const;
     bool isFrame() const;
+    bool isEmpty() const;
 
-    QString name() const;
+    const QString& name() const;
     WordRange range() const;
     Frame* childFrame() const;
-    QList<Word> words() const;
+    const QList<Word>& words() const;
 
     void toTreantJson(QString& ret, int depth, int maxDepth) const;
 private:

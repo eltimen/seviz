@@ -9,7 +9,11 @@ bool FrameElement::isFrame() const {
     return m_subFrame;
 }
 
-QString FrameElement::name() const {
+bool FrameElement::isEmpty() const {
+    return m_name.isEmpty();
+}
+
+const QString& FrameElement::name() const {
     return m_name;
 }
 
@@ -25,7 +29,7 @@ Frame* FrameElement::childFrame() const {
     return m_subFrame;
 }
 
-QList<Word> FrameElement::words() const {
+const QList<Word>& FrameElement::words() const {
     return m_words;
 }
 

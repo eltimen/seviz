@@ -140,6 +140,10 @@ public:
         return m_id < o.m_id;
     }
 
+    bool operator==(const Word& o) const {
+        return m_id == o.m_id && m_text == o.m_text;
+    }
+
     int id() const { return m_id; }
     const QString& text() const { return m_text; }
 

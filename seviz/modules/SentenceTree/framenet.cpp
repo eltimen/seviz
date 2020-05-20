@@ -1,4 +1,6 @@
 #include "framenet.h"
+
+#include <QSet>
 #include "frameelement.h"
 
 // ---------- FrameNet tree methods ------------------------------
@@ -12,6 +14,7 @@ FrameTree::~FrameTree() {
 }
 
 int FrameTree::insertFrame(Frame* frame, const QString& fe) {
+    // TODO отбирать слова из дипапзона у фрейма верхнего уровня
     frame->setTreeId(++m_lastId);
     if (!m_rootFrame) {
         assert(fe.isEmpty());
@@ -100,6 +103,10 @@ QString Frame::name() const {
     return m_name;
 }
 
+const Word& Frame::lu() const {
+    return m_lu;
+}
+
 const std::vector<Word>& Frame::words() const {
     return m_words;
 }
@@ -120,8 +127,19 @@ QStringList Frame::getFreeElementsList() const {
     return QStringList::fromSet(m_allowedElements.toSet() - fes);
 }
 
-std::map<WordRange, FrameElement>& Frame::elements() {
-    return m_elements;
+FrameElement& Frame::operator[](const QString& feName) {
+    return m_elementsByNames[feName];
+}
+
+void Frame::clearElements() {
+    // std::remove_if not works with map
+    for (auto iter =  m_elements.begin(); iter != m_elements.end(); ) {
+        if (iter->second.name() != "LU") 
+            iter = m_elements.erase(iter);
+        else
+            ++iter;
+    }
+    m_elementsByNames.clear();
 }
 
 void Frame::setElement(const FrameElement& val) {
@@ -129,6 +147,7 @@ void Frame::setElement(const FrameElement& val) {
     assert(!val.range().contains(m_lu.id()));
 
     m_elements[val.range()] = val;
+    m_elementsByNames[val.name()] = val;
 }
 
 void Frame::setTreeId(int id) {
