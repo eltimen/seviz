@@ -253,6 +253,7 @@ class Render {
                     if (idFrom == null && idTo == null) {
                         this.result.innerHTML += html;
                         console.log("inner");
+                        return this.extractChapterPartHtml(i, true, callback);
                     } else {
                         // иначе вырезаем главу из остальных элементов страницы
                         let currentElem;
