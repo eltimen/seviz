@@ -147,6 +147,8 @@ void ConstituencyTreeNode::removeNode(int nodeId) {
         if (child->m_id == nodeId) {
             // когда удаляемый потомок найден, забираем у него его дочерние узлы
             ChildrenContainer children = child->m_children;
+            child->m_children.clear();
+            delete child;
             // и вставляем их вместо данного узла
             it = m_children.erase(it);
             it = m_children.insert(it, children.begin(), children.end());
