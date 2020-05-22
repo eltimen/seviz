@@ -73,6 +73,7 @@ SOURCES += \
         modules/SentenceTree/constituency.cpp \
         modules/SentenceTree/dependency.cpp \
         modules/SentenceTree/choosepalettedialog.cpp \
+        modules/SentenceTree/frame.cpp \
         modules/SentenceTree/frameelement.cpp \
         modules/SentenceTree/frameelementseditor.cpp \
         modules/SentenceTree/framenet.cpp \
@@ -102,6 +103,7 @@ HEADERS += \
         modules/SentenceTree/constituency.h \
         modules/SentenceTree/dependency.h \
         modules/SentenceTree/choosepalettedialog.h \
+        modules/SentenceTree/frame.h \
         modules/SentenceTree/frameelement.h \
         modules/SentenceTree/frameelementseditor.h \
         modules/SentenceTree/framenet.h \
