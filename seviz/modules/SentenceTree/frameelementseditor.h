@@ -26,7 +26,9 @@ private:
     Ui::FrameElementsEditor *ui;
     Frame* m_frame;
     std::vector<Word> m_words; // слова фрейма (без LU)
+    std::vector<Frame*> m_subFrames;
     std::unordered_map<int, int> m_wordIndexById;
+    std::map<QString, int> m_subFrameIndexByFrameName;
 
     void setupWidgets();
 };

@@ -18,6 +18,7 @@ public:
     const Word& lu() const;
     const std::vector<Word>& words() const;
     WordRange range() const;
+    std::vector<Frame*> subFrames() const;
 
     QStringList elementsList() const;
     QStringList getFreeElementsList() const;

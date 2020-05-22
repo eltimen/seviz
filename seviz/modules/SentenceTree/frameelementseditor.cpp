@@ -28,14 +28,18 @@ void FrameElementsEditor::onSave() {
     m_frame->clearElements();
     for (const QGroupBox* gb : ui->feContainer->findChildren<QGroupBox*>()) {
         QRadioButton* wordRadioButton = gb->findChild<QRadioButton*>("wordRadioButton");
-        QRadioButton* subFrameRadioButton = gb->findChild<QRadioButton*>("subFrameRadioButton");
         QComboBox* wordFromComboBox = gb->findChild<QComboBox*>("wordFromComboBox");
         // QComboBox* wordToComboBox = gb->findChild<QComboBox*>("wordFromComboBox");
         QComboBox* subFrameComboBox = gb->findChild<QComboBox*>("subFrameComboBox");
 
-        if (gb->isChecked() && wordRadioButton->isChecked()) {
-            FrameElement fe(gb->title(), { m_words[wordFromComboBox->currentIndex()] });
-            m_frame->setElement(fe);
+        if (gb->isChecked()) {
+            if (wordRadioButton->isChecked()) {
+                FrameElement fe(gb->title(), { m_words[wordFromComboBox->currentIndex()] });
+                m_frame->setElement(fe);
+            } else {
+                FrameElement fe(gb->title(), m_subFrames[subFrameComboBox->currentIndex()]);
+                m_frame->setElement(fe);
+            }
         }
         //
     }
@@ -53,12 +57,13 @@ void FrameElementsEditor::setupWidgets() {
             l->setText("<b>" + w.text() + "</b>");
         } else {
             m_words.emplace_back(w);
-            m_wordIndexById[w.id()] = m_words.size()-1;
+            m_wordIndexById[w.id()] = (int)m_words.size()-1;
         }
     }
     wordsLayout->addItem(new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum));
     
     // виджеты для редактирования FE (в дальнейшем - feBox)
+    m_subFrames = m_frame->subFrames();
     QStringList feNames = m_frame->elementsList();
     int rows = sqrt(feNames.size());
     int column = 0;
@@ -90,7 +95,6 @@ void FrameElementsEditor::setupWidgets() {
         verticalLayout_2->addWidget(subFrameRadioButton);
         QComboBox* subFrameComboBox = new QComboBox(feBox);
         subFrameComboBox->setObjectName("subFrameComboBox");
-        subFrameComboBox->addItem(QString("---"));
         verticalLayout_2->addWidget(subFrameComboBox);
         layout ->addLayout(verticalLayout_2);
 
@@ -115,6 +119,10 @@ void FrameElementsEditor::setupWidgets() {
             wordFromComboBox->addItem(w.text(), w.id());
             //wordToComboBox->addItem(w.text(), w.id());
         }
+        for (int i = 0; i < m_subFrames.size(); ++i) {
+            subFrameComboBox->addItem(m_subFrames[i]->name());
+            m_subFrameIndexByFrameName[m_subFrames[i]->name()] = i;
+        }
 
         // инициализация значением FE
         FrameElement fe((*m_frame)[feName]);
@@ -128,7 +136,8 @@ void FrameElementsEditor::setupWidgets() {
                 //wordToComboBox->setCurrentIndex(m_wordIndexById[last.id()]);
             } else {
                 assert(fe.isFrame());
-
+                subFrameRadioButton->setChecked(true);
+                subFrameComboBox->setCurrentIndex(m_subFrameIndexByFrameName[fe.childFrame()->name()]);
             }
         } else {
             wordRadioButton->setChecked(true);

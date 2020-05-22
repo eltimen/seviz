@@ -29,6 +29,16 @@ WordRange Frame::range() const {
     return m_range;
 }
 
+std::vector<Frame*> Frame::subFrames() const {
+    std::vector<Frame*> ret;
+    for (const auto& rangeAndFE : m_elements) {
+        if (rangeAndFE.second.isFrame()) {
+            ret.push_back(rangeAndFE.second.childFrame());
+        }
+    }
+    return ret;
+}
+
 QStringList Frame::elementsList() const {
     return m_allowedElements;
 }
