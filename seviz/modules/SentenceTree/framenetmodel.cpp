@@ -19,7 +19,9 @@ FrameNetModel::FrameNetModel() {
 
 QStringList FrameNetModel::frameNamesForLexicalUnit(const QString& word) const {
     QSqlQuery query(m_db);
-    query.prepare("SELECT frameName FROM lexical_units "
+    // TODO добавить POS-тег в качестве параметра
+    // DISTICT ниже нужен для удаления одинаковых слов, у которых разная часть речи
+    query.prepare("SELECT DISTINCT frameName FROM lexical_units "
                   "WHERE text IS :text");
     query.bindValue(":text", word);
     if (query.exec()) {
