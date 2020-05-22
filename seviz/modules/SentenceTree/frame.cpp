@@ -6,9 +6,9 @@ Frame::Frame(const QString& name, const Word& lu, const WordRange& range, const 
     : m_name(name),
     m_lu(lu),
     m_words(words),
-    m_allowedElements(frameNetDb.frameElementsFor("name")),
+    m_allowedElements(frameNetDb.frameElementsFor(name)),
     m_range(range) {
-    // для упрощения вывода дерева LU заносится как FE "LU"
+    // РґР»СЏ СѓРїСЂРѕС‰РµРЅРёСЏ РІС‹РІРѕРґР° РґРµСЂРµРІР° LU Р·Р°РЅРѕСЃРёС‚СЃСЏ РєР°Рє FE "LU"
     assert(WordRange(lu.id(), lu.id()) == FrameElement("LU", { lu }).range());
     m_elements.emplace(WordRange(lu.id(), lu.id()), FrameElement("LU", { lu }));
 }

@@ -90,7 +90,9 @@ void STWindow::onFrameInsert(IEngine* engine) {
             }
 
             if (frameWords.size() > 0) {
-                //QMessageBox::information(nullptr, "", QStringLiteral("%1 %2").arg(frameWords[0].text(), frameWords[frameWords.size() - 1].text()));
+                FrameTree& tree = m_core->currentSentenceData().framenet;
+                WordRange range(frameWords[0].id(), frameWords[frameWords.size() - 1].id());
+
                 std::vector<std::pair<Word, QString>> possibleFrames;
                 QStringList paletteButtons;
                 for (const Word& w : frameWords) {
@@ -100,9 +102,11 @@ void STWindow::onFrameInsert(IEngine* engine) {
                         paletteButtons << QString("%1 (\"%2\")").arg(frame, w.text());
                     }
                 }
+                if (paletteButtons.isEmpty()) {
+                    QMessageBox::warning(this, "Вставка фрейма", "В данном отрезке не найдено LU, выделенных в FrameNet");
+                    return;
+                }
 
-                FrameTree& tree = m_core->currentSentenceData().framenet;
-                WordRange range(frameWords[0].id(), frameWords[frameWords.size() - 1].id());
                 FrameInsertionData insertPos;
                 if (tree.canInsertFrameWithRange(range, &insertPos)) {
                     QScopedPointer<ChoosePaletteDialog> chooser(new ChoosePaletteDialog(this, paletteButtons, 4));

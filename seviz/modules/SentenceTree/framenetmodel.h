@@ -2,19 +2,19 @@
 #define FRAMENETMODEL_H
 
 #include <memory>
+#include <QSqlDatabase>
 #include <QString>
 #include <QStringList>
 
 class FrameNetModel {
 public:
+    FrameNetModel();
+
     QStringList frameNamesForLexicalUnit(const QString& word) const;
     QStringList frameElementsFor(const QString& frameName) const;
-    // TODO ??? get FEs for word
-
+    
 private: 
-    // SQL database
-    // pre-parsed JSON
-    // raw FrameNet xmls?
+    QSqlDatabase m_db;
 };
 
 
