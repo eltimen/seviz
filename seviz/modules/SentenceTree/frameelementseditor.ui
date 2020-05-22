@@ -22,7 +22,7 @@
      <property name="title">
       <string>Слова</string>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_2"/>
+     <layout class="QGridLayout" name="wordsLayout"/>
     </widget>
    </item>
    <item>

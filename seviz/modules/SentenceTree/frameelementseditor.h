@@ -31,6 +31,7 @@ private:
     std::map<QString, int> m_subFrameIndexByFrameName;
 
     void setupWidgets();
+    void setupWordsWidget();
 };
 
 #endif // FRAMEELEMENTSEDITOR_H

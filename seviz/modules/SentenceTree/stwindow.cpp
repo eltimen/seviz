@@ -109,7 +109,7 @@ void STWindow::onFrameInsert(IEngine* engine) {
 
                 FrameInsertionData insertPos;
                 if (tree.canInsertFrameWithRange(range, &insertPos)) {
-                    QScopedPointer<ChoosePaletteDialog> chooser(new ChoosePaletteDialog(this, paletteButtons, 4));
+                    QScopedPointer<ChoosePaletteDialog> chooser(new ChoosePaletteDialog(this, paletteButtons, 20));
                     chooser->setWindowTitle("Выберите фрейм и LU");
                     if (chooser->exec()) {
                         int index = chooser->getChoosedIndex();

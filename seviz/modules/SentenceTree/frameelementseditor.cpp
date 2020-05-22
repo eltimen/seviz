@@ -49,18 +49,7 @@ void FrameElementsEditor::onSave() {
 
 void FrameElementsEditor::setupWidgets() {
     // слова фрейма сверху окна
-    QLayout* wordsLayout = ui->wordsGroupBox->layout();
-    for (const Word& w : m_frame->words()) {
-        QLabel* l = new QLabel(w.text(), ui->wordsGroupBox);
-        wordsLayout->addWidget(l);
-        if (w == m_frame->lu()) {
-            l->setText("<b>" + w.text() + "</b>");
-        } else {
-            m_words.emplace_back(w);
-            m_wordIndexById[w.id()] = (int)m_words.size()-1;
-        }
-    }
-    wordsLayout->addItem(new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum));
+    setupWordsWidget();
     
     // виджеты для редактирования FE (в дальнейшем - feBox)
     m_subFrames = m_frame->subFrames();
@@ -137,11 +126,33 @@ void FrameElementsEditor::setupWidgets() {
             } else {
                 assert(fe.isFrame());
                 subFrameRadioButton->setChecked(true);
-                subFrameComboBox->setCurrentIndex(m_subFrameIndexByFrameName[fe.childFrame()->name()]);
+                subFrameComboBox->setCurrentIndex(m_subFrameIndexByFrameName.at(fe.childFrame()->name()));
             }
         } else {
             wordRadioButton->setChecked(true);
         }
     }
     
+}
+
+void FrameElementsEditor::setupWordsWidget() {
+    int column = 0;
+    int row = 0;
+    int maxColumns = 13;
+    for (const Word& w : m_frame->words()) {
+        QLabel* l = new QLabel(w.text(), ui->wordsGroupBox);
+        if (w == m_frame->lu()) {
+            l->setText("<b>" + w.text() + "</b>");
+        } else {
+            m_words.emplace_back(w);
+            m_wordIndexById[w.id()] = (int)m_words.size() - 1;
+        }
+
+        ui->wordsLayout->addWidget(l, row, column);
+        ++column;
+        if (column > maxColumns) {
+            column = 0;
+            ++row;
+        }
+    }
 }
