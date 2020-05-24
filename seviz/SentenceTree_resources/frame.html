@@ -63,7 +63,7 @@
                 window.onkeyup = function (e) {
                     //del
                     if (e.keyCode == 46 && hoverNode) {
-                        //core.onConstituencyDeleteNode(hoverNode.id);
+                        core.onFrameRemove(hoverNode.id);
                     }
                 }
 
@@ -75,13 +75,13 @@
                         node.ondblclick = function () {
                             core.onFrameEdit(node.id);
                         }
-                    }
-                    
-                    node.onmouseover = function () {
-                        hoverNode = node;
-                    }
-                    node.onmouseleave = function () {
-                        hoverNode = undefined;
+
+                        node.onmouseover = function () {
+                            hoverNode = node;
+                        }
+                        node.onmouseleave = function () {
+                            hoverNode = undefined;
+                        }
                     }
                 }
             }

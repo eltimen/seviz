@@ -1,5 +1,6 @@
 #include "frame.h"
 #include <QSet>
+#include <QDebug>
 #include <cassert>
 
 Frame::Frame(const QString& name, const Word& lu, const WordRange& range, const std::vector<Word>& words, const FrameNetModel& frameNetDb)
@@ -11,6 +12,10 @@ Frame::Frame(const QString& name, const Word& lu, const WordRange& range, const 
     // для упрощения вывода дерева LU заносится как FE "LU"
     assert(WordRange(lu.id(), lu.id()) == FrameElement("LU", { lu }).range());
     m_elements.emplace(WordRange(lu.id(), lu.id()), FrameElement("LU", { lu }));
+}
+
+Frame::~Frame() {
+    qDebug() << m_name << " is dead";
 }
 
 QString Frame::name() const {
@@ -29,8 +34,8 @@ WordRange Frame::range() const {
     return m_range;
 }
 
-std::vector<Frame*> Frame::subFrames() const {
-    std::vector<Frame*> ret;
+std::vector<std::shared_ptr<Frame>> Frame::subFrames() const {
+    std::vector<std::shared_ptr<Frame>> ret;
     for (const auto& rangeAndFE : m_elements) {
         if (rangeAndFE.second.isFrame()) {
             ret.push_back(rangeAndFE.second.childFrame());
@@ -52,7 +57,7 @@ QStringList Frame::getFreeElementsList() const {
 }
 
 FrameElement& Frame::operator[](const QString& feName) {
-    return m_elementsByNames[feName];
+    return m_elements[m_rangeByElementName[feName]];
 }
 
 void Frame::clearElements() {
@@ -63,15 +68,19 @@ void Frame::clearElements() {
         else
             ++iter;
     }
-    m_elementsByNames.clear();
+    m_rangeByElementName.clear();
 }
 
 void Frame::setElement(const FrameElement& val) {
     assert(m_allowedElements.contains(val.name()));
     assert(!val.range().contains(m_lu.id()));
 
-    m_elements[val.range()] = val;
-    m_elementsByNames[val.name()] = val;
+    m_elements.emplace(val.range(), val);
+    m_rangeByElementName.emplace(val.name(), val.range());
+}
+
+int Frame::treeId() const {
+    return m_treeId;
 }
 
 void Frame::setTreeId(int id) {
@@ -111,14 +120,30 @@ void Frame::toTreantJson(QString& ret, int depth, int maxDepth, const QString& p
     ret += "]} \n";
 }
 
+void Frame::removeFEWithChild(int nodeId) {
+    for (decltype(m_elements)::iterator it = m_elements.begin(); it != m_elements.end(); ++it) {
+        std::shared_ptr<Frame> child = it->second.childFrame();
+        if (child) {
+            if (child->m_treeId == nodeId) {
+                m_rangeByElementName.erase(it->second.name());
+                it = m_elements.erase(it);
+                break;
+            } else {
+                child->removeFEWithChild(nodeId);
+            }
+        }
+    }
+    assert(m_elements.size()-1 == m_rangeByElementName.size());
+}
+
 Frame* Frame::find(int id) {
     if (this->m_treeId == id) {
         return this;
     }
     for (const auto& child : m_elements) {
-        Frame* found = child.second.childFrame();
+        std::shared_ptr<Frame> found = child.second.childFrame();
         if (child.second.isFrame() && found) {
-            return found;
+            return found.get();
         }
     }
     return nullptr;

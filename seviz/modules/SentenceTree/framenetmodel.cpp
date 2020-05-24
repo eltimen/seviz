@@ -45,7 +45,6 @@ QStringList FrameNetModel::frameElementsFor(const QString& frameName) const {
     if (query.exec()) {
         QStringList res;
         while (query.next()) {
-            qDebug() << query.record().indexOf("name");
             res << query.value(query.record().indexOf("name")).toString();
         }
         return res;

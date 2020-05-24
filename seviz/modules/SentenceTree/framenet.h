@@ -20,8 +20,7 @@ public:
 
     int insertFrame(Frame* frame, const QString& parentFe = "");
     Frame* findByTreeId(int id);
-    bool editFrame(int nodeId);
-    bool remove(int nodeId);
+    void remove(int nodeId);
 
     bool canInsertFrameWithRange(const WordRange& range, FrameInsertionData* data = nullptr); // may be pos (to check sentence borders)
 
@@ -31,9 +30,6 @@ private:
     int m_lastId = 0;
 
     Frame* m_rootFrame = nullptr;
-    // adjacency list
-    // frame name -> [ {FE, }, ...] ?
-    // word_id_range -> [Frame] ?
 };
 
 #endif // FRAMENET_H

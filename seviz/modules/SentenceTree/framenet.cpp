@@ -9,7 +9,8 @@ FrameTree::FrameTree(const Sentence& sent)
 {
 }
 
-FrameTree::~FrameTree() {
+FrameTree::~FrameTree() { 
+    delete m_rootFrame;
 }
 
 int FrameTree::insertFrame(Frame* frame, const QString& fe) {
@@ -37,6 +38,16 @@ int FrameTree::insertFrame(Frame* frame, const QString& fe) {
 
 Frame* FrameTree::findByTreeId(int id) {
     return m_rootFrame->find(id);
+}
+
+void FrameTree::remove(int nodeId) {
+    if (m_rootFrame->treeId() != nodeId) {
+        m_rootFrame->removeFEWithChild(nodeId);
+    } else {
+        delete m_rootFrame;
+        m_rootFrame = nullptr;
+    }
+    
 }
 
 bool FrameTree::canInsertFrameWithRange(const WordRange& range, FrameInsertionData* data) {

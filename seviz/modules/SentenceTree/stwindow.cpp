@@ -233,6 +233,12 @@ void STWindow::onFrameEdit(int id) {
     }
 }
 
+void STWindow::onFrameRemove(int id) {
+    FrameTree& tree = m_core->currentSentenceData().framenet;
+    tree.remove(id);
+    renderFrameNet(tree);
+}
+
 // --------------------- render methods ----------------------------
 void STWindow::renderConstituency(const ConstituencyTree& tree) {
     QString data = tree.toTreantJson();

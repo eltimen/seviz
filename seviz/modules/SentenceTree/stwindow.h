@@ -35,6 +35,7 @@ public slots:
     void onDepChangeEdgeType(int from, int to);
     void onFrameInsert(IEngine* engine);
     void onFrameEdit(int id);
+    void onFrameRemove(int id);
 
 private:
     Ui::STWindow *ui;
