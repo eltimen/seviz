@@ -28,12 +28,12 @@ public:
         return !(*this==other);
     }
 
-    bool operator<(int val) const {
-        return second < val;
+    bool operator<(int wordId) const {
+        return second < wordId;
     }
 
-    bool contains(int val) const {
-        return first <= val && val <= second;
+    bool contains(int wordId) const {
+        return first <= wordId && wordId <= second;
     }
 
     bool isOutsideOf(const WordRange& range) const {

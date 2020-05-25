@@ -4,11 +4,28 @@
 #include <map>
 #include <algorithm>
 #include <QString>
+#include <QDebug>
 #include "BookModels.h"
 #include "frame.h"
 
+using FrameVector = std::vector<Frame*>;
+
+// хранит информацию о ситуации при вставке фрейма
 struct FrameInsertionData {
-    bool hasSubframe = false;
+    /* Возможно 4 случая при вставке newFrame:
+        1) дерева фреймов еще нет - тогда просто добавляем вставляемый фрейм в root
+        2) Расширение корневого узла - во всем дереве только 1 фрейм (в root) и мы добавляем его определенный FE к newFrame
+        3) Уточнение корневого узла - newFrame добавляется в определенный FE потомком у корневого узла
+        4) Вставка в середину - находится фрейм верхний и нижние. 
+    */
+    Frame* highFrame;
+    FrameVector lowFrames;
+    std::map<WordRange,FrameElement> lowFramesAsHighFrameElements;
+    std::vector<QString> feNamesOfChildFramesInsideFutureParent;
+
+    bool hasChildFrames() const {
+        return lowFrames.size() > 0;
+    }
 };
 
 class FrameElement;
@@ -18,7 +35,7 @@ public:
     FrameTree(const Sentence& sent);
     ~FrameTree();
 
-    int insertFrame(Frame* frame, const QString& parentFe = "");
+    int insertFrame(Frame* frame, const QString& parentFe = "", const std::map<QString, QString>& childFramesInitFE = {});
     Frame* findByTreeId(int id);
     void remove(int nodeId);
 

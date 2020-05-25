@@ -1,8 +1,10 @@
 #ifndef STWINDOW_H
 #define STWINDOW_H
 
+#include "BookModels.h"
 #include <QWidget>
 #include <QWebEngineView>
+#include <QStringList>
 
 class SentenceTree;
 class Sentence;
@@ -11,6 +13,8 @@ class ConstituencyTree;
 class DependencyTree;
 class FrameTree;
 class IEngine;
+struct FrameInsertionData;
+class Frame;
 
 namespace Ui {
 class STWindow;
@@ -47,6 +51,13 @@ private:
     void renderConstituency(const ConstituencyTree& tree);
     void renderDependencies(const DependencyTree& tree);
     void renderFrameNet(const FrameTree& tree);
+
+    std::vector<Word> getWordsInsideFrameRange(IEngine* engine, const Position& from, const Position& to);
+    QStringList generateFrameChoosingPalette(const std::vector<Word>& frameWords, std::vector<std::pair<Word, QString>>& possibleFrames, FrameInsertionData& insertionContext);
+    // спрашивает, куда вставлять фреймы, оказавшиеся внутри добавляемого фрейма
+    std::map<QString, QString> askFrameElementsForSubframes(const FrameInsertionData& insertionData, Frame* newFrame);
+    // спрашивает, в какой FE верхнего фрейма вставлять добавляемый фрейм
+    QString askParentFrameElementForNewFrame(const FrameInsertionData& insertionData, Frame* newFrame);
 };
 
 #endif // STWINDOW_H

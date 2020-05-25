@@ -7,6 +7,7 @@ Frame::Frame(const QString& name, const Word& lu, const WordRange& range, const 
     : m_name(name),
     m_lu(lu),
     m_words(words),
+    m_currentWords(words),
     m_allowedElements(frameNetDb.frameElementsFor(name)),
     m_range(range) {
     // для упрощения вывода дерева LU заносится как FE "LU"
@@ -27,7 +28,7 @@ const Word& Frame::lu() const {
 }
 
 const std::vector<Word>& Frame::words() const {
-    return m_words;
+    return m_currentWords;
 }
 
 WordRange Frame::range() const {
@@ -44,6 +45,10 @@ std::vector<std::shared_ptr<Frame>> Frame::subFrames() const {
     return ret;
 }
 
+const std::map<WordRange, FrameElement>& Frame::elements() const {
+    return m_elements;
+}
+
 QStringList Frame::elementsList() const {
     return m_allowedElements;
 }
@@ -57,7 +62,7 @@ QStringList Frame::getFreeElementsList() const {
 }
 
 FrameElement& Frame::operator[](const QString& feName) {
-    return m_elements[m_rangeByElementName[feName]];
+    return m_elements.at(m_rangeByElementName.at(feName));
 }
 
 void Frame::clearElements() {
@@ -69,14 +74,29 @@ void Frame::clearElements() {
             ++iter;
     }
     m_rangeByElementName.clear();
+    m_currentWords = m_words;
 }
 
 void Frame::setElement(const FrameElement& val) {
     assert(m_allowedElements.contains(val.name()));
     assert(!val.range().contains(m_lu.id()));
 
+    if (val.isFrame()) {
+        m_currentWords.erase(std::remove_if(m_currentWords.begin(), m_currentWords.end(), [&val](const Word& w) {
+            return val.childFrame()->range().contains(w.id());
+        }), m_currentWords.end());
+    }
+    
     m_elements.emplace(val.range(), val);
     m_rangeByElementName.emplace(val.name(), val.range());
+}
+
+FrameElement Frame::takeElement(const QString& name) {
+    WordRange range = m_rangeByElementName.at(name);
+    FrameElement ret = m_elements.at(range);
+    m_rangeByElementName.erase(name);
+    m_elements.erase(range);
+    return ret;
 }
 
 int Frame::treeId() const {
@@ -86,20 +106,6 @@ int Frame::treeId() const {
 void Frame::setTreeId(int id) {
     m_treeId = id;
 }
-
-//Frame* Frame::findParentToInsertFrame(const WordRange& range) {
-//    Frame* found = this;
-//    for (const std::pair<WordRange, FrameElement>& fe : m_elements) {
-//        if (fe.second.isFrame() && fe.second.childFrame()->range().isInsideOf(range)) {
-//            found = fe.second.childFrame();
-//            break;
-//        }
-//    }
-//
-//    return m_range.isInsideOf(range) 
-//        ? found
-//        : nullptr;
-//}
 
 void Frame::toTreantJson(QString& ret, int depth, int maxDepth, const QString& parentFe) const {
     ret += QStringLiteral(R"(
@@ -152,12 +158,11 @@ Frame* Frame::find(int id) {
 Frame* Frame::findLeastParentForRange(const WordRange& range) const {
     const Frame* found = this;
     for (const std::pair<WordRange, FrameElement>& fe : m_elements) {
-        if (fe.second.isFrame() && fe.first.isInsideOf(range)) {
+        if (fe.second.isFrame() && fe.first.isOutsideOf(range)) {
             found = fe.second.childFrame()->findLeastParentForRange(range);
             break;
         }
     }
-    //assert(!found->m_isTerminal);
     return (Frame*)found;
 }
 

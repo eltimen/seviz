@@ -35,10 +35,15 @@ void FrameElementsEditor::onSave() {
         if (gb->isChecked()) {
             if (wordRadioButton->isChecked()) {
                 FrameElement fe(gb->title(), { m_words[wordFromComboBox->currentIndex()] });
-                m_frame->setElement(fe);
+                if (!fe.isEmpty()) {
+                   m_frame->setElement(fe);
+                }
+               
             } else {
                 FrameElement fe(gb->title(), m_subFrames[subFrameComboBox->currentIndex()]);
-                m_frame->setElement(fe);
+                if (!fe.isEmpty()) {
+                    m_frame->setElement(fe);
+                }
             }
         }
         //
@@ -114,23 +119,28 @@ void FrameElementsEditor::setupWidgets() {
         }
 
         // инициализация значением FE
-        FrameElement fe((*m_frame)[feName]);
-        feBox->setChecked(!fe.isEmpty());
-        if (!fe.isEmpty()) {
-            if (fe.isWord()) {
-                const Word& first = fe.words().first();
-                const Word& last = fe.words().last();
-                wordRadioButton->setChecked(true);
-                wordFromComboBox->setCurrentIndex(m_wordIndexById[first.id()]);
-                //wordToComboBox->setCurrentIndex(m_wordIndexById[last.id()]);
+        try {
+            FrameElement fe((*m_frame)[feName]);
+            feBox->setChecked(!fe.isEmpty());
+            if (!fe.isEmpty()) {
+                if (fe.isWord()) {
+                    const Word& first = fe.words().first();
+                    const Word& last = fe.words().last();
+                    wordRadioButton->setChecked(true);
+                    wordFromComboBox->setCurrentIndex(m_wordIndexById[first.id()]);
+                    //wordToComboBox->setCurrentIndex(m_wordIndexById[last.id()]);
+                } else {
+                    assert(fe.isFrame());
+                    subFrameRadioButton->setChecked(true);
+                    subFrameComboBox->setCurrentIndex(m_subFrameIndexByFrameName.at(fe.childFrame()->name()));
+                }
             } else {
-                assert(fe.isFrame());
-                subFrameRadioButton->setChecked(true);
-                subFrameComboBox->setCurrentIndex(m_subFrameIndexByFrameName.at(fe.childFrame()->name()));
+                wordRadioButton->setChecked(true);
             }
-        } else {
-            wordRadioButton->setChecked(true);
+        } catch (std::out_of_range&) {
+            feBox->setChecked(false);
         }
+        
     }
     
 }

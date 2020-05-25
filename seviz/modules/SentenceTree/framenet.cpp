@@ -13,21 +13,29 @@ FrameTree::~FrameTree() {
     delete m_rootFrame;
 }
 
-int FrameTree::insertFrame(Frame* frame, const QString& fe) {
-    // TODO отбирать слова из дипапзона у фрейма верхнего уровня
+int FrameTree::insertFrame(Frame* frame, const QString& parentFe, const std::map<QString, QString>& childFramesInitFE) {
+    // TODO отбирать слова из диапазона у фрейма верхнего уровня
     frame->setTreeId(++m_lastId);
     if (!m_rootFrame) {
-        assert(fe.isEmpty());
         m_rootFrame = frame;
     } else if(m_rootFrame->range().isInsideOf(frame->range())) {
         // это расширение корневого фрейма? 
-        frame->setElement(FrameElement(fe, m_rootFrame));
+        frame->setElement(FrameElement(parentFe, m_rootFrame));
         m_rootFrame = frame;
     } else if (m_rootFrame->range().isOutsideOf(frame->range())) {
         // это уточнение корневого фрейма?
         // найти самый узкий родительский фрейм (проверяя на пересечения)
-        //  m_rootFrame->setElement(parentFE, FrameElement(frame));
-        //
+        Frame* parentToInsert = m_rootFrame->findLeastParentForRange(frame->range());
+        // забрать у него дочерние FE, которые входят в диапазон добавляемого фрейма
+        // и передать их в добавляемый фрейм
+        for (const auto& feAndParentFe : childFramesInitFE) {
+            FrameElement removedFe = parentToInsert->takeElement(feAndParentFe.second);
+            assert(removedFe.isFrame());
+            frame->setElement(FrameElement(feAndParentFe.first, removedFe.childFrame()));
+        }
+        // добавить добавляемый фрейм его родителю как потомка
+        parentToInsert->setElement(FrameElement(parentFe, frame));
+        
     } else {
         // попытка добавить фрейм на одном уровне с корневым?
         // в этой версии такое не реализовано
@@ -53,18 +61,29 @@ void FrameTree::remove(int nodeId) {
 bool FrameTree::canInsertFrameWithRange(const WordRange& range, FrameInsertionData* data) {
     bool res = false;
     // true, если дерево фреймов пустое 
-    // или диапазон включает в себя диапазон родительского фрейма
-    // или в дереве есть фрейм, диапазон которого включает в себя данный фрейм 
-    //      и вставляемый диапазон не пересекается с диапазоном ни одного фрейма в дереве
-    //      и вставляемый диапазон свободен (не занят LU и не входит в какие-нибудь FE)
     if (!m_rootFrame) {
         res = true;
+    // или диапазон включает в себя диапазон родительского фрейма
     } else if (m_rootFrame->range().isInsideOf(range)) {
         res = true;
         if (data) {
-            data->hasSubframe = true;
+            data->lowFrames = { m_rootFrame };
         }
-    } else if (false) { //TODO
+    // или он входит в корневой фрейм 
+    } else if (m_rootFrame->range().isOutsideOf(range)) { //TODO
+        res = true;
+        Frame* parentToInsert = m_rootFrame->findLeastParentForRange(range);
+        if (data) {
+            data->highFrame = parentToInsert;
+            for (const auto& fe : parentToInsert->elements()) {
+                if (fe.second.isFrame() && fe.first.isInsideOf(range)) {
+                    data->lowFrames.push_back(fe.second.childFrame().get());
+                    data->feNamesOfChildFramesInsideFutureParent.push_back(fe.second.name());
+                }
+            }
+        }
+        //    и вставляемый диапазон не пересекается с диапазоном ни одного фрейма в дереве
+        //      и вставляемый диапазон свободен (не занят LU и не входит в какие-нибудь FE)
     }
 
     return res;

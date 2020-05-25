@@ -6,7 +6,6 @@
 #include <QMessageBox>
 #include <QDebug>
 #include <QInputDialog>
-#include "BookModels.h"
 #include "SentenceTree.h"
 #include "constituency.h"
 #include "dependency.h"
@@ -76,55 +75,32 @@ void STWindow::onFrameInsert(IEngine* engine) {
             from.wordId() > 0 && to.wordId() > 0) {
 
             // извлечение списка слов, которые будут внутри фрейма
-            std::vector<Word> frameWords;
-            while (from < to || from == to) {
-                Word w = engine->getBook().getWord(from);
-                if (!w.isPunct()) {
-                    frameWords.emplace_back(engine->getBook().getWord(from));
-                }
-                if (from.hasNextWord()) {
-                    from = from.nextWord();
-                } else {
-                    break;
-                }
-            }
-
+            std::vector<Word> frameWords = getWordsInsideFrameRange(engine, from, to);
+            
             if (frameWords.size() > 0) {
                 FrameTree& tree = m_core->currentSentenceData().framenet;
-                WordRange range(frameWords[0].id(), frameWords[frameWords.size() - 1].id());
-
-                std::vector<std::pair<Word, QString>> possibleFrames;
-                QStringList paletteButtons;
-                for (const Word& w : frameWords) {
-                    QStringList framesForWord = m_core->framesModel().frameNamesForLexicalUnit(w.text());
-                    for (QString& frame : framesForWord) {
-                        possibleFrames.emplace_back(std::make_pair(w, frame));
-                        paletteButtons << QString("%1 (\"%2\")").arg(frame, w.text());
-                    }
-                }
-                if (paletteButtons.isEmpty()) {
-                    QMessageBox::warning(this, "Вставка фрейма", "В данном отрезке не найдено LU, выделенных в FrameNet");
-                    return;
-                }
-
                 FrameInsertionData insertPos;
+                WordRange range(frameWords[0].id(), frameWords[frameWords.size() - 1].id());
                 if (tree.canInsertFrameWithRange(range, &insertPos)) {
+                    std::vector<std::pair<Word, QString>> possibleFrames;
+                    QStringList paletteButtons = generateFrameChoosingPalette(frameWords, possibleFrames, insertPos);
+                    if (paletteButtons.isEmpty()) {
+                        QMessageBox::warning(this, "Вставка фрейма", "В данном отрезке не найдено LU, выделенных в FrameNet");
+                        return;
+                    }
+
                     QScopedPointer<ChoosePaletteDialog> chooser(new ChoosePaletteDialog(this, paletteButtons, 20));
                     chooser->setWindowTitle("Выберите фрейм и LU");
                     if (chooser->exec()) {
                         int index = chooser->getChoosedIndex();
                         Frame* f = new Frame(possibleFrames[index].second, possibleFrames[index].first, range, frameWords, m_core->framesModel());
-
-                        QString subframeFE;
-                        bool ok = false;
-                        if (insertPos.hasSubframe) {
-                            subframeFE = QInputDialog::getItem(this, "Вставка фрейма", "Выберите элемент для подфрейма: ", f->getFreeElementsList(), 0, false, &ok);
-                        }
-                        
-                        if (!insertPos.hasSubframe || (ok && !subframeFE.isEmpty())) {
-                            tree.insertFrame(f, subframeFE);
-                            renderFrameNet(tree);
-                        }
+                        std::map<QString, QString> feForSubframes = askFrameElementsForSubframes(insertPos, f);
+                        QString parentFE = askParentFrameElementForNewFrame(insertPos, f);
+                                                
+                        // TODO проверить, что FE указаны
+                        tree.insertFrame(f, parentFE, feForSubframes);
+                        // TODO добавить CSS border границ фрейма и выделить черным LU
+                        renderFrameNet(tree);
 
                     }
                 } else {
@@ -252,4 +228,83 @@ void STWindow::renderDependencies(const DependencyTree& tree) {
 void STWindow::renderFrameNet(const FrameTree& tree) {
     QString data = tree.toTreantJson();
     ui->framenetView->page()->runJavaScript("config=" + data + "; render(config);");
+
 }
+
+std::vector<Word> STWindow::getWordsInsideFrameRange(IEngine* engine, const Position& from, const Position& to) {
+    std::vector<Word> ret;
+    Position current = from;
+    while (current < to || current == to) {
+        Word w = engine->getBook().getWord(current);
+        if (!w.isPunct()) {
+            ret.emplace_back(engine->getBook().getWord(current));
+        }
+        if (current.hasNextWord()) {
+            current = current.nextWord();
+        } else {
+            break;
+        }
+    }
+    return ret;
+}
+
+QStringList STWindow::generateFrameChoosingPalette(const std::vector<Word>& frameWords, std::vector<std::pair<Word, QString>>& possibleFrames, FrameInsertionData& insertionContext) {
+    QStringList paletteButtons;
+    for (const Word& w : frameWords) {
+        bool insideChildFrame = false;
+        for (Frame* f : insertionContext.lowFrames) {
+            if (f->range().contains(w.id())) {
+                insideChildFrame = true;
+                break;
+            }
+        }
+        if (!insideChildFrame) {
+            QStringList framesForWord = m_core->framesModel().frameNamesForLexicalUnit(w.text());
+            for (QString& frame : framesForWord) {
+                possibleFrames.emplace_back(std::make_pair(w, frame));
+                paletteButtons << QString("%1 (\"%2\")").arg(frame, w.text());
+            }
+        }
+    }
+
+    return paletteButtons;
+}
+
+QString STWindow::askParentFrameElementForNewFrame(const FrameInsertionData& insertionData, Frame* newFrame) {
+    QString ret;
+    bool ok = false;
+    if (insertionData.highFrame) {
+        ret = QInputDialog::getItem(this,
+                                    "Вставка фрейма",
+                                    QString("Выберите элемент фрейма %1 для добавления в него %2: ")
+                                        .arg(insertionData.highFrame->name())
+                                        .arg(newFrame->name()),
+                                    insertionData.highFrame->getFreeElementsList(),
+                                    0,
+                                    false,
+                                    &ok);
+    }
+    return ret;
+}
+
+std::map<QString, QString> STWindow::askFrameElementsForSubframes(const FrameInsertionData& insertionData, Frame* newFrame) {
+    std::map<QString, QString> ret;
+    QString subframeFE;
+    bool ok = false;
+    assert(insertionData.lowFrames.size() == insertionData.lowFramesAsHighFrameElements.size());
+    for (int i = 0; i < insertionData.lowFrames.size(); ++i) {
+        QString name = insertionData.lowFrames[i]->name();
+        subframeFE = QInputDialog::getItem(this,
+                                           "Вставка фрейма",
+                                           QString("Выберите FE для вставки дочернего фрейма %1: ").arg(name),
+                                           newFrame->getFreeElementsList(), // TODO исключая занятые ранее в этом цикле
+                                           0,
+                                           false,
+                                           &ok);
+        if (ok) {
+            ret.emplace(subframeFE, insertionData.feNamesOfChildFramesInsideFutureParent[i]);
+        }
+    }
+    return ret;
+}
+

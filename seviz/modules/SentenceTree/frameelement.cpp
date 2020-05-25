@@ -5,13 +5,16 @@
 
 FrameElement::FrameElement(const QString& name, Frame* child)
     : m_subFrame(child),
-    m_name(name) {
+    m_name(name) 
+{
+    assert(child->range().first != -1);
 }
 
 FrameElement::FrameElement(const QString& name, std::shared_ptr<Frame> child) 
     : m_subFrame(child),
     m_name(name)
 {
+    assert(child->range().first != -1);
 }
 
 FrameElement::FrameElement(const QString& name, const QList<Word>& phrase)

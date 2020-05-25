@@ -11,6 +11,8 @@
 class Frame {
 
 public:
+    // range - диапазон слов в предложении, закрепленных за данным фреймом
+    // words - слова, которые изначально закреплены за данным фреймом для создания вложенных в него FE
     Frame(const QString& name, const Word& lu, const WordRange& range, const std::vector<Word>& words, const FrameNetModel& frameNetDb);
     ~Frame();
 
@@ -23,10 +25,12 @@ public:
     WordRange range() const;
     std::vector<std::shared_ptr<Frame>> subFrames() const;
 
+    const std::map<WordRange, FrameElement>& elements() const;
     QStringList elementsList() const;
     QStringList getFreeElementsList() const;
     FrameElement& operator[] (const QString& feName);
     void setElement(const FrameElement& val);
+    FrameElement takeElement(const QString& name);
     void clearElements();
 
     void toTreantJson(QString& ret, int depth, int maxDepth, const QString& parentFe = "") const;
@@ -39,6 +43,7 @@ public:
 private:
     WordRange m_range;// borders in sentence
     std::vector<Word> m_words;
+    std::vector<Word> m_currentWords;
     QString m_name; // name 
     const QStringList m_allowedElements; // allowed FEs
     Word m_lu; // LU - word id
