@@ -25,11 +25,11 @@ QStringList FrameNetModel::frameNamesForLexicalUnit(const QString& word) const {
                   "WHERE text IS :text");
     query.bindValue(":text", word);
     if (query.exec()) {
-        QStringList res;
+        QStringList frameNames;
         while (query.next()) {
-            res << query.value(0).toString();
+            frameNames << query.value(0).toString();
         }
-        return res;
+        return frameNames;
     } else {
         qDebug() << query.lastError();
         return {};

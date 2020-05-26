@@ -260,6 +260,9 @@ QStringList STWindow::generateFrameChoosingPalette(const std::vector<Word>& fram
         }
         if (!insideChildFrame) {
             QStringList framesForWord = m_core->framesModel().frameNamesForLexicalUnit(w.text());
+            if (framesForWord.empty()) {
+                framesForWord = m_core->framesModel().frameNamesForLexicalUnit(w.infinitive());
+            }
             for (QString& frame : framesForWord) {
                 possibleFrames.emplace_back(std::make_pair(w, frame));
                 paletteButtons << QString("%1 (\"%2\")").arg(frame, w.text());

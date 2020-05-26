@@ -148,6 +148,9 @@ public:
     const QString& text() const { return m_text; }
 
     bool isPunct() const { return m_text.length() == 1 && !QRegExp("\\w+").exactMatch(m_text); }
+    
+    // возвращает нормальную форму глагола. Внимание: реализовано через отрезание -s, -ed, -ing и т.д. Неправильные глагол пока не поддерживаются
+    QString infinitive() const;
 };
 
 class Chapter {
