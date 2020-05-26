@@ -261,7 +261,11 @@ class Render {
                             currentElem = chapterDoc.body.firstElementChild;
                             idTo = searchTo;
                         } else {
-                            currentElem = chapterDoc.getElementById(idFrom);
+                            if (idFrom == undefined) {
+                                currentElem = chapterDoc.body.firstElementChild;
+                            } else {
+                                currentElem = chapterDoc.getElementById(idFrom);
+                            }
                         }
                         console.log('idFrom: ' + idFrom + ' idTo: ' + idTo);
                         while (currentElem != null && (currentElem.id != idTo || idTo == null)) {
