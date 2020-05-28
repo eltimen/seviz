@@ -17,7 +17,7 @@ FrameElement::FrameElement(const QString& name, std::shared_ptr<Frame> child)
     assert(child->range().first != -1);
 }
 
-FrameElement::FrameElement(const QString& name, const QList<Word>& phrase)
+FrameElement::FrameElement(const QString& name, const std::vector<Word>& phrase)
     : m_words(phrase),
     m_name(name) {
     assert(phrase.size() > 0);
@@ -55,7 +55,7 @@ std::shared_ptr<Frame> FrameElement::childFrame() const {
     return m_subFrame;
 }
 
-const QList<Word>& FrameElement::words() const {
+const std::vector<Word>& FrameElement::words() const {
     return m_words;
 }
 

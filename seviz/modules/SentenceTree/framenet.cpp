@@ -50,7 +50,7 @@ Frame* FrameTree::findByTreeId(int id) {
 
 void FrameTree::remove(int nodeId) {
     if (m_rootFrame->treeId() != nodeId) {
-        m_rootFrame->removeFEWithChild(nodeId);
+        m_rootFrame->removeFeWhichContainSubframe(nodeId);
     } else {
         delete m_rootFrame;
         m_rootFrame = nullptr;

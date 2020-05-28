@@ -2,7 +2,9 @@
 #define FRAMEELEMENTSEDITOR_H
 
 #include <QDialog>
+#include <QComboBox>
 #include <unordered_map>
+#include <unordered_set>
 #include "BookModels.h"
 
 class Frame;
@@ -25,11 +27,19 @@ private slots:
 private:
     Ui::FrameElementsEditor *ui;
     Frame* m_frame;
-    std::vector<Word> m_words; // слова фрейма (без LU)
-    std::vector<std::shared_ptr<Frame>> m_subFrames;
-    std::unordered_map<int, int> m_wordIndexById;
-    std::map<QString, int> m_subFrameIndexByFrameName;
+    std::map<int, Word> m_words; // ID - Слово
+    std::vector<Word> m_wordsPool; // pool слов для заполнения FE // TODO заменить на пул ID-шников!!!!!
+    std::unordered_map<QComboBox*,int> m_previousFrom;
+    std::unordered_map<QComboBox*,int> m_previousTo;
 
+    std::vector<std::shared_ptr<Frame>> m_subFrames;
+    std::map<QString, int> m_subFrameIndexByFEName;
+    std::unordered_set<int> m_subframeIndexesPool;
+    std::unordered_map<QComboBox*, int> m_previousSubFrameIndex;
+
+    std::vector<Word> getPossibleEndsOfWordRangeFrom(int id);
+    void takeWordRangeFromPool(int from, int to);
+    void restoreWordRangeToPool(int from, int to);
     void setupWidgets();
     void setupWordsWidget();
 };

@@ -2,6 +2,7 @@
 #define FRAME_H
 
 #include <map>
+#include <set>
 #include <QString>
 #include "BookModels.h"
 #include "frameelement.h"
@@ -21,7 +22,7 @@ public:
 
     QString name() const;
     const Word& lu() const;
-    const std::vector<Word>& words() const;
+    std::vector<Word> words() const;
     WordRange range() const;
     std::vector<std::shared_ptr<Frame>> subFrames() const;
 
@@ -35,15 +36,15 @@ public:
 
     void toTreantJson(QString& ret, int depth, int maxDepth, const QString& parentFe = "") const;
 
-    void removeFEWithChild(int nodeId);
+    void removeFeWhichContainSubframe(int nodeId);
     Frame* find(int id);
     Frame* findLeastParentForRange(const WordRange& range) const;
     int maxDepth() const;
 
 private:
     WordRange m_range;// borders in sentence
-    std::vector<Word> m_words;
-    std::vector<Word> m_currentWords;
+    std::set<Word> m_words;
+    std::set<Word> m_currentWords;
     QString m_name; // name 
     const QStringList m_allowedElements; // allowed FEs
     Word m_lu; // LU - word id
