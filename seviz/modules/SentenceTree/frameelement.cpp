@@ -59,10 +59,10 @@ const std::vector<Word>& FrameElement::words() const {
     return m_words;
 }
 
-void FrameElement::toTreantJson(QString& ret, int depth, int maxDepth) const {
+void FrameElement::toTreantJson(QString& ret, int depth, int maxDepth, const QPair<QString, QString>& colors) const {
     if (isFrame()) {
-        m_subFrame->toTreantJson(ret, depth, maxDepth, m_name);
-    } else if (!isEmpty()) { // TODO fix empty FEs bug
+        m_subFrame->toTreantJson(ret, depth, maxDepth, m_name, colors);
+    } else if (!isEmpty()) { // TODO fix empty FEs bug, then remove "if" here
         int dropLevel = maxDepth - 1 - depth;
 
         for (int i = 0; i < dropLevel; ++i) {
@@ -78,10 +78,16 @@ void FrameElement::toTreantJson(QString& ret, int depth, int maxDepth) const {
         {
         "text": { title: "%1", name: "%2" }, 
         "HTMLclass": "%3",
+        "title_fgcolor": "%4",
+        "title_bgcolor": "%5",
+        "HTMLid": "%6",
         "children": [
-        )").arg(m_name)
+        )") .arg(m_name)
             .arg(constituent)
-            .arg("word");
+            .arg("word")
+            .arg(colors.second)
+            .arg(colors.first)
+            .arg(QString("fe-word-") + QString::number(m_words.begin()->id()));
 
         ret += "]} \n";
 

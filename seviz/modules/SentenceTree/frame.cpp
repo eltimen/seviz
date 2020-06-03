@@ -9,7 +9,9 @@ Frame::Frame(const QString& name, const Word& lu, const WordRange& range, const 
     m_words(words.begin(), words.end()),
     m_currentWords(words.begin(), words.end()),
     m_allowedElements(frameNetDb.frameElementsFor(name)),
-    m_range(range) {
+    m_range(range),
+    m_frameNetDb(frameNetDb)
+{
     // для упрощения вывода дерева LU заносится как FE "LU"
     assert(WordRange(lu.id(), lu.id()) == FrameElement("LU", { lu }).range());
     m_elements.emplace(WordRange(lu.id(), lu.id()), FrameElement("LU", { lu }));
@@ -111,19 +113,24 @@ void Frame::setTreeId(int id) {
     m_treeId = id;
 }
 
-void Frame::toTreantJson(QString& ret, int depth, int maxDepth, const QString& parentFe) const {
+void Frame::toTreantJson(QString& ret, int depth, int maxDepth, const QString& parentFe, const QPair<QString, QString>& parentFEcolors) const {
     ret += QStringLiteral(R"(
         {
         "text": { title: "%1", name: "%2" }, 
         "HTMLclass": "frame",
         "HTMLid": "%3",
+        "title_fgcolor": "%4",
+        "title_bgcolor": "%5",
         "children": [
     )").arg(parentFe)
         .arg(m_name)
-        .arg(QString::number(m_treeId));
+        .arg(QString::number(m_treeId))
+        .arg(parentFEcolors.second)
+        .arg(parentFEcolors.first);
 
     for (const std::pair<WordRange, FrameElement>& fe : m_elements) {
-        fe.second.toTreantJson(ret, depth + 1, maxDepth);
+        auto colors = m_frameNetDb.getColorsForFE(m_name, fe.second.name());
+        fe.second.toTreantJson(ret, depth + 1, maxDepth, colors);
         ret += ",";
     }
 

@@ -21,6 +21,7 @@ QStringList FrameNetModel::frameNamesForLexicalUnit(const QString& word) const {
     QSqlQuery query(m_db);
     // TODO добавить POS-тег в качестве параметра
     // DISTICT ниже нужен для удаления одинаковых слов, у которых разная часть речи
+    // TODO фильтр по части речи
     query.prepare("SELECT DISTINCT frameName FROM lexical_units "
                   "WHERE text IS :text");
     query.bindValue(":text", word);
@@ -53,4 +54,21 @@ QStringList FrameNetModel::frameElementsFor(const QString& frameName) const {
         return {};
         // TODO throw
     }
+}
+
+QPair<QString, QString> FrameNetModel::getColorsForFE(const QString& frameName, const QString& elementName) const {
+    QSqlQuery query(m_db);
+    query.prepare("SELECT bgColor, fgColor FROM frame_elements "
+                  "WHERE frameName IS :frameName AND name IS :feName");
+    query.bindValue(":frameName", frameName);
+    query.bindValue(":feName", elementName);
+    if (query.exec()) {
+        while (query.next()) {
+            return { query.value(query.record().indexOf("bgColor")).toString(),  query.value(query.record().indexOf("fgColor")).toString() };
+        }  
+    } else {
+        qDebug() << query.lastError();
+        // TODO throw
+    }
+    return {};
 }

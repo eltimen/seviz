@@ -11,10 +11,15 @@ body { background: #fff; }
     padding: 3px;
 }
 
-div.node.word p.node-name:nth-child(2){
+div.node.word p.node-name:nth-child(2) {
     /* border: 1px solid black; */
     margin-top: 5px;
     text-decoration: underline;
+    text-align: center;
+}
+
+div.node:not(.word) p.node-name {
+    text-align: center;
 }
 
 div.node:not(.word) p.node-name:hover{ 
@@ -22,7 +27,7 @@ div.node:not(.word) p.node-name:hover{
 }
 
 /* FE */
-.node-title {
+p.node-title {
     font-size: 80%;
     font-style: italic;
     text-align: center;

@@ -34,7 +34,7 @@ public:
     FrameElement takeElement(const QString& name);
     void clearElements();
 
-    void toTreantJson(QString& ret, int depth, int maxDepth, const QString& parentFe = "") const;
+    void toTreantJson(QString& ret, int depth, int maxDepth, const QString& parentFe = "", const QPair<QString, QString>& parentFEcolors = {}) const;
 
     void removeFeWhichContainSubframe(int nodeId);
     Frame* find(int id);
@@ -52,6 +52,7 @@ private:
     std::map<QString, WordRange> m_rangeByElementName; // FEs
     // TODO FE in order of sentence words (ranges?) 
     int m_treeId = -1;
+    const FrameNetModel& m_frameNetDb;
 };
 
 #endif // FRAME_H

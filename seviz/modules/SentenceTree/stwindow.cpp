@@ -227,8 +227,7 @@ void STWindow::renderDependencies(const DependencyTree& tree) {
 
 void STWindow::renderFrameNet(const FrameTree& tree) {
     QString data = tree.toTreantJson();
-    ui->framenetView->page()->runJavaScript("config=" + data + "; render(config);");
-
+    ui->framenetView->page()->runJavaScript("config=" + data + "; render(config); setupFEcolors(config.nodeStructure); ");
 }
 
 QString STWindow::getInitialFormOfWord(const QString& word) const {

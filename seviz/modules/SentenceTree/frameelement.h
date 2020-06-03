@@ -27,7 +27,7 @@ public:
     std::shared_ptr<Frame> childFrame() const;
     const std::vector<Word>& words() const;
 
-    void toTreantJson(QString& ret, int depth, int maxDepth) const;
+    void toTreantJson(QString& ret, int depth, int maxDepth, const QPair<QString, QString>& colors) const;
 private:
     QString m_name;
     // value - frame or word id
