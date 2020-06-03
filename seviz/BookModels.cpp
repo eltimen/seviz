@@ -256,16 +256,3 @@ QString Position::cssSelector() const {
 
     return sel;
 }
-
-QString Word::infinitive() const {
-    // TODO поддержка неправильных глаголов
-    static QStringList verbEndings{ "ed", "ing", "s" };
-    for (const QString& s : verbEndings) {
-        if (m_text.endsWith(s)) {
-            QString ret = m_text;
-            ret.chop(s.length());
-            return ret;
-        }
-    }
-    return m_text;
-}

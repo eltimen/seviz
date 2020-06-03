@@ -52,6 +52,10 @@ private:
     void renderDependencies(const DependencyTree& tree);
     void renderFrameNet(const FrameTree& tree);
 
+    // возвращает допустимые фреймы, определяя в процессе предполагаемые начальные формы слова. 
+    // Внимание: реализовано через отрезание -s, -ed, -ing и т.д. => неправильные глаголы пока не поддерживаются
+    QString getInitialFormOfWord(const QString& word) const;
+
     std::vector<Word> getWordsInsideFrameRange(IEngine* engine, const Position& from, const Position& to);
     QStringList generateFrameChoosingPalette(const std::vector<Word>& frameWords, std::vector<std::pair<Word, QString>>& possibleFrames, FrameInsertionData& insertionContext);
     // спрашивает, куда вставлять фреймы, оказавшиеся внутри добавляемого фрейма

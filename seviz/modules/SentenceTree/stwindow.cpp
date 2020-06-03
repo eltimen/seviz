@@ -231,6 +231,19 @@ void STWindow::renderFrameNet(const FrameTree& tree) {
 
 }
 
+QString STWindow::getInitialFormOfWord(const QString& word) const {
+    // TODO поддержка неправильных глаголов
+    static QStringList verbEndings{ "ed", "ing", "s" };
+    for (const QString& s : verbEndings) {
+        if (word.endsWith(s)) {
+            QString ret = word;
+            ret.chop(s.length());
+            return ret;
+        }
+    }
+    return word;
+}
+
 std::vector<Word> STWindow::getWordsInsideFrameRange(IEngine* engine, const Position& from, const Position& to) {
     std::vector<Word> ret;
     Position current = from;
@@ -261,7 +274,10 @@ QStringList STWindow::generateFrameChoosingPalette(const std::vector<Word>& fram
         if (!insideChildFrame) {
             QStringList framesForWord = m_core->framesModel().frameNamesForLexicalUnit(w.text());
             if (framesForWord.empty()) {
-                framesForWord = m_core->framesModel().frameNamesForLexicalUnit(w.infinitive());
+                framesForWord = m_core->framesModel().frameNamesForLexicalUnit(getInitialFormOfWord(w.text()));
+                if (framesForWord.empty()) {
+                    framesForWord = m_core->framesModel().frameNamesForLexicalUnit(getInitialFormOfWord(w.text()+"e"));
+                }
             }
             for (QString& frame : framesForWord) {
                 possibleFrames.emplace_back(std::make_pair(w, frame));
