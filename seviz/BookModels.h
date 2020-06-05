@@ -47,6 +47,8 @@ public:
     int wordId() const { return m_idWord; }
     TailPosition tail() const { return m_tail; }
 
+    Position trimmedTo(ElementType type) const;
+
     bool hasElement(ElementType type);
 
     static void setBook(const Book* book) { m_book = book; }
@@ -138,8 +140,14 @@ public:
         return m_id < o.m_id;
     }
 
+    bool operator==(const Word& o) const {
+        return m_id == o.m_id && m_text == o.m_text;
+    }
+
     int id() const { return m_id; }
     const QString& text() const { return m_text; }
+
+    bool isPunct() const { return m_text.length() == 1 && !QRegExp("\\w+").exactMatch(m_text); }
 };
 
 class Chapter {

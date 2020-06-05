@@ -147,6 +147,8 @@ void ConstituencyTreeNode::removeNode(int nodeId) {
         if (child->m_id == nodeId) {
             // когда удаляемый потомок найден, забираем у него его дочерние узлы
             ChildrenContainer children = child->m_children;
+            child->m_children.clear();
+            delete child;
             // и вставляем их вместо данного узла
             it = m_children.erase(it);
             it = m_children.insert(it, children.begin(), children.end());
@@ -163,12 +165,11 @@ NodeInsertPosition ConstituencyTreeNode::findPositionToInsertNode(const std::pai
         decltype(m_children)::iterator it = std::find_if(parent->m_children.begin(), parent->m_children.end(), [&range](const auto& child) {
             return child->tokenRange().first == range.first && child->isInsideOfRange(range);
         });
-
         if (it == parent->m_children.end()) {
             throw -2;
         }
-
         ChildrenContainer::iterator from = it;
+
         while (it != parent->m_children.end() && (*it)->isInsideOfRange(range)) {
             it++;
             if (it != parent->m_children.end() && range.second >= (*it)->m_range.first && range.second < (*it)->m_range.second) {

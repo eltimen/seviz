@@ -60,6 +60,17 @@ bool Position::hasSameLevelWith(const Position& o) const {
         (m_idWord == -1) == (o.m_idWord == -1);
 }
 
+Position Position::trimmedTo(ElementType type) const {
+    Position temp(*this);
+    if (type == ElementType::PARAGRAPH) {
+        temp.m_idSentence = -1;
+        temp.m_idWord = -1;
+    } else if (type == ElementType::SENTENCE) {
+        temp.m_idWord = -1;
+    }
+    return temp;
+}
+
 bool Position::hasElement(ElementType type) {
     if (type == ElementType::PARAGRAPH) {
         return paragraphId() != -1;

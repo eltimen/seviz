@@ -60,3 +60,8 @@ seviz/seviz.vcxproj
 seviz/seviz.sln
 seviz/cpp.hint
 seviz/BookModels.h.rej
+*.tmp
+seviz/seviz.aps
+seviz/seviz.rc
+seviz/seviz_resource.rc
+seviz/resource.h

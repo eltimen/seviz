@@ -253,6 +253,7 @@ class Render {
                     if (idFrom == null && idTo == null) {
                         this.result.innerHTML += html;
                         console.log("inner");
+                        return this.extractChapterPartHtml(i, true, callback);
                     } else {
                         // иначе вырезаем главу из остальных элементов страницы
                         let currentElem;
@@ -260,7 +261,11 @@ class Render {
                             currentElem = chapterDoc.body.firstElementChild;
                             idTo = searchTo;
                         } else {
-                            currentElem = chapterDoc.getElementById(idFrom);
+                            if (idFrom == undefined) {
+                                currentElem = chapterDoc.body.firstElementChild;
+                            } else {
+                                currentElem = chapterDoc.getElementById(idFrom);
+                            }
                         }
                         console.log('idFrom: ' + idFrom + ' idTo: ' + idTo);
                         while (currentElem != null && (currentElem.id != idTo || idTo == null)) {

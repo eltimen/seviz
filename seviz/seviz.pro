@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui webengine webenginewidgets webchannel
+QT       += core gui webengine webenginewidgets webchannel sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -73,7 +73,13 @@ SOURCES += \
         modules/SentenceTree/constituency.cpp \
         modules/SentenceTree/dependency.cpp \
         modules/SentenceTree/choosepalettedialog.cpp \
-        modules/SentenceTree/stwindow.cpp
+        modules/SentenceTree/frame.cpp \
+        modules/SentenceTree/frameelement.cpp \
+        modules/SentenceTree/frameelementseditor.cpp \
+        modules/SentenceTree/framenet.cpp \
+        modules/SentenceTree/framenetmodel.cpp \
+        modules/SentenceTree/stwindow.cpp \
+        modules/SentenceTree/wordrange.cpp
 
 HEADERS += \
         3rdparty/quazip/quazip/quagzipfile.h \ #for moc
@@ -97,7 +103,13 @@ HEADERS += \
         modules/SentenceTree/constituency.h \
         modules/SentenceTree/dependency.h \
         modules/SentenceTree/choosepalettedialog.h \
+        modules/SentenceTree/frame.h \
+        modules/SentenceTree/frameelement.h \
+        modules/SentenceTree/frameelementseditor.h \
+        modules/SentenceTree/framenet.h \
+        modules/SentenceTree/framenetmodel.h \
         modules/SentenceTree/stwindow.h \
+        modules/SentenceTree/wordrange.h \
         modules/modules.h
 
 FORMS += \
@@ -105,7 +117,10 @@ FORMS += \
         mainwindow.ui \
         modules/EngineTest/enginetestwidget.ui \
         modules/SentenceTree/choosepalettedialog.ui \
+        modules/SentenceTree/frameelementseditor.ui \
         modules/SentenceTree/stwindow.ui
+
+RC_ICONS = app.ico
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -113,4 +128,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 RESOURCES += \
+    main.qrc \
     modules/SentenceTree/sentencetree.qrc
