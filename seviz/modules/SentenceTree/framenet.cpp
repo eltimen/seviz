@@ -73,7 +73,9 @@ bool FrameTree::canInsertFrameWithRange(const WordRange& range, FrameInsertionDa
     } else if (m_rootFrame->range().isOutsideOf(range)) { //TODO
         res = true;
         Frame* parentToInsert = m_rootFrame->findLeastParentForRange(range);
-        if (data) {
+        if (range.contains(parentToInsert->lu().id())) {
+            res = false;
+        } else if (data) {
             data->highFrame = parentToInsert;
             for (const auto& fe : parentToInsert->elements()) {
                 if (fe.second.isFrame() && fe.first.isInsideOf(range)) {
