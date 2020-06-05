@@ -26,6 +26,7 @@ public:
     void bookOpened(Book* book, QTemporaryDir& epubDir, QList<Chapter>& chapters);
     QList<Feature*> featureEnabled(const Feature& feature);
     void featureDisabled(const Feature& feature);
+    QWidget* mainWindow() const;
 
     // для загрузчика книги (BookLoader)
     EpubRenderer& getBookRender();

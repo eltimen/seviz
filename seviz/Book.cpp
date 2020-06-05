@@ -1,5 +1,6 @@
 #include "Book.h"
 #include <QRegularExpression>
+#include <QProgressDialog>
 #include <JLCompress.h>
 #include <QDir>
 #include "exceptions.h"
@@ -23,6 +24,9 @@ Book::~Book()
 void Book::open() {
     // распаковка во временную папку
     if (m_epubDir.isValid()) {
+        QProgressDialog progress ("Открытие книги", "", 0, 0, m_moduleManager.mainWindow());
+        progress.setCancelButton(nullptr);
+        progress.show();
         QStringList files = JlCompress::extractDir(m_epubPath, m_epubDir.path());
         if (!files.empty()) {
             // TODO взять путь к opf из META_INF/container.xml. пока берем первый попавшийся opf из epub
@@ -33,6 +37,7 @@ void Book::open() {
         } else {
             throw InvalidEpubException();
         }
+        progress.cancel(); // !!! не забыть убрать при возникновении исключения
     } else {
         throw IOException(m_epubDir.errorString());
     }
@@ -48,9 +53,13 @@ void Book::showChapter(int index) {
 }
 
 void Book::save() {
+    QProgressDialog progress("Сохранение...", "", 0, 0, m_moduleManager.mainWindow());
+    progress.setCancelButton(nullptr);
+    progress.show();
+
     QDir dir(m_epubDir.path());
     dir.cd("seviz");
-
+    
     m_moduleManager.forEachModule([this, &dir](AbstractModule* m) {
         if (dir.cd(m->id())) {
             m->save(dir);
@@ -71,6 +80,8 @@ void Book::save() {
         !QFile::rename(tmpPath, m_epubPath)) {
         throw IOException("не удалось сохранить epub");
     }
+
+    progress.cancel();
 }
 
 QStringList Book::getChapterTitles() {

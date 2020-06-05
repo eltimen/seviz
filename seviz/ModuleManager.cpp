@@ -146,6 +146,10 @@ void ModuleManager::featureDisabled(const Feature& feature) {
     }
 }
 
+QWidget* ModuleManager::mainWindow() const {
+    return m_window;
+}
+
 void ModuleManager::registerHandler(EventType onEvent, ElementType onElements, Button withKey, const Feature& feature, const std::function<void(const Position&)>& slot) {
     Handler h(onEvent, onElements, withKey, slot);
 
