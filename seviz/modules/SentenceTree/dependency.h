@@ -86,6 +86,9 @@ public:
 
     bool canInsertRelation(int from, int to) const;
 
+    void fromStanfordCoreNlpJson(const QString& basicDepJson);
+    QString toStanfordCoreNlpJson() const;
+
     QString toBratJson() const;
 
 private:

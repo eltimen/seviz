@@ -1,5 +1,5 @@
 #include "SentenceTree.h"
-#include "frameelement.h" // TEST=====
+#include <QIntValidator>
 
 SentenceTree::SentenceTree(IEngine* engine) :
     AbstractModule(engine, "SentenceTree"),
@@ -34,6 +34,106 @@ void SentenceTree::render(const Position& from, const Position& to, DomChapter& 
         dom.addStyle(pos, "border-right: 1px solid black;");
 
         dom.addStyle(m_currentSentencePos, "font-weight: bold;");
+    }
+}
+
+void SentenceTree::load(QDir* moduleDir) {
+    if (!moduleDir)
+        return;
+
+    QDir dir = *moduleDir;
+
+    for (const auto& chapterDir : dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot)) {
+        bool ok = false;
+        int chId = chapterDir.fileName().toInt(&ok);
+        if (!ok) continue;
+        dir.cd(chapterDir.fileName());
+
+        for (const auto& sectionDir : dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot)) {
+            bool ok = false;
+            int sId = sectionDir.fileName().toInt(&ok);
+            if (!ok) continue;
+            dir.cd(sectionDir.fileName());
+
+            for (const auto& parDir : dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot)) {
+                bool ok = false;
+                int parId = parDir.fileName().toInt(&ok);
+                if (!ok) continue;
+                dir.cd(parDir.fileName());
+
+                for (const auto& sentDir : dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot)) {
+                    bool ok = false;
+                    int sentId = sentDir.fileName().toInt(&ok);
+                    if (!ok) continue;
+                    dir.cd(sentDir.fileName());
+
+                    Position pos(chId, sId, parId, sentId);
+                    m_currentSentencePos = pos;
+                    m_currentSentence = m_engine->getBook().getSentence(m_currentSentencePos);
+                    m_currentSentenceData = new SentenceData(m_currentSentence);
+
+                    if (dir.exists("constituency.json")) {
+                        QFile file(dir.filePath("constituency.json"));
+                        if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+                            QTextStream in(&file);
+                            m_currentSentenceData->constituency.fromJson(in.readAll());
+                        }
+                    }
+
+
+                    if (dir.exists("dependency.json")) {
+                        QFile file(dir.filePath("dependency.json"));
+                        if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+                            QTextStream in(&file);
+                            m_currentSentenceData->dependency.fromStanfordCoreNlpJson(in.readAll());
+                        }
+                    }
+
+                    m_storage.emplace(pos, std::unique_ptr<SentenceData>(m_currentSentenceData));
+
+                    dir.cdUp();
+                }
+                dir.cdUp();
+            }
+            dir.cdUp();
+        }
+        dir.cdUp();
+    }
+}
+
+void SentenceTree::save(QDir& moduleDir) {
+    qDebug() << moduleDir.path();
+    for (const auto& positionAndTrees : m_storage) {
+        Position pos = positionAndTrees.first;
+        const auto& data = positionAndTrees.second;
+        QString sentencePath = QString("%1/%2/%3/%4")
+                               .arg(QString::number(pos.chapterId()))
+                               .arg(QString::number(pos.sectionId()))
+                               .arg(QString::number(pos.paragraphId()))
+                               .arg(QString::number(pos.sentenceId()));
+        if (moduleDir.mkpath(sentencePath)) {
+            QDir sentenceDir(moduleDir.path() + "/" + sentencePath);
+
+            {
+                QFile file(sentenceDir.filePath("constituency.json"));
+                if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+                    QTextStream out(&file);
+                    out << data->constituency.toJson();
+                }
+            }
+
+            {
+                QFile file(sentenceDir.filePath("dependency.json"));
+                if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+                    QTextStream out(&file);
+                    out << data->dependency.toStanfordCoreNlpJson();
+                }
+            }
+
+            {
+
+            }
+        }
     }
 }
 

@@ -69,7 +69,9 @@ public:
     ConstituencyTreeNode* find(int nodeId);
     int maxDepth() const;
 
-    QString toBracedString(const QString& sep = "[]") const;
+    QString toJson();
+
+    QString toBracedString(const QString& sep) const;
     void toTreantJson(QString& ret, int depth, int maxDepth) const;
 
 private:
@@ -102,12 +104,21 @@ public:
     bool canInsertNodeWithRange(int from, int to, NodeInsertPosition* position = nullptr) const;
     bool canChangeOrDeleteNode(int nodeId) const;
 
-    QString toBracedString(const QString& sep = "[]") const;
+    // пока не будет интегрирован CoreNLP
+    void fromJson(const QString& json);
+    QString toJson();
+
+    //void fromBracedString(const QString& str, int lastTokenId = 0, const QString& sep = "()");
+    QString toBracedString(const QString& sep = "()") const;
+
     QString toTreantJson() const;
 
 private:
     int m_lastId = 0;
     ConstituencyTreeNode *m_root;
+
+    int createNodeFromBracedString(const QStringList& str, int lastTokenId, const QString& sep);
+    void fromJsonHelper(const QJsonArray& children);
 };
 
 #endif // CONSTITUENCY_H

@@ -38,6 +38,9 @@ public:
     virtual QList<Feature> features() override;
     virtual void render(const Position& from, const Position& to, DomChapter& dom, const QVector<Feature*>& activeFeatures) override;
 
+    virtual void load(QDir* moduleDir) override;
+    virtual void save(QDir& moduleDir) override;
+
     // TODO public sentenceData(pos...)
     SentenceData& SentenceTree::currentSentenceData(); // TODO private, friend class
     const FrameNetModel& framesModel();

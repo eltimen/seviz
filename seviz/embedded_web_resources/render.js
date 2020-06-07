@@ -225,6 +225,7 @@ class Render {
                 let chaptersCount = this.chapters.length;
                 this.chapterData = Array.apply(null, Array(chaptersCount)).map(function () { });
                 this.model = Array.apply(null, Array(chaptersCount)).map(function () { });
+                console.log(this.model);
                 window.core.setChaptersList(this.chapters);
             }.bind(this));
 
@@ -300,6 +301,8 @@ class Render {
             this.chapterData[i] = this.result;
 
             this.model[i] = model;
+            console.log(i);
+            console.log(this.model);
             window.core.setModelDataForChapter(i, model);
         }.bind(this));
     }
@@ -321,7 +324,7 @@ class Render {
         for (let i = 0; i < this.chapterData.length; ++i) {
             arr.push(this.chapterData[i].outerHTML);
         }
-
+        console.log(this.model);
         return {
             model: this.model,
             dom: arr
@@ -329,8 +332,10 @@ class Render {
     }
 
     deserializeTokenizedChapters(json) {
+        console.log(json)
         for (let i = 0; i < json.model.length; ++i) {
             window.core.setModelDataForChapter(i, json.model[i]);
+            console.log(json.model[i])
         }
 
         for (let i = 0; i < json.dom.length; ++i) {
