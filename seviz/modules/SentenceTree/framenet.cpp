@@ -19,8 +19,9 @@ int FrameTree::insertFrame(Frame* frame, const QString& parentFe, const std::map
     if (!m_rootFrame) {
         m_rootFrame = frame;
     } else if(m_rootFrame->range().isInsideOf(frame->range())) {
+        assert(childFramesInitFE.size() == 1);
         // это расширение корневого фрейма? 
-        frame->setElement(FrameElement(parentFe, m_rootFrame));
+        frame->setElement(FrameElement(childFramesInitFE.begin()->first, m_rootFrame));
         m_rootFrame = frame;
     } else if (m_rootFrame->range().isOutsideOf(frame->range())) {
         // это уточнение корневого фрейма?
