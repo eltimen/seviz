@@ -100,7 +100,11 @@ void MainWindow::onFileSave() {
 }
 
 void MainWindow::onAbout() {
-
+    QString aboutString("Платформа составления корпуса художественных текстов на английском языке\n"
+                        "Разработчик: Наумов И.Ю.\n"
+                        "Научный руководитель: доцент Сычев О.А."
+                       );
+    QMessageBox::about(this, "О программе", aboutString);
 }
 
 void MainWindow::onChapterChanged(int index) {
