@@ -1,7 +1,11 @@
 #include "frame.h"
 #include <QSet>
 #include <QDebug>
+#include <QJsonDocument>
+#include <QJsonArray>
+#include <QJsonObject>
 #include <cassert>
+#include "stwindow.h"
 
 Frame::Frame(const QString& name, const Word& lu, const WordRange& range, const std::vector<Word>& words, const FrameNetModel& frameNetDb)
     : m_name(name),
@@ -77,6 +81,69 @@ void Frame::clearElements() {
     }
     m_rangeByElementName.clear();
     m_currentWords = m_words;
+}
+
+Frame* Frame::fromJson(const QString& json, const FrameNetModel& frameNetDb, IEngine* engine, const Position& sentPos) {
+    
+    QJsonParseError error;
+    QJsonDocument doc = QJsonDocument::fromJson(json.toUtf8(), &error);
+    if (!doc.isNull()) {
+        QString name = doc.object().value("name").toString();
+        int fromWordId = doc.object().value("from").toInt();
+        int toWordId = doc.object().value("to").toInt();
+        int luId = doc.object().value("luId").toInt();
+        int treeId = doc.object().value("treeId").toInt();
+
+        Position from(sentPos.chapterId(), sentPos.sectionId(), sentPos.paragraphId(), sentPos.sentenceId(), fromWordId);
+        Position to(sentPos.chapterId(), sentPos.sectionId(), sentPos.paragraphId(), sentPos.sentenceId(), toWordId);
+        std::vector<Word> frameWords = STWindow::getWordsInsideFrameRange(engine, from, to);
+        WordRange range(frameWords[0].id(), frameWords[frameWords.size() - 1].id());
+
+        Word lu = *std::find_if(frameWords.begin(), frameWords.end(), [luId](const Word& w) {return w.id() == luId; });
+        assert(lu.id() == luId);
+
+        Frame* frame = new Frame(name, lu, range, frameWords, frameNetDb);
+        frame->setTreeId(treeId);
+
+        for (const QJsonValue& elem : doc.object().value("elements").toArray()) {
+            FrameElement fe = FrameElement::fromJson(elem, frameNetDb, engine, sentPos);
+            if (fe.name() != "LU") {
+                frame->setElement(fe);
+            }
+        }
+        return frame;
+    }
+
+    return nullptr; //TODO throw
+}
+
+QString Frame::toJson() const {
+    QString ret(R"(
+    {
+        "name": "%1", 
+        "from" : %2,
+        "to" : %3,
+        "luId" : %4,
+        "treeId" : %5,
+        "elements": [
+    )");
+
+    ret = ret.arg(m_name)
+             .arg(m_range.first)
+             .arg(m_range.second)
+             .arg(m_lu.id())
+             .arg(m_treeId);
+
+    bool first = true;
+    for (const auto& fe : m_elements) {
+        if (!first) ret += ",";
+        ret += fe.second.toJson();
+        first = false;
+    }
+
+    ret += "]}";
+
+    return ret;
 }
 
 void Frame::setElement(const FrameElement& val) {

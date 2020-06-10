@@ -41,6 +41,9 @@ public:
 
     bool canInsertFrameWithRange(const WordRange& range, FrameInsertionData* data = nullptr); // may be pos (to check sentence borders)
 
+    void fromJson(const QString& json, const FrameNetModel& frameNetDb, IEngine* engine, const Position& currentSentencePos);
+    QString toJson() const;
+
     QString toTreantJson() const;
 private:
     Sentence m_sentence;

@@ -43,6 +43,7 @@ public:
 
     // TODO public sentenceData(pos...)
     SentenceData& SentenceTree::currentSentenceData(); // TODO private, friend class
+    const Position& SentenceTree::currentSentencePos() const; // TODO private, friend class
     const FrameNetModel& framesModel();
 
 public slots:

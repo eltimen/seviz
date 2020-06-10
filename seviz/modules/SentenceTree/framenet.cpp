@@ -92,6 +92,17 @@ bool FrameTree::canInsertFrameWithRange(const WordRange& range, FrameInsertionDa
     return res;
 }
 
+void FrameTree::fromJson(const QString& json, const FrameNetModel& frameNetDb, IEngine* engine, const Position& currentSentencePos) {
+    m_rootFrame = Frame::fromJson(json, frameNetDb, engine, currentSentencePos);
+}
+
+QString FrameTree::toJson() const {
+    if (m_rootFrame) {
+        return m_rootFrame->toJson();
+    }
+    return "{}";
+}
+
 QString FrameTree::toTreantJson() const {
     QString ret = QStringLiteral(R"(
     {

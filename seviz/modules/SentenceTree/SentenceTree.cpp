@@ -89,6 +89,14 @@ void SentenceTree::load(QDir* moduleDir) {
                         }
                     }
 
+                    if (dir.exists("framenet.json")) {
+                        QFile file(dir.filePath("framenet.json"));
+                        if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+                            QTextStream in(&file);
+                            m_currentSentenceData->framenet.fromJson(in.readAll(), m_framesModel, m_engine, m_currentSentencePos);
+                        }
+                    }
+
                     m_storage.emplace(pos, std::unique_ptr<SentenceData>(m_currentSentenceData));
 
                     dir.cdUp();
@@ -131,7 +139,11 @@ void SentenceTree::save(QDir& moduleDir) {
             }
 
             {
-
+                QFile file(sentenceDir.filePath("framenet.json"));
+                if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+                    QTextStream out(&file);
+                    out << data->framenet.toJson();
+                }
             }
         }
     }
@@ -139,6 +151,10 @@ void SentenceTree::save(QDir& moduleDir) {
 
 SentenceData& SentenceTree::currentSentenceData() {
     return *m_currentSentenceData;
+}
+
+const Position& SentenceTree::currentSentencePos() const {
+    return m_currentSentencePos;
 }
 
 const FrameNetModel& SentenceTree::framesModel() {

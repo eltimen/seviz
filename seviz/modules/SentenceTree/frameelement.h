@@ -7,6 +7,8 @@
 #include "wordrange.h"
 
 class Frame;
+class IEngine;
+class FrameNetModel;
 
 class FrameElement {
 public:
@@ -26,6 +28,9 @@ public:
     WordRange range() const;
     std::shared_ptr<Frame> childFrame() const;
     const std::vector<Word>& words() const;
+
+    static FrameElement fromJson(const QJsonValue& json, const FrameNetModel& frameNetDb, IEngine* engine, const Position& currentSentencePos);
+    QString toJson() const;
 
     void toTreantJson(QString& ret, int depth, int maxDepth, const QPair<QString, QString>& colors) const;
 private:
