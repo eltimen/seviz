@@ -68,24 +68,21 @@ void SentenceTree::load(QDir* moduleDir) {
                     dir.cd(sentDir.fileName());
 
                     Position pos(chId, sId, parId, sentId);
-                    m_currentSentencePos = pos;
-                    m_currentSentence = m_engine->getBook().getSentence(m_currentSentencePos);
-                    m_currentSentenceData = new SentenceData(m_currentSentence);
+                    SentenceData* loadingSentenceData = new SentenceData(m_engine->getBook().getSentence(pos));
 
                     if (dir.exists("constituency.json")) {
                         QFile file(dir.filePath("constituency.json"));
                         if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
                             QTextStream in(&file);
-                            m_currentSentenceData->constituency.fromJson(in.readAll());
+                            loadingSentenceData->constituency.fromJson(in.readAll());
                         }
                     }
-
 
                     if (dir.exists("dependency.json")) {
                         QFile file(dir.filePath("dependency.json"));
                         if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
                             QTextStream in(&file);
-                            m_currentSentenceData->dependency.fromStanfordCoreNlpJson(in.readAll());
+                            loadingSentenceData->dependency.fromStanfordCoreNlpJson(in.readAll());
                         }
                     }
 
@@ -93,11 +90,11 @@ void SentenceTree::load(QDir* moduleDir) {
                         QFile file(dir.filePath("framenet.json"));
                         if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
                             QTextStream in(&file);
-                            m_currentSentenceData->framenet.fromJson(in.readAll(), m_framesModel, m_engine, m_currentSentencePos);
+                            loadingSentenceData->framenet.fromJson(in.readAll(), m_framesModel, m_engine, pos);
                         }
                     }
 
-                    m_storage.emplace(pos, std::unique_ptr<SentenceData>(m_currentSentenceData));
+                    m_storage.emplace(pos, std::unique_ptr<SentenceData>(loadingSentenceData));
 
                     dir.cdUp();
                 }
