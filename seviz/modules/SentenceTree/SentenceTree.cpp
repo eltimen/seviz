@@ -43,6 +43,8 @@ void SentenceTree::load(QDir* moduleDir) {
 
     QDir dir = *moduleDir;
 
+    m_currentSentenceData = nullptr;
+
     for (const auto& chapterDir : dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot)) {
         bool ok = false;
         int chId = chapterDir.fileName().toInt(&ok);
