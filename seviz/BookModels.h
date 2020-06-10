@@ -24,7 +24,7 @@ enum TailPosition {
 
 class Position {
 public:
-    Position(int idChapter, int idSection = -1, int idParagraph = -1, int idSentence = -1, int idWord = -1, TailPosition tail = NOT_TAIL);
+    explicit Position(int idChapter, int idSection = -1, int idParagraph = -1, int idSentence = -1, int idWord = -1, TailPosition tail = NOT_TAIL);
     Position() : Position(1) {}
 
     bool operator<(const Position& o) const;
