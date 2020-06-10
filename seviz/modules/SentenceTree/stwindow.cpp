@@ -114,7 +114,7 @@ void STWindow::onFrameInsert(IEngine* engine) {
             throw EmptySelectionException();
         }
     } catch (EmptySelectionException&) {
-        QMessageBox::warning(this, "Ошибка", "Для добавления фрейма нужно выделить диапазон слов ВНУТРИ ОДНОГО предложения");
+        QMessageBox::warning(this, "Ошибка", "Выделен диапазон слов из нескольких предложений");
     }
    
 }// ------------------ constituency tree event handlers ---------------------

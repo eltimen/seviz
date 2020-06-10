@@ -26,7 +26,7 @@ ModuleManager::~ModuleManager() {
 void ModuleManager::bookOpened(Book* book, QTemporaryDir& epubDir, QList<Chapter>& chapters) {
     m_book = book;
 
-    {
+    try {
         QDir dir(epubDir.path());
         if (dir.cd("seviz") && dir.cd(m_loader.id())) {
             // подгрузка преобразованных глав
@@ -40,17 +40,23 @@ void ModuleManager::bookOpened(Book* book, QTemporaryDir& epubDir, QList<Chapter
 
             m_loader.importBook(chapters, dir, m_window);
         }
+    } catch (const QString & msg) {
+        throw QString("Не удалось загрузить данные модуля ") + m_loader.id() + ": " + msg;
     }
 
     // загрузка данных остальных плагинов
     m_container.remove(m_loader.id());
 	for (AbstractModule* m : m_container) {
-        QDir dir(epubDir.path()); // QDir каждый раз создается, чтобы гарантировать, что плагин не поменял текущую директорию
-        if (dir.cd("seviz") && dir.cd(m->id())) {
-            m->load(&dir);
-        } else {
-            // если папки нет - передаем NULL, чтобы плагин понял, что загружена новая книга
-            m->load(nullptr);
+        try {
+            QDir dir(epubDir.path()); // QDir каждый раз создается, чтобы гарантировать, что плагин не поменял текущую директорию
+            if (dir.cd("seviz") && dir.cd(m->id())) {
+                m->load(&dir);
+            } else {
+                // если папки нет - передаем NULL, чтобы плагин понял, что загружена новая книга
+                m->load(nullptr);
+            }
+        } catch (const QString & msg) {
+            throw QString("Не удалось загрузить данные модуля ") + m->id() + ": " + msg;
         }
 	}
     m_container.insert(m_loader.id(), &m_loader);

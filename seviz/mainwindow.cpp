@@ -81,22 +81,31 @@ void MainWindow::setupModules() {
 }
 
 void MainWindow::onFileOpen() {
-    QString path = QFileDialog::getOpenFileName(this, "Открыть книгу", ".", "Файл EPUB (*.epub)");
-    if (!path.isEmpty()) {
-        delete m_book;
-        m_book = new Book(path, m_bookViewer, m_manager); 
-        m_book->open();
-        ui->mainToolBar->setEnabled(true);
-        ui->modulesMenu->setEnabled(true);
-        ui->fileSaveAction->setEnabled(true);
-        ui->chapterComboBox->setEnabled(true);
-        ui->chapterComboBox->clear();
-        ui->chapterComboBox->addItems(m_book->getChapterTitles());
+    try {
+        QString path = QFileDialog::getOpenFileName(this, "Открыть книгу", ".", "Файл EPUB (*.epub)");
+        if (!path.isEmpty()) {
+            delete m_book;
+            m_book = new Book(path, m_bookViewer, m_manager);
+            m_book->open();
+
+            ui->mainToolBar->setEnabled(true);
+            ui->modulesMenu->setEnabled(true);
+            ui->fileSaveAction->setEnabled(true);
+            ui->chapterComboBox->setEnabled(true);
+            ui->chapterComboBox->clear();
+            ui->chapterComboBox->addItems(m_book->getChapterTitles());
+        }
+    } catch (const QString& msg) {
+        QMessageBox::critical(this, "Ошибка", msg);
     }
 }
 
 void MainWindow::onFileSave() {
-    m_book->save();
+    try {
+        m_book->save();
+    } catch (const QString& msg) {
+        QMessageBox::critical(this, "Ошибка", msg);
+    }
 }
 
 void MainWindow::onAbout() {

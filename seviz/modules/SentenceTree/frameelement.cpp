@@ -82,7 +82,7 @@ FrameElement FrameElement::fromJson(const QJsonValue& json, const FrameNetModel&
         std::vector<Word> words = STWindow::getWordsInsideFrameRange(engine, from, to);
         return FrameElement(name, words);
     } else {
-        //throw;
+        throw QString("invalid type of FE in tree");
     }
 
 

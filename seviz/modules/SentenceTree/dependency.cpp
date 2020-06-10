@@ -117,6 +117,8 @@ void DependencyTree::fromStanfordCoreNlpJson(const QString& basicDepJson) {
 				insert(from, to, static_cast<DependencyRelation>(depIndex));
 			}
 		}
+	} else {
+		throw QString("dependency ") + error.errorString();
 	}
 }
 

@@ -112,6 +112,8 @@ Frame* Frame::fromJson(const QString& json, const FrameNetModel& frameNetDb, IEn
             }
         }
         return frame;
+    } else {
+        throw QString("framenet tree ") + error.errorString();
     }
 
     return nullptr; //TODO throw

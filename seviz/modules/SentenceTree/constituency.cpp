@@ -65,6 +65,8 @@ void ConstituencyTree::fromJson(const QString& json) {
         QJsonArray children = doc.object().value("children").toArray();
         
         fromJsonHelper(children);
+    } else {
+        throw QString("constituency ") + error.errorString();
     }
 }
 
