@@ -334,6 +334,7 @@ class Render {
     deserializeTokenizedChapters(json) {
         console.log(json)
         for (let i = 0; i < json.model.length; ++i) {
+            this.model[i] = json.model[i];
             window.core.setModelDataForChapter(i, json.model[i]);
             console.log(json.model[i])
         }
