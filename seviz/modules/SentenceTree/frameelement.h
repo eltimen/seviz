@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <memory>
+#include <QJsonValue>
 #include "BookModels.h"
 #include "wordrange.h"
 

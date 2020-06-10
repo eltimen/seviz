@@ -4,6 +4,7 @@
 #include <utility>
 #include <memory>
 #include <vector>
+#include <QJsonArray>
 #include "BookModels.h"
 
 // taken from penn treebank
