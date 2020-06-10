@@ -88,6 +88,10 @@ Frame* Frame::fromJson(const QString& json, const FrameNetModel& frameNetDb, IEn
     QJsonParseError error;
     QJsonDocument doc = QJsonDocument::fromJson(json.toUtf8(), &error);
     if (!doc.isNull()) {
+        if (json == "{}") { // TODO replace
+            return nullptr;
+        }
+
         QString name = doc.object().value("name").toString();
         int fromWordId = doc.object().value("from").toInt();
         int toWordId = doc.object().value("to").toInt();
@@ -116,7 +120,7 @@ Frame* Frame::fromJson(const QString& json, const FrameNetModel& frameNetDb, IEn
         throw QString("framenet tree ") + error.errorString();
     }
 
-    return nullptr; //TODO throw
+    return nullptr; 
 }
 
 QString Frame::toJson() const {
