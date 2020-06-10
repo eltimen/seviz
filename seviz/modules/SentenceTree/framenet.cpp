@@ -19,8 +19,9 @@ int FrameTree::insertFrame(Frame* frame, const QString& parentFe, const std::map
     if (!m_rootFrame) {
         m_rootFrame = frame;
     } else if(m_rootFrame->range().isInsideOf(frame->range())) {
+        assert(childFramesInitFE.size() == 1);
         // это расширение корневого фрейма? 
-        frame->setElement(FrameElement(parentFe, m_rootFrame));
+        frame->setElement(FrameElement(childFramesInitFE.begin()->first, m_rootFrame));
         m_rootFrame = frame;
     } else if (m_rootFrame->range().isOutsideOf(frame->range())) {
         // это уточнение корневого фрейма?
@@ -89,6 +90,17 @@ bool FrameTree::canInsertFrameWithRange(const WordRange& range, FrameInsertionDa
     }
 
     return res;
+}
+
+void FrameTree::fromJson(const QString& json, const FrameNetModel& frameNetDb, IEngine* engine, const Position& currentSentencePos) {
+    m_rootFrame = Frame::fromJson(json, frameNetDb, engine, currentSentencePos);
+}
+
+QString FrameTree::toJson() const {
+    if (m_rootFrame) {
+        return m_rootFrame->toJson();
+    }
+    return "{}";
 }
 
 QString FrameTree::toTreantJson() const {

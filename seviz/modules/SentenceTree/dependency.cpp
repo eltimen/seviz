@@ -1,4 +1,9 @@
 #include "dependency.h"
+
+#include <QJsonDocument>
+#include <QJsonArray>
+#include <QJsonObject>
+#include <QtDebug>
 #include <unordered_set>
 #include <algorithm>
 #include <vector>
@@ -80,6 +85,71 @@ bool DependencyTree::hasLoopWithEdge(int from, int to) const {
 	return false;
 }
 
+void DependencyTree::fromStanfordCoreNlpJson(const QString& basicDepJson) {
+	/* пример входных данных
+	{
+          "dep": "nsubj",
+          "governor": 9,
+          "governorGloss": "shouldn",
+          "dependent": 12,
+          "dependentGloss": "eat"
+        },
+	*/
+	// если в dep сдержится двоеточие - это universal dependencies и тогда берем часть справа от двоеточия
+	// если соотношение не найдено в программе - игнорируем эту связь
+
+	m_tree.clear();
+
+	QJsonParseError error;
+	QJsonDocument doc = QJsonDocument::fromJson(basicDepJson.toUtf8(), &error);
+	if (!doc.isNull()) {
+		qDebug() << doc.isArray() << doc.isEmpty() << doc.isNull() << doc.isObject();
+		QJsonValue val = doc.object().value("basicDependencies");
+		qDebug() << doc.object().keys();
+		QJsonArray basicDep = val.toArray();
+		for (const QJsonValue& val : basicDep) {
+			QString dep = val["dep"].toString();
+			int from = val["governor"].toInt();
+			int to = val["dependent"].toInt();
+
+			int depIndex = DependencyRelationStr.indexOf(dep);
+			if (depIndex >= 0) {
+				insert(from, to, static_cast<DependencyRelation>(depIndex));
+			}
+		}
+	}
+}
+
+QString DependencyTree::toStanfordCoreNlpJson() const {
+	QString ret = "{\"basicDependencies\": [ \n";
+	// Qt don't support trailing commas 
+	int i = 0;
+	for (const auto& dep : m_tree) {
+		int fromId = dep.first;
+		int toId = dep.second.first;
+		QString relation = DependencyRelationStr[static_cast<int>(dep.second.second)];
+
+		if (i) 
+			ret.append(",");
+
+		ret += QStringLiteral(R"(
+		{
+          "dep": "%1",
+          "governor": %2,
+          "dependent": %3
+        }
+		)").arg(relation)
+			.arg(QString::number(fromId))
+			.arg(QString::number(toId));
+
+		++i;
+	}
+
+	ret += "]}";
+
+    return ret;
+}
+
 QString DependencyTree::toBratJson() const {
 	QString entities;
 	int lastIndex = 0;
@@ -87,7 +157,7 @@ QString DependencyTree::toBratJson() const {
 		int tokenEndIndex = lastIndex + w.text().length();
 		entities += QStringLiteral("\t[\"N%1\", \"%2\", [[%3, %4]]],\n").arg(
 			QString::number(w.id()),
-			"Word", // TODO POS-tag
+			"Token", // TODO POS-tag
 			QString::number(lastIndex),
 			QString::number(tokenEndIndex)
 		);

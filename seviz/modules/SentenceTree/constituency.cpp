@@ -1,6 +1,9 @@
 #include "constituency.h"
 
 #include <algorithm>
+#include <QJsonDocument>
+#include <QJsonArray>
+#include <QJsonObject>
 #include <QString>
 #include <QDebug>
 
@@ -50,6 +53,39 @@ bool ConstituencyTree::canChangeOrDeleteNode(int nodeId) const {
     return m_root->id() != nodeId && !m_root->find(nodeId)->isSentenceToken();
 }
 
+void ConstituencyTree::fromJson(const QString& json) {
+
+    QJsonParseError error;
+    QJsonDocument doc = QJsonDocument::fromJson(json.toUtf8(), &error);
+    if (!doc.isNull()) {
+        QString labelStr = doc.object().value("label").toString();
+        ConstituencyLabel label = static_cast<ConstituencyLabel>(ConstituencyLabelStr.indexOf(labelStr));
+        int from = doc.object().value("fromWordId").toInt();
+        int to = doc.object().value("toWordId").toInt();
+        QJsonArray children = doc.object().value("children").toArray();
+        
+        fromJsonHelper(children);
+    }
+}
+
+void ConstituencyTree::fromJsonHelper(const QJsonArray& children) {
+    for (const QJsonValue& val : children) {
+        QString labelStr = val.toObject().value("label").toString();
+        ConstituencyLabel label = static_cast<ConstituencyLabel>(ConstituencyLabelStr.indexOf(labelStr));
+        int from = val.toObject().value("fromWordId").toInt();
+        int to = val.toObject().value("toWordId").toInt();
+        QJsonArray children = val.toObject().value("children").toArray();
+
+        fromJsonHelper(children);
+
+        insert(std::make_pair(from, to), label);
+    }
+}
+
+QString ConstituencyTree::toJson() {
+    return m_root->toJson();
+}
+
 bool ConstituencyTree::change(int nodeId, ConstituencyLabel label) {
     if (canChangeOrDeleteNode(nodeId)) {
         ConstituencyTreeNode* node = m_root->find(nodeId);
@@ -68,6 +104,50 @@ bool ConstituencyTree::remove(int nodeId) {
         return false;
     }
 }
+
+/*
+void ConstituencyTree::fromBracedString(const QString& str, int lastTokenId, const QString& sep) {
+    QString node = str.simplified();
+    assert(node.front() == sep[0]);
+    assert(node.back() == sep[1]);
+    
+    QStringList parts = str.split(" ", QString::SkipEmptyParts);
+
+    createNodeFromBracedString(parts, 0, sep);
+}
+
+int ConstituencyTree::createNodeFromBracedString(const QStringList& parts, int lastTokenId, const QString& sep) {
+    static QRegExp nodeBegin("\\([\\S]+");
+
+    QString tag = parts[0].mid(1);
+    ConstituencyLabel label = static_cast<ConstituencyLabel>(ConstituencyLabelStr.indexOf(tag));
+    int from = -1;
+    int to;
+
+    int partIndex = lastTokenId;
+    for (const QString& part : parts) {
+        if (nodeBegin.exactMatch(part)) {
+            // открывающая скобка и тег узла
+            createNodeFromBracedString(parts.mid(1), lastTokenId, sep);
+        } else if (part == ")") {
+            // конец узла
+            // TODO а если нет пробела после последнего тоекена в предложении?
+            break;
+        } else {
+            // слово или знак препинания предложения
+            if (from == -1) {
+                from = partIndex;
+                to = from;
+            }
+            to = partIndex;
+        }
+        ++partIndex;
+    }
+
+    return partIndex;
+}
+
+*/
 
 QString ConstituencyTree::toBracedString(const QString& sep) const {
     return m_root->toBracedString(sep);
@@ -222,6 +302,30 @@ int ConstituencyTreeNode::maxDepth() const {
         depth = std::max(depth, d);
     }
     return depth + 1;
+}
+
+QString ConstituencyTreeNode::toJson() {
+    QString ret = QStringLiteral(R"(
+		{
+          "label": "%1",
+          "fromWordId": %2,
+          "toWordId": %3,
+          "children": [
+    )").arg(ConstituencyLabelStr[m_label])
+        .arg(QString::number(m_range.first))
+        .arg(QString::number(m_range.second));
+
+    int i = 0;
+    for (const auto& child : m_children) {
+        if (!child->m_isTerminal) {
+            if (i) ret.append(",");
+            ret += child->toJson();
+            ++i;
+        }
+    }
+
+    ret += "] }";
+    return ret;
 }
 
 QString ConstituencyTreeNode::toBracedString(const QString& sep) const {

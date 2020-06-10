@@ -309,7 +309,7 @@ std::map<QString, QString> STWindow::askFrameElementsForSubframes(const FrameIns
     std::map<QString, QString> ret;
     QString subframeFE;
     bool ok = false;
-    assert(insertionData.lowFrames.size() == insertionData.lowFramesAsHighFrameElements.size());
+
     for (int i = 0; i < insertionData.lowFrames.size(); ++i) {
         QString name = insertionData.lowFrames[i]->name();
         subframeFE = QInputDialog::getItem(this,
@@ -320,7 +320,8 @@ std::map<QString, QString> STWindow::askFrameElementsForSubframes(const FrameIns
                                            false,
                                            &ok);
         if (ok) {
-            ret.emplace(subframeFE, insertionData.feNamesOfChildFramesInsideFutureParent[i]);
+            QString parentFE = insertionData.feNamesOfChildFramesInsideFutureParent.empty() ? "" : insertionData.feNamesOfChildFramesInsideFutureParent[i];
+            ret.emplace(subframeFE, parentFE);
         }
     }
     return ret;

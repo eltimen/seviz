@@ -9,6 +9,8 @@
 #include "framenetmodel.h"
 #include "wordrange.h"
 
+class IEngine;
+
 class Frame {
 
 public:
@@ -34,6 +36,9 @@ public:
     FrameElement takeElement(const QString& name);
     void clearElements();
 
+    static Frame* fromJson(const QString& json, const FrameNetModel& frameNetDb, IEngine* engine, const Position& currentSentencePos);
+    QString toJson() const;
+
     void toTreantJson(QString& ret, int depth, int maxDepth, const QString& parentFe = "", const QPair<QString, QString>& parentFEcolors = {}) const;
 
     void removeFeWhichContainSubframe(int nodeId);
@@ -50,7 +55,7 @@ private:
     Word m_lu; // LU - word id
     std::map<WordRange, FrameElement> m_elements; // FEs
     std::map<QString, WordRange> m_rangeByElementName; // FEs
-    // TODO FE in order of sentence words (ranges?) 
+
     int m_treeId = -1;
     const FrameNetModel& m_frameNetDb;
 };
