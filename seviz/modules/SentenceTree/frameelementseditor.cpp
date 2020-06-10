@@ -169,7 +169,15 @@ void FrameElementsEditor::setupWidgets() {
         }
         
         // инициализация только что активированного FE
-        connect(feBox, &QGroupBox::toggled, [&, subFrameComboBox, wordFromComboBox, wordToComboBox, wordRadioButton, subFrameRadioButton](bool ch) {
+        connect(feBox, &QGroupBox::toggled, [&, subFrameComboBox, wordFromComboBox, wordToComboBox, wordRadioButton, subFrameRadioButton, feBox](bool ch) {
+            {
+                QSignalBlocker lock(feBox);
+                if (ch && (m_frame->getFreeElementsList().empty() || m_wordsPool.empty())) {
+                    feBox->setChecked(false);
+                    return;
+                }
+            }
+
             QSignalBlocker lock1(wordFromComboBox);
             QSignalBlocker lock2(wordToComboBox);
             QSignalBlocker lock3(subFrameComboBox);
@@ -205,7 +213,7 @@ void FrameElementsEditor::setupWidgets() {
                 }
 
             } else {
-                if (wordRadioButton->isChecked() && m_wordsPool.size() > 0) {
+                if (wordRadioButton->isChecked()) {
                     // отдаем захваченные FE слова обратно в wordPool
                     restoreWordRangeToPool(wordFromComboBox->currentData().toInt(),
                                            wordToComboBox->currentData().toInt());
