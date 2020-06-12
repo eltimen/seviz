@@ -142,10 +142,14 @@ QPair<Position, Position> EpubRenderer::selectedTextPos() {
         if (!list.isEmpty()) {
             QVariantMap first = list[0].toMap();
             QVariantMap second = list[1].toMap();
-            Position firstPos(m_book->getCurrentChapter().id(), 1, first["paragraph"].toInt(), first["sentence"].toInt(), first["word"].toInt());
-            Position secondPos(m_book->getCurrentChapter().id(), 1, second["paragraph"].toInt(), second["sentence"].toInt(), second["word"].toInt());
-            ret = qMakePair(firstPos, secondPos);
-            retIsEmpty = false;
+            try {
+                Position firstPos(m_book->getCurrentChapter().id(), 1, first["paragraph"].toInt(), first["sentence"].toInt(), first["word"].toInt());
+                Position secondPos(m_book->getCurrentChapter().id(), 1, second["paragraph"].toInt(), second["sentence"].toInt(), second["word"].toInt());
+                ret = qMakePair(firstPos, secondPos);
+                retIsEmpty = false;
+            } catch (std::invalid_argument & e) {
+                retIsEmpty = true;
+            }  
         } 
         loop.exit(0);
     });
