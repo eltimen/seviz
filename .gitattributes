@@ -1,0 +1,5 @@
+seviz/3rdparty/* linguist-vendored
+seviz/embedded_web_resources/3rdparty/* linguist-vendored
+
+seviz/SentenceTree_resources/3rdparty/* linguist-vendored
+seviz/SentenceTree_resources/static/* linguist-vendored
