@@ -18,7 +18,7 @@ struct FrameInsertionData {
         3) Уточнение корневого узла - newFrame добавляется в определенный FE потомком у корневого узла
         4) Вставка в середину - находится фрейм верхний и нижние. 
     */
-    Frame* highFrame;
+    Frame* highFrame = nullptr;
     FrameVector lowFrames;
     std::map<WordRange,FrameElement> lowFramesAsHighFrameElements;
     std::vector<QString> feNamesOfChildFramesInsideFutureParent;
