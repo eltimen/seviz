@@ -130,8 +130,11 @@ public:
 class Word {
     int m_id;
     QString m_text;
+    QString m_POS = "?";
 
 public:
+    const static QStringList PosTagsStr;
+
     Word(int id, const QString& text) :
         m_id(id), m_text(text) {
     }
@@ -146,8 +149,9 @@ public:
 
     int id() const { return m_id; }
     const QString& text() const { return m_text; }
-
     bool isPunct() const { return m_text.length() == 1 && !QRegExp("\\w+").exactMatch(m_text); }
+    QString POS() const { return m_POS; }
+    void setPOS(const QString& posTag);
 };
 
 class Chapter {

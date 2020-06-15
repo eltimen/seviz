@@ -1,4 +1,5 @@
 #include "BookModels.h"
+#include <exception>
 #include "Book.h"
 
 const Book* Position::m_book = nullptr;
@@ -255,4 +256,23 @@ QString Position::cssSelector() const {
     }
 
     return sel;
+}
+
+
+const QStringList Word::PosTagsStr = 
+{
+    "?",
+    "CC", "CD", "DT", "EX", "FW", "IN", "JJ", "JJR", "JJS", "LS", "MD", "NN", "NNS", "NNP", "NNPS",
+    "PDT", "POS", "PRP", "PP$", "RB", "RBR", "RBS", "RP", "SYM", "TO", "UH", "VB", "VBD", "VBG", "VBN",
+    "VBP", "VBZ", "WDT", "WP", "WP$", "WRB",
+    "#", "$", ".", ",", ":", "(", ")", "\"" "‘", "“", "’", "”"
+};
+
+
+void Word::setPOS(const QString& posTag) {
+    QString tag = posTag.trimmed();
+    if (!PosTagsStr.contains(tag)) {
+        throw std::invalid_argument("invalid pos tag");
+    }
+    m_POS = tag;
 }

@@ -54,7 +54,7 @@ private:
     void renderDependencies(const DependencyTree& tree);
     void renderFrameNet(const FrameTree& tree);
 
-    // возвращает допустимые фреймы, определяя в процессе предполагаемые начальные формы слова. 
+    // возвращает начальную форму слова
     // Внимание: реализовано через отрезание -s, -ed, -ing и т.д. => неправильные глаголы пока не поддерживаются
     QString getInitialFormOfWord(const QString& word) const;
 
