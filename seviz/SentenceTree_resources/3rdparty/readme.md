@@ -1,0 +1,1 @@
+Warning! The file `brat-frontent-editor.js` has some changes to handle user events (such as click) with arrows and annotations. Be careful on migrate to other brat version!
