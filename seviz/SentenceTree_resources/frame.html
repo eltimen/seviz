@@ -97,8 +97,10 @@
                 if (node.title_fgcolor != null && node.title_bgcolor != null) {
                     document.getElementById(node.HTMLid).getElementsByClassName("node-title")[0].style.cssText += "color: #" + node.title_fgcolor + "; background-color: #" + node.title_bgcolor + ";";
                 }
-                for (let [key, value] of Object.entries(node.children)) {
-                    setupFEcolors(value);
+                if (node.children) {
+                    for (let [key, value] of Object.entries(node.children)) {
+                        setupFEcolors(value);
+                    }
                 }
             }
 
