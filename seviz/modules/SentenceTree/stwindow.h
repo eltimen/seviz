@@ -28,7 +28,7 @@ public:
     explicit STWindow(SentenceTree* core);
     ~STWindow();
 
-    void showSentence(const Sentence& sent, const SentenceData& data);
+    void showSentence(const SentenceData& data);
 
     static std::vector<Word> getWordsInsideFrameRange(IEngine* engine, const Position& from, const Position& to);
 
@@ -42,6 +42,7 @@ public slots:
     void onFrameInsert(IEngine* engine);
     void onFrameEdit(int id);
     void onFrameRemove(int id);
+    void onPOSChange(int id);
 
 private:
     Ui::STWindow *ui;
@@ -53,6 +54,8 @@ private:
     void renderConstituency(const ConstituencyTree& tree);
     void renderDependencies(const DependencyTree& tree);
     void renderFrameNet(const FrameTree& tree);
+
+    void initPosTagColors();
 
     // возвращает начальную форму слова
     // Внимание: реализовано через отрезание -s, -ed, -ing и т.д. => неправильные глаголы пока не поддерживаются

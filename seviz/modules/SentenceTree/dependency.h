@@ -72,7 +72,7 @@ const QStringList DependencyRelationStr = {
 
 class DependencyTree {
 public:
-    DependencyTree(const Sentence& sent);
+    explicit DependencyTree(Sentence& sent);
    
     // добавить ребро
     // in: ID откуда, ID куда, тип связи
@@ -92,7 +92,7 @@ public:
     QString toBratJson() const;
 
 private:
-    Sentence m_sentence;
+    Sentence& m_sentence;
     // adjacency list
     // word id -> [ {word id, stanford relation}, ...]
     std::multimap<int, std::pair<int, DependencyRelation>> m_tree;

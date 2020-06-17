@@ -95,7 +95,7 @@ class ConstituencyTree
 {
     using ChildrenContainer = ConstituencyTreeNode::ChildrenContainer;
 public:
-    ConstituencyTree(const Sentence& sent);
+    explicit ConstituencyTree(const Sentence& sent);
     ~ConstituencyTree();
 
     int insert(const std::pair<int, int>& range, ConstituencyLabel label, NodeInsertPosition* position = nullptr);

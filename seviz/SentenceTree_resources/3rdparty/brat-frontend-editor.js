@@ -10606,15 +10606,8 @@ var AnnotatorUI = (function($, window, undefined) {
           $.each(editedSpan.fragments, function(fragmentNo, fragment) {
             offsets.push([fragment.from, fragment.to]);
           });
-          spanOptions = {
-            action: 'createSpan',
-            offsets: offsets,
-            type: editedSpan.type,
-            id: id,
-          };
-          fillSpanTypesAndDisplayForm(evt, editedSpan.text, editedSpan);
-          // for precise timing, log annotation display to user.
-          dispatcher.post('logAction', ['spanEditSelected']);
+          
+          core.onPOSChange(Number(id.match(/[\d]+/)));
         }
 
         // if not an arc or a span, is this a double-click on text?
@@ -19505,9 +19498,6 @@ var VisualizerUI = (function($, window, undefined) {
 
           $('#viewspan_selected').text(span.text);
           var encodedText = encodeURIComponent(span.text);
-          $.each(searchConfig, function(searchNo, search) {
-            $('#viewspan_'+search[0]).attr('href', search[1].replace('%s', encodedText));
-          });
           // annotator comments
           $('#viewspan_notes').val(span.annotatorNotes || '');
           dispatcher.post('showForm', [viewspanForm]);

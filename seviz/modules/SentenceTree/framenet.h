@@ -32,7 +32,7 @@ class FrameElement;
 
 class FrameTree {
 public:
-    FrameTree(const Sentence& sent);
+    explicit FrameTree(const Sentence& sent);
     ~FrameTree();
 
     int insertFrame(Frame* frame, const QString& parentFe = "", const std::map<QString, QString>& childFramesInitFE = {});

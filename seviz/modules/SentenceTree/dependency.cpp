@@ -8,7 +8,7 @@
 #include <algorithm>
 #include <vector>
 
-DependencyTree::DependencyTree(const Sentence& sent)
+DependencyTree::DependencyTree(Sentence& sent)
 	: m_sentence(sent) 
 {
 }
@@ -159,7 +159,7 @@ QString DependencyTree::toBratJson() const {
 		int tokenEndIndex = lastIndex + w.text().length();
 		entities += QStringLiteral("\t[\"N%1\", \"%2\", [[%3, %4]]],\n").arg(
 			QString::number(w.id()),
-			"Token", // TODO POS-tag
+			w.POS() == "?" ? "Token" : w.POS(),
 			QString::number(lastIndex),
 			QString::number(tokenEndIndex)
 		);

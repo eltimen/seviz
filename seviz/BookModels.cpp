@@ -265,7 +265,7 @@ const QStringList Word::PosTagsStr =
     "CC", "CD", "DT", "EX", "FW", "IN", "JJ", "JJR", "JJS", "LS", "MD", "NN", "NNS", "NNP", "NNPS",
     "PDT", "POS", "PRP", "PP$", "RB", "RBR", "RBS", "RP", "SYM", "TO", "UH", "VB", "VBD", "VBG", "VBN",
     "VBP", "VBZ", "WDT", "WP", "WP$", "WRB",
-    "#", "$", ".", ",", ":", "(", ")", "\"" "‘", "“", "’", "”"
+    "#", "$", ".", ",", ":", "(", ")", "\"", "‘", "“", "’", "”"
 };
 
 
@@ -275,4 +275,34 @@ void Word::setPOS(const QString& posTag) {
         throw std::invalid_argument("invalid pos tag");
     }
     m_POS = tag;
+}
+
+QString Word::getPosTagColor(const QString& posTag){
+    // taken from https://github.com/stanfordnlp/CoreNLP/blob/master/src/edu/stanford/nlp/pipeline/demo/corenlp-brat.js
+    if (posTag.startsWith("N")) {
+        return "#A4BCED";
+    } else if (posTag.startsWith("V") || posTag.startsWith("M")) {
+        return "#ADF6A2";
+    } else if (posTag.startsWith("P")) {
+        return "#CCDAF6";
+    } else if (posTag.startsWith("I")) {
+        return "#FFE8BE";
+    } else if (posTag.startsWith("R") || posTag.startsWith("W")) {
+        return "#FFFDA8";
+    } else if (posTag.startsWith("D") || posTag == "CD") {
+        return "#CCADF6";
+    } else if (posTag.startsWith("J")) {
+        return "#FFFDA8";
+    } else if (posTag.startsWith("T")) {
+        return "#FFE8BE";
+    } else if (posTag.startsWith("E") || posTag.startsWith("S")) {
+        return "#E4CBF6";
+    } else if (posTag.startsWith("CC")) {
+        return "#FFFFFF";
+    } else if (posTag == "LS" || posTag == "FW") {
+        return "#FFFFFF";
+    } else {
+        return "#E3E3E3";
+    }
+    return QString();
 }

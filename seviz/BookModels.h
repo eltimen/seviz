@@ -134,6 +134,7 @@ class Word {
 
 public:
     const static QStringList PosTagsStr;
+    static QString getPosTagColor(const QString& tag); // а не перенести ли этот метод в модуль SentenceTree?
 
     Word(int id, const QString& text) :
         m_id(id), m_text(text) {

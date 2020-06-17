@@ -13,11 +13,14 @@
 enum SentenceState {NODATA, PARTIAL, DONE};
 
 struct SentenceData {
-    SentenceData(const Sentence& sent)
-        : constituency(sent),
-        dependency(sent),
-        framenet(sent) {}
+    explicit SentenceData(const Sentence& sent)
+        : sentence(sent),
+          constituency(sent),
+          dependency(sentence),
+          framenet(sent) 
+    {}
 
+    Sentence sentence;
     ConstituencyTree constituency;
     DependencyTree dependency;
     FrameTree framenet;
@@ -55,7 +58,6 @@ private:
     FrameNetModel m_framesModel;
 
     Position m_currentSentencePos;
-    Sentence m_currentSentence;
     SentenceData *m_currentSentenceData = nullptr;
     std::map<Position, std::unique_ptr<SentenceData>> m_storage; 
 };

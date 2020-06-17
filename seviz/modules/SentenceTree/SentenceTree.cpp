@@ -72,6 +72,23 @@ void SentenceTree::load(QDir* moduleDir) {
                     Position pos(chId, sId, parId, sentId);
                     SentenceData* loadingSentenceData = new SentenceData(m_engine->getBook().getSentence(pos));
 
+                    if (dir.exists("pos.txt")) {
+                        QFile file(dir.filePath("pos.txt"));
+                        if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+                            try {
+                                QTextStream in(&file);
+                                QString pos;
+                                int i = 0;
+                                while (in.readLineInto(&pos)) {
+                                    loadingSentenceData->sentence[i].setPOS(pos);
+                                    ++i;
+                                }
+                            } catch (const std::invalid_argument& ) {
+                                throw QString("invalid pos tag");
+                            }
+                        }
+                    }
+
                     if (dir.exists("constituency.json")) {
                         QFile file(dir.filePath("constituency.json"));
                         if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -138,6 +155,16 @@ void SentenceTree::save(QDir& moduleDir) {
             }
 
             {
+                QFile file(sentenceDir.filePath("pos.txt"));
+                if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+                    QTextStream out(&file);
+                    for (const Word& w : data->sentence) {
+                        out << w.POS() << '\n';
+                    }
+                }
+            }
+
+            {
                 QFile file(sentenceDir.filePath("framenet.json"));
                 if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
                     QTextStream out(&file);
@@ -164,15 +191,15 @@ void SentenceTree::onSentenceChanged(const Position& pos) {
     // TODO проверка на наличие несохраненных изменений
 
     m_currentSentencePos = pos.trimmedTo(ElementType::SENTENCE);
-    m_currentSentence = m_engine->getBook().getSentence(m_currentSentencePos);
     if (m_storage.count(m_currentSentencePos)) {
         m_currentSentenceData = m_storage.at(m_currentSentencePos).get();
     } else {
-        m_currentSentenceData = new SentenceData(m_currentSentence);
+        const Sentence& sent = m_engine->getBook().getSentence(m_currentSentencePos);
+        m_currentSentenceData = new SentenceData(sent);
         m_storage.emplace(m_currentSentencePos, std::unique_ptr<SentenceData>(m_currentSentenceData));
     }
 
-    m_widget.showSentence(m_currentSentence, *m_currentSentenceData);
+    m_widget.showSentence(*m_currentSentenceData);
     m_engine->triggerRerendering(m_currentSentencePos, m_currentSentencePos);
 }
 

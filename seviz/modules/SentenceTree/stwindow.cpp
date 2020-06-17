@@ -28,6 +28,7 @@ STWindow::STWindow(SentenceTree* core) :
     ui->dependencyView->setContextMenuPolicy(Qt::NoContextMenu);
     ui->dependencyView->page()->setWebChannel(m_webchannel);
     ui->dependencyView->setUrl(QUrl("file:///SentenceTree_resources/dep.html"));
+    connect(ui->dependencyView, &QWebEngineView::loadFinished, [this]() { initPosTagColors(); });
 
     ui->constituencyView->page()->settings()->setAttribute(QWebEngineSettings::LocalContentCanAccessRemoteUrls, true);
     ui->constituencyView->page()->settings()->setAttribute(QWebEngineSettings::LocalContentCanAccessFileUrls, true); 
@@ -48,12 +49,12 @@ STWindow::~STWindow()
     delete ui;
 }
 
-void STWindow::showSentence(const Sentence& sent, const SentenceData& data) {
+void STWindow::showSentence(const SentenceData& data) {
     m_sentenceText.clear();
-    for (const Word& w : sent) {
+    for (const Word& w : data.sentence) {
         m_sentenceText.append(w.text() + " ");
     }
-    ui->idLabel->setText(QStringLiteral("ID: %1").arg(sent.id()));
+    ui->idLabel->setText(QStringLiteral("ID: %1").arg(data.sentence.id()));
 
     renderConstituency(data.constituency);
     renderDependencies(data.dependency); 
@@ -215,6 +216,16 @@ void STWindow::onFrameRemove(int id) {
     renderFrameNet(tree);
 }
 
+void STWindow::onPOSChange(int id) {
+    Word& w = m_core->currentSentenceData().sentence[id - 1];
+    QScopedPointer<ChoosePaletteDialog> chooser(new ChoosePaletteDialog(this, Word::PosTagsStr));
+    if (chooser->exec()) {
+        int i = chooser->getChoosedIndex();
+        w.setPOS(Word::PosTagsStr[i]);
+        renderDependencies(m_core->currentSentenceData().dependency);
+    } 
+}
+
 // --------------------- render methods ----------------------------
 void STWindow::renderConstituency(const ConstituencyTree& tree) {
     QString data = tree.toTreantJson();
@@ -228,6 +239,31 @@ void STWindow::renderDependencies(const DependencyTree& tree) {
 void STWindow::renderFrameNet(const FrameTree& tree) {
     QString data = tree.toTreantJson();
     ui->framenetView->page()->runJavaScript("config=" + data + "; render(config); setupFEcolors(config.nodeStructure); ");
+}
+
+void STWindow::initPosTagColors() {
+    QString entityTypes = (
+        R"({
+                "name": "%1",
+                "type": "%1",
+                "labels": ["%1"],
+                "bgColor": "%2",
+                "borderColor": "darken",
+                "children": [],
+                "unused": false,
+                "attributes": [],
+                "arcs": [],
+                "children": []
+           },
+     )");
+
+    QString ret("[\n");
+    for (const QString& pos : Word::PosTagsStr) {
+        ret += entityTypes.arg(pos=="\"" ? "\\\"" : pos, Word::getPosTagColor(pos));
+    }
+    ret += "]";
+    
+    ui->dependencyView->page()->runJavaScript("collData.entity_types = " + ret + ";");
 }
 
 QString STWindow::getInitialFormOfWord(const QString& word) const {
