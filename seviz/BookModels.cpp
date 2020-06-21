@@ -22,22 +22,8 @@ Position::Position(int idChapter, int idSection, int idParagraph, int idSentence
 } 
 
 bool Position::operator<(const Position& o) const {
-    // TODO refactor, unit tests
-    if (m_idChapter < o.m_idChapter) {
-        return true;
-    } else if (m_idSection < o.m_idSection) {
-        return true;
-    } else if (m_idParagraph < o.m_idParagraph) {
-        return true;
-    } else if (m_idSentence < o.m_idSentence) {
-        return true;
-    } else if (m_idWord < o.m_idWord) {
-        return true;
-    } else if (m_tail < o.m_tail) {
-        return true;
-    } else {
-        return false;
-    }
+    return std::tie(m_idChapter, m_idSection, m_idParagraph, m_idSentence, m_idWord, m_tail)
+         < std::tie(o.m_idChapter, o.m_idSection, o.m_idParagraph, o.m_idSentence, o.m_idWord, o.m_tail);
 }
 
 bool Position::operator==(const Position& o) const {
