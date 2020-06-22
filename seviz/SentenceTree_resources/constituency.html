@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
     <head>
     <meta charset="utf-8">
@@ -73,9 +73,15 @@
                 }
             });
 
+            function clear() {
+                document.getElementById("help").style.display = "block";
+                document.getElementById("OrganiseChart-simple").style.display = "none";
+            }
+
             //render function
             function render(config) {
                 document.getElementById("help").style.display = "none";
+                document.getElementById("OrganiseChart-simple").style.display = "block";
                 new Treant(config);
 
                 // setup handlers

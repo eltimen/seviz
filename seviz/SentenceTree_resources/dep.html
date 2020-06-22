@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -54,6 +54,16 @@
         function render() {
             seviz_inDelete = false;
             var brat = new BratFrontendEditor(document.getElementById("brat"), collData, docData, options);
+        }
+
+        function clear() {
+            docData = {
+                "source_files": ["ann", "txt"],
+                "text": "Наведите курсор мыши на предложение при нажатом Ctrl, чтобы просмотреть его дерево",
+                "entities": [],
+                "relations": []
+            };
+            render();
         }
 
         function window_onload() {

@@ -38,12 +38,15 @@ void SentenceTree::render(const Position& from, const Position& to, DomChapter& 
 }
 
 void SentenceTree::load(QDir* moduleDir) {
+    m_widget.clear();
+    m_currentSentenceData = nullptr;
+    m_currentSentencePos = Position();
+    m_storage.clear();
+
     if (!moduleDir)
         return;
 
     QDir dir = *moduleDir;
-
-    m_currentSentenceData = nullptr;
 
     for (const auto& chapterDir : dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot)) {
         bool ok = false;

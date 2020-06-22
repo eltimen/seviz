@@ -233,6 +233,12 @@ void STWindow::onPOSChange(int id) {
 }
 
 // --------------------- render methods ----------------------------
+void STWindow::clear() {
+    ui->constituencyView->page()->runJavaScript("clear();");
+    ui->dependencyView->page()->runJavaScript("clear();");
+    ui->framenetView->page()->runJavaScript("clear();");
+}
+
 void STWindow::renderConstituency(const ConstituencyTree& tree) {
     QString data = tree.toTreantJson();
     ui->constituencyView->page()->runJavaScript("var constituency = " + data + "; render(constituency);");

@@ -53,6 +53,7 @@
                     document.getElementById("help-empty-tree").style.display = "block";
                 } else {
                     document.getElementById("help-empty-tree").style.display = "none";
+                    document.getElementById("OrganiseChart-simple").style.display = "block";
                 }
 
                 new Treant(config);
@@ -84,6 +85,12 @@
                         }
                     }
                 }
+            }
+
+            function clear() {
+                document.getElementById("help").style.display = "block";
+                document.getElementById("help-empty-tree").style.display = "none";
+                document.getElementById("OrganiseChart-simple").style.display = "none";
             }
 
             function init() {
