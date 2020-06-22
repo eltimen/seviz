@@ -84,20 +84,11 @@ void SentenceTree::load(QDir* moduleDir) {
                     Position pos(chId, sId, parId, sentId);
                     SentenceData* loadingSentenceData = new SentenceData(m_engine->getBook().getSentence(pos));
 
-                    if (dir.exists("pos.txt")) {
-                        QFile file(dir.filePath("pos.txt"));
+                    if (dir.exists("tokens.json")) {
+                        QFile file(dir.filePath("tokens.json"));
                         if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-                            try {
-                                QTextStream in(&file);
-                                QString pos;
-                                int i = 0;
-                                while (in.readLineInto(&pos)) {
-                                    loadingSentenceData->sentence[i].setPOS(pos);
-                                    ++i;
-                                }
-                            } catch (const std::invalid_argument& ) {
-                                throw QString("invalid pos tag");
-                            }
+                            QTextStream in(&file);
+                            loadTokensDataCoreNlp(in.readAll(), loadingSentenceData->sentence);
                         }
                     }
 
@@ -167,12 +158,10 @@ void SentenceTree::save(QDir& moduleDir) {
             }
 
             {
-                QFile file(sentenceDir.filePath("pos.txt"));
+                QFile file(sentenceDir.filePath("tokens.json"));
                 if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
                     QTextStream out(&file);
-                    for (const Word& w : data->sentence) {
-                        out << w.POS() << '\n';
-                    }
+                    out << tokensDataToCoreNlpJson(data->sentence);
                 }
             }
 
@@ -223,6 +212,7 @@ void SentenceTree::onRunParser() {
         QJsonArray sentences = doc.object().value("sentences").toArray();
 
         QJsonObject sent = sentences.first().toObject();
+        loadTokensDataCoreNlp(QJsonDocument(sent).toJson(), m_currentSentenceData->sentence);
         m_currentSentenceData->dependency.fromStanfordCoreNlpJson(QJsonDocument(sent).toJson());
         m_widget.updateTreesView();
     }
@@ -291,6 +281,52 @@ QJsonDocument SentenceTree::execCoreNlp() {
         QMessageBox::warning(m_feature.window(), "Ошибка", "Не задан путь к StanfordCoreNLP (переменная окружения CORENLP)");
     }
     return QJsonDocument();
+}
+
+void SentenceTree::loadTokensDataCoreNlp(const QString& json, Sentence& sent) {
+    QJsonParseError error;
+    QJsonDocument doc = QJsonDocument::fromJson(json.toUtf8(), &error);
+    if (!doc.isNull()) {
+        QJsonValue val = doc.object().value("tokens");
+        QJsonArray tokens = val.toArray();
+        for (const QJsonValue& val : tokens) {
+            int id = val["index"].toInt();
+            QString pos = val["pos"].toString();
+            try {
+                sent[id - 1].setPOS(pos);
+                assert(sent[id - 1].id() == id);
+            } catch (const std::invalid_argument&) {
+            }
+        }
+    } else {
+        throw QString("tokens ") + error.errorString();
+    }
+}
+
+QString SentenceTree::tokensDataToCoreNlpJson(const Sentence& sent) {
+    QString ret = "{\"tokens\": [ \n";
+    // Qt don't support trailing commas 
+    int i = 0;
+    for (const Word& w : sent) {
+        if (i)
+            ret.append(",");
+
+        ret += QStringLiteral(R"(
+		{
+          "index": %1,
+          "word": "%2",
+          "pos": "%3"
+        }
+		)").arg(QString::number(w.id()))
+           .arg(w.text())
+           .arg(w.POS());
+
+        ++i;
+    }
+
+    ret += "]}";
+
+    return ret;
 }
 
 

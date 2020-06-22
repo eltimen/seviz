@@ -58,6 +58,9 @@ private slots:
 private:
     QJsonDocument execCoreNlp();
 
+    void loadTokensDataCoreNlp(const QString& json, Sentence& sent);
+    QString tokensDataToCoreNlpJson(const Sentence& sent);
+
     Feature m_feature;
     STWindow m_widget;
     FrameNetModel m_framesModel;
