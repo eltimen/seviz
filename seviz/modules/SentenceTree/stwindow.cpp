@@ -52,6 +52,12 @@ STWindow::~STWindow()
     delete ui;
 }
 
+void STWindow::updateTreesView() {
+    renderConstituency(m_core->currentSentenceData().constituency);
+    renderDependencies(m_core->currentSentenceData().dependency);
+    renderFrameNet(m_core->currentSentenceData().framenet);
+}
+
 void STWindow::showSentence(const SentenceData& data) {
     ui->sentencePrevButton->setEnabled(true);
     ui->sentenceNextButton->setEnabled(true);

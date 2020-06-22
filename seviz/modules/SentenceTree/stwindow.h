@@ -28,6 +28,7 @@ public:
     explicit STWindow(SentenceTree* core);
     ~STWindow();
 
+    void updateTreesView();
     void showSentence(const SentenceData& data);
 
     static std::vector<Word> getWordsInsideFrameRange(IEngine* engine, const Position& from, const Position& to);

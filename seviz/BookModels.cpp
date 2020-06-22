@@ -301,3 +301,11 @@ QString Word::getPosTagColor(const QString& posTag){
     }
     return QString();
 }
+
+QStringList Sentence::toStringList() {
+    QStringList tokens;
+    for (const auto& w : *this) {
+        tokens << w.text();
+    }
+    return tokens;
+}

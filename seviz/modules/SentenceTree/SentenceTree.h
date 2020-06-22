@@ -52,6 +52,9 @@ public:
 public slots:
     void onSentenceChanged(const Position& pos);
 
+private slots:
+    void execCoreNlp();
+
 private:
     Feature m_feature;
     STWindow m_widget;
