@@ -33,6 +33,7 @@ public:
     static std::vector<Word> getWordsInsideFrameRange(IEngine* engine, const Position& from, const Position& to);
 
 public slots:
+    // for js code
     void onConstituencyCreateNode(int from, int to);
     void onConstituencyChangeNodeType(int id);
     void onConstituencyDeleteNode(int id);
@@ -43,6 +44,11 @@ public slots:
     void onFrameEdit(int id);
     void onFrameRemove(int id);
     void onPOSChange(int id);
+
+private slots:
+    // UI
+    void onPrevSentence();
+    void onNextSentence();
 
 private:
     Ui::STWindow *ui;

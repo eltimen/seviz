@@ -203,6 +203,15 @@ Position Position::firstSentence() const {
         NOT_TAIL);
 }
 
+Position Position::lastSentence() const {
+    return Position(m_idChapter,
+                    m_idSection > 0 ? m_idSection : 1,
+                    m_idParagraph > 0 ? m_idParagraph : 1,
+                    m_book->getParagraph(*this).size(),
+                    -1,
+                    NOT_TAIL);
+}
+
 Position Position::firstWord() const {
     return Position(m_idChapter, 
         m_idSection > 0 ? m_idSection : 1, 

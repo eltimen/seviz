@@ -21,6 +21,9 @@ STWindow::STWindow(SentenceTree* core) :
 {
     ui->setupUi(this);
 
+    connect(ui->sentencePrevButton, &QPushButton::clicked, this, &STWindow::onPrevSentence);
+    connect(ui->sentenceNextButton, &QPushButton::clicked, this, &STWindow::onNextSentence);
+
     m_webchannel->registerObject("core", this);
 
     ui->dependencyView->page()->settings()->setAttribute(QWebEngineSettings::LocalContentCanAccessRemoteUrls, true);
@@ -50,6 +53,9 @@ STWindow::~STWindow()
 }
 
 void STWindow::showSentence(const SentenceData& data) {
+    ui->sentencePrevButton->setEnabled(true);
+    ui->sentenceNextButton->setEnabled(true);
+
     m_sentenceText.clear();
     for (const Word& w : data.sentence) {
         m_sentenceText.append(w.text() + " ");
@@ -294,6 +300,22 @@ std::vector<Word> STWindow::getWordsInsideFrameRange(IEngine* engine, const Posi
         }
     }
     return ret;
+}
+
+void STWindow::onPrevSentence() {
+    if (m_core->currentSentencePos().hasPrevSentence()) {
+        m_core->onSentenceChanged(m_core->currentSentencePos().prevSentence());
+    } else if (m_core->currentSentencePos().hasPrevParagraph()) {
+        m_core->onSentenceChanged(m_core->currentSentencePos().prevParagraph().lastSentence());
+    }
+}
+
+void STWindow::onNextSentence() {
+    if (m_core->currentSentencePos().hasNextSentence()) {
+        m_core->onSentenceChanged(m_core->currentSentencePos().nextSentence());
+    } else if (m_core->currentSentencePos().hasNextParagraph()) {
+        m_core->onSentenceChanged(m_core->currentSentencePos().nextParagraph().firstSentence());
+    }
 }
 
 QStringList STWindow::generateFrameChoosingPalette(const std::vector<Word>& frameWords, std::vector<std::pair<Word, QString>>& possibleFrames, FrameInsertionData& insertionContext) {
