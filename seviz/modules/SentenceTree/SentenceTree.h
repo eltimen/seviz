@@ -53,9 +53,11 @@ public slots:
     void onSentenceChanged(const Position& pos);
 
 private slots:
-    void execCoreNlp();
+    void onRunParser();
 
 private:
+    QJsonDocument execCoreNlp();
+
     Feature m_feature;
     STWindow m_widget;
     FrameNetModel m_framesModel;

@@ -8,6 +8,7 @@
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QJsonObject>
+#include <QProgressDialog>
 
 SentenceTree::SentenceTree(IEngine* engine) :
     AbstractModule(engine, "SentenceTree"),
@@ -16,7 +17,7 @@ SentenceTree::SentenceTree(IEngine* engine) :
 {
     m_feature.window()->setWidget(&m_widget);
 
-    m_feature.menu()->addAction("Запустить Stanford CoreNLP", this, &SentenceTree::execCoreNlp);
+    m_feature.menu()->addAction("Запустить Stanford CoreNLP", this, &SentenceTree::onRunParser);
     m_feature.menu()->setEnabled(false);
     
     m_engine->registerHandler(EventType::MOUSE_OVER, ElementType::SENTENCE, CTRL, m_feature, SLOTPOS(onSentenceChanged));
@@ -215,10 +216,20 @@ void SentenceTree::onSentenceChanged(const Position& pos) {
     m_feature.menu()->setEnabled(true);
 }
 
-void SentenceTree::execCoreNlp() {
-    if (QProcessEnvironment::systemEnvironment().contains("CORENLP")) {
-        QString path = QProcessEnvironment::systemEnvironment().value("CORENLP");
+void SentenceTree::onRunParser() {
+    QJsonDocument doc = execCoreNlp();
+    if (!doc.isNull()) {
+        // временно до поддержки constituency. в будущем переработать форматы хранения, а также код ниже
+        QJsonArray sentences = doc.object().value("sentences").toArray();
 
+        QJsonObject sent = sentences.first().toObject();
+        m_currentSentenceData->dependency.fromStanfordCoreNlpJson(QJsonDocument(sent).toJson());
+        m_widget.updateTreesView();
+    }
+}
+
+QJsonDocument SentenceTree::execCoreNlp() {
+    if (QProcessEnvironment::systemEnvironment().contains("CORENLP")) {
         QTemporaryFile inputFile;
         if (inputFile.open()) {
             QTextStream out(&inputFile);
@@ -226,6 +237,7 @@ void SentenceTree::execCoreNlp() {
         }
         //inputFile.setAutoRemove(false); // for debug only!
 
+        QString path = QProcessEnvironment::systemEnvironment().value("CORENLP");
         QStringList args;
         args << "-cp" << QString("%1%2*").arg(path, QDir::separator());
         args << "-Xmx1024m";
@@ -237,41 +249,48 @@ void SentenceTree::execCoreNlp() {
         args << "-parse.originalDependencies"; 
         args << "-parse.buildgraphs"; 
         args << "-outputFormat" << "json";
-        qDebug() << args.join(' ');
+        //qDebug() << args.join(' ');
 
         QProcess proc;
         proc.setArguments(args);
         proc.setProgram("java");
         proc.setWorkingDirectory(QDir::tempPath());
+
+        QProgressDialog progress("Выполняется парсинг", "Отмена", 0, 0, &m_widget);
+        progress.setWindowTitle("Stanford CoreNLP");
+        progress.setWindowModality(Qt::WindowModal);
+        connect(&progress, &QProgressDialog::canceled, [&proc]() {
+            proc.kill();
+         });
+        connect(&proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), [&progress]() {
+            progress.cancel();
+        });
         proc.start();
-        proc.waitForFinished();
+        progress.exec();
+
         qDebug() << proc.readAllStandardOutput();
-        int exitCode = proc.exitStatus();
-        if (!exitCode) {
+
+        if (proc.exitStatus() == QProcess::NormalExit) {
             QFile outFile(inputFile.fileName() + ".json");
             if (outFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
                 QTextStream in(&outFile);
-                // временно до поддержки constituency. в будущем переработать форматы хранения, а также код ниже
-                QJsonDocument doc = QJsonDocument::fromJson(in.readAll().toUtf8());
-                QJsonArray sentences = doc.object().value("sentences").toArray();
-                QJsonObject sent = sentences.first().toObject();
-                m_currentSentenceData->dependency.fromStanfordCoreNlpJson(QJsonDocument(sent).toJson());
-                m_widget.updateTreesView();
+                QByteArray output = in.readAll().toUtf8();
+                outFile.remove();
+                return QJsonDocument::fromJson(output);
             } else {
                 QMessageBox::warning(m_feature.window(), "Ошибка", "Не удалось прочитать вывод StanfordCoreNLP");
             }
-
         } else {
-            QMessageBox mess(QMessageBox::Icon::Warning, "Ошибка запуска парсера", "Статус: " + QVariant::fromValue(proc.exitStatus()).toString() +
+            QMessageBox mess(QMessageBox::Icon::Warning, "Ошибка запуска парсера", "Статус: " + QVariant::fromValue(proc.error()).toString() +
                                                                                    "Код: " + QString::number(proc.exitCode()));
             mess.setParent(m_feature.window());
             mess.setDetailedText(proc.readAllStandardError());
             mess.exec();
         }
-
     } else {
         QMessageBox::warning(m_feature.window(), "Ошибка", "Не задан путь к StanfordCoreNLP (переменная окружения CORENLP)");
     }
+    return QJsonDocument();
 }
 
 
