@@ -111,7 +111,6 @@ void ConstituencyTree::fromBracedString(const QString& str, const QString& sep) 
     QString bracedTree = str.simplified();
     bracedTree.replace(sep[0], sep[0] + QString(" "));
     bracedTree.replace(sep[1], QString(" ") + sep[1]);
-    qDebug() << bracedTree;
     QStringList tokens = bracedTree.split(" ", QString::SplitBehavior::SkipEmptyParts);
     assert(tokens.front() == sep[0]);
     assert(tokens.back() == sep[1]);

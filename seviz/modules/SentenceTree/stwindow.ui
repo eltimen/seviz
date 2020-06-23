@@ -43,9 +43,16 @@
       </spacer>
      </item>
      <item>
-      <widget class="QLabel" name="label_2">
+      <widget class="QPushButton" name="runParserButton">
        <property name="text">
-        <string>Статус: Частично размечено</string>
+        <string>Обработать StanfordCoreNLP</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="Line" name="line">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
        </property>
       </widget>
      </item>

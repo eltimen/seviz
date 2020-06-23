@@ -12,13 +12,10 @@
 
 SentenceTree::SentenceTree(IEngine* engine) :
     AbstractModule(engine, "SentenceTree"),
-    m_feature("Деревья предложений", QIcon(":/st/icon.png"), new QDockWidget(), this, true, new QMenu()),
+    m_feature("Деревья предложений", QIcon(":/st/icon.png"), new QDockWidget(), this, true),
     m_widget(this)
 {
     m_feature.window()->setWidget(&m_widget);
-
-    m_feature.menu()->addAction("Запустить Stanford CoreNLP", this, &SentenceTree::onRunParser);
-    m_feature.menu()->setEnabled(false);
     
     m_engine->registerHandler(EventType::MOUSE_OVER, ElementType::SENTENCE, CTRL, m_feature, SLOTPOS(onSentenceChanged));
     m_engine->registerHotkey(QKeySequence("Ctrl+F"), m_feature, [this]() {
@@ -202,7 +199,6 @@ void SentenceTree::onSentenceChanged(const Position& pos) {
     
     m_widget.showSentence(*m_currentSentenceData);
     m_engine->triggerRerendering(m_currentSentencePos, m_currentSentencePos);
-    m_feature.menu()->setEnabled(true);
 }
 
 void SentenceTree::onRunParser() {

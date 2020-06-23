@@ -23,6 +23,7 @@ STWindow::STWindow(SentenceTree* core) :
 
     connect(ui->sentencePrevButton, &QPushButton::clicked, this, &STWindow::onPrevSentence);
     connect(ui->sentenceNextButton, &QPushButton::clicked, this, &STWindow::onNextSentence);
+    connect(ui->runParserButton, &QPushButton::clicked, m_core, &SentenceTree::onRunParser);
 
     m_webchannel->registerObject("core", this);
 

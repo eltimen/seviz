@@ -51,8 +51,6 @@ public:
 
 public slots:
     void onSentenceChanged(const Position& pos);
-
-private slots:
     void onRunParser();
 
 private:
