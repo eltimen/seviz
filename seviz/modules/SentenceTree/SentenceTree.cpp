@@ -209,6 +209,8 @@ void SentenceTree::onRunParser() {
 
         QJsonObject sent = sentences.first().toObject();
         loadTokensDataCoreNlp(QJsonDocument(sent).toJson(), m_currentSentenceData->sentence);
+        QString parse = sent.value("parse").toString();
+        m_currentSentenceData->constituency.fromBracedString(parse);
         m_currentSentenceData->dependency.fromStanfordCoreNlpJson(QJsonDocument(sent).toJson());
         m_widget.updateTreesView();
     }

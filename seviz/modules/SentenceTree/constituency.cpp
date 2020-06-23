@@ -146,9 +146,12 @@ ConstituencyTreeNode* ConstituencyTreeNode::createNodeFromBracedString(const QSt
                 int index = ConstituencyLabelStr.indexOf(label);
                 ConstituencyTreeNode* ret;
                 if (index == -1) {
-                    // если 1 потомок, скипнуть
-                    // иначе заменить на NP
-                    ret = new ConstituencyTreeNode(NP, i);
+                    if (label == "ROOT" && children.size() == 1) {
+                        // для Stanford CoreNLP
+                        return children[0];
+                    } else {
+                        ret = new ConstituencyTreeNode(NP, i);
+                    }
                 } else {
                     ret = new ConstituencyTreeNode(static_cast<ConstituencyLabel>(index), i);
                 }
