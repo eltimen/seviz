@@ -92,11 +92,11 @@ void SentenceTree::load(QDir* moduleDir) {
                         }
                     }
 
-                    if (dir.exists("constituency.json")) {
-                        QFile file(dir.filePath("constituency.json"));
+                    if (dir.exists("constituency.txt")) {
+                        QFile file(dir.filePath("constituency.txt"));
                         if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
                             QTextStream in(&file);
-                            loadingSentenceData->constituency.fromJson(in.readAll());
+                            loadingSentenceData->constituency.fromBracedString(in.readAll());
                         }
                     }
 
@@ -142,10 +142,10 @@ void SentenceTree::save(QDir& moduleDir) {
             QDir sentenceDir(moduleDir.path() + "/" + sentencePath);
 
             {
-                QFile file(sentenceDir.filePath("constituency.json"));
+                QFile file(sentenceDir.filePath("constituency.txt"));
                 if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
                     QTextStream out(&file);
-                    out << data->constituency.toJson();
+                    out << data->constituency.toBracedString();
                 }
             }
 

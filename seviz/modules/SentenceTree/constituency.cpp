@@ -107,49 +107,71 @@ bool ConstituencyTree::remove(int nodeId) {
     }
 }
 
-/*
-void ConstituencyTree::fromBracedString(const QString& str, int lastTokenId, const QString& sep) {
-    QString node = str.simplified();
-    assert(node.front() == sep[0]);
-    assert(node.back() == sep[1]);
-    
-    QStringList parts = str.split(" ", QString::SkipEmptyParts);
+void ConstituencyTree::fromBracedString(const QString& str, const QString& sep) {
+    QString bracedTree = str.simplified();
+    bracedTree.replace(sep[0], sep[0] + QString(" "));
+    bracedTree.replace(sep[1], QString(" ") + sep[1]);
+    qDebug() << bracedTree;
+    QStringList tokens = bracedTree.split(" ", QString::SplitBehavior::SkipEmptyParts);
+    assert(tokens.front() == sep[0]);
+    assert(tokens.back() == sep[1]);
 
-    createNodeFromBracedString(parts, 0, sep);
+    delete m_root;
+    int i = 1;
+    int i2 = 0;
+    m_root = ConstituencyTreeNode::createNodeFromBracedString(tokens, i, i2, sep);
 }
 
-int ConstituencyTree::createNodeFromBracedString(const QStringList& parts, int lastTokenId, const QString& sep) {
-    static QRegExp nodeBegin("\\([\\S]+");
-
-    QString tag = parts[0].mid(1);
-    ConstituencyLabel label = static_cast<ConstituencyLabel>(ConstituencyLabelStr.indexOf(tag));
-    int from = -1;
-    int to;
-
-    int partIndex = lastTokenId;
-    for (const QString& part : parts) {
-        if (nodeBegin.exactMatch(part)) {
-            // открывающая скобка и тег узла
-            createNodeFromBracedString(parts.mid(1), lastTokenId, sep);
-        } else if (part == ")") {
-            // конец узла
-            // TODO а если нет пробела после последнего тоекена в предложении?
-            break;
-        } else {
-            // слово или знак препинания предложения
-            if (from == -1) {
-                from = partIndex;
-                to = from;
+ConstituencyTreeNode* ConstituencyTreeNode::createNodeFromBracedString(const QStringList& tokens, int& indexTokenFrom, int& lastTokenId, const QString& sep) {
+    QString label;
+    ChildrenContainer children;
+    QString text;
+    for (int& i = indexTokenFrom; i < tokens.size(); ++i) {
+        QString token = tokens[i];
+        if (token == sep[0]) { // (
+            if (i + 1 < tokens.size() && tokens[i + 1] == sep[1]) {
+                ++lastTokenId;
+                ++i;
+                ++i;
+                return new ConstituencyTreeNode(Word(lastTokenId, sep[0]), lastTokenId);
+            } else {
+                // добавить как потомка к текущей
+                children.push_back(createNodeFromBracedString(tokens, ++i, lastTokenId, sep));
             }
-            to = partIndex;
+        } else if (token == sep[1]) { // )
+            // вернуть текущий узел
+            if (!text.isEmpty()) {
+                ++lastTokenId;
+                return new ConstituencyTreeNode(Word(lastTokenId, text), lastTokenId);
+            } else {
+                int index = ConstituencyLabelStr.indexOf(label);
+                ConstituencyTreeNode* ret;
+                if (index == -1) {
+                    // если 1 потомок, скипнуть
+                    // иначе заменить на NP
+                    ret = new ConstituencyTreeNode(NP, i);
+                } else {
+                    ret = new ConstituencyTreeNode(static_cast<ConstituencyLabel>(index), i);
+                }
+                ret->setChildren(children);
+                return ret;
+            }
+        } else { // POS tag, constituency tag, or word?
+            if (label.isEmpty()) {
+                label = token;
+                if (i+1 < tokens.size() && tokens[i+1] != sep[0]) {
+                    ++i;
+                    text = tokens[i];
+                }
+            } else {
+                assert(false);
+                return nullptr;
+            }
         }
-        ++partIndex;
     }
-
-    return partIndex;
+    assert(false);
+    return nullptr;
 }
-
-*/
 
 QString ConstituencyTree::toBracedString(const QString& sep) const {
     return m_root->toBracedString(sep);
@@ -334,7 +356,10 @@ QString ConstituencyTreeNode::toBracedString(const QString& sep) const {
     assert(sep.size() == 2);
 
     if (m_isTerminal) {
-        return m_token.text();
+        if (m_token.text() == sep[0]) {
+            return "( " + m_token.POS() + " " + sep[0] + sep[1]+" )";
+        }
+        return "(" + m_token.POS() + " " + m_token.text() + ")";
     } else {
         QString ret = sep[0];
         ret.append(ConstituencyLabelStr[m_label] + " ");
