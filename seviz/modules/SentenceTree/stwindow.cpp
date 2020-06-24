@@ -21,6 +21,13 @@ STWindow::STWindow(SentenceTree* core) :
 {
     ui->setupUi(this);
 
+    connect(ui->tabWidget, &QTabWidget::currentChanged, [this](int i) {
+        if (i == 2 && m_core->currentSentenceSelected()) {
+            // framenet криво показывается, если быть на другой вкладке
+            renderFrameNet(m_core->currentSentenceData().framenet);
+        }
+    });
+
     connect(ui->sentencePrevButton, &QPushButton::clicked, this, &STWindow::onPrevSentence);
     connect(ui->sentenceNextButton, &QPushButton::clicked, this, &STWindow::onNextSentence);
     connect(ui->runParserButton, &QPushButton::clicked, m_core, &SentenceTree::onRunParser);
@@ -108,6 +115,11 @@ void STWindow::onFrameInsert(IEngine* engine) {
                     if (chooser->exec()) {
                         int index = chooser->getChoosedIndex();
                         Frame* f = new Frame(possibleFrames[index].second, possibleFrames[index].first, range, frameWords, m_core->framesModel());
+                        if (insertPos.highFrame && insertPos.highFrame->getFreeElementsList().empty()) {
+                            QMessageBox::warning(this, "Вставка фрейма", "Нет свободных FE в фрейме " + insertPos.highFrame->name());
+                            return;
+                        }
+
                         std::map<QString, QString> feForSubframes = askFrameElementsForSubframes(insertPos, f);
                         QString parentFE = askParentFrameElementForNewFrame(insertPos, f);
                                                 

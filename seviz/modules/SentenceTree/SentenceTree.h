@@ -45,6 +45,7 @@ public:
     virtual void save(QDir& moduleDir) override;
 
     // TODO public sentenceData(pos...)
+    bool currentSentenceSelected() const;
     SentenceData& SentenceTree::currentSentenceData(); // TODO private, friend class
     const Position& SentenceTree::currentSentencePos() const; // TODO private, friend class
     const FrameNetModel& framesModel();

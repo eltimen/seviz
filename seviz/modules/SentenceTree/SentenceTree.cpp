@@ -173,6 +173,10 @@ void SentenceTree::save(QDir& moduleDir) {
     }
 }
 
+bool SentenceTree::currentSentenceSelected() const {
+    return (bool)m_currentSentenceData;
+}
+
 SentenceData& SentenceTree::currentSentenceData() {
     return *m_currentSentenceData;
 }
