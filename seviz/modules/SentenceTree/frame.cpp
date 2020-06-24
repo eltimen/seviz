@@ -201,10 +201,54 @@ void Frame::toTreantJson(QString& ret, int depth, int maxDepth, const QString& p
         .arg(parentFEcolors.second)
         .arg(parentFEcolors.first);
 
+    
+    std::map<WordRange, std::vector<Word>> freeWordRanges;
+    int currentFrom = -1;
+    int currentTo = -1;
+    std::vector<Word> wordsInsideRange;
+    for (const Word& w : m_currentWords) {
+        bool noFeWithWord = true;
+        for (const std::pair<WordRange, FrameElement>& fe : m_elements) {
+            if (fe.first.contains(w.id())) {
+                noFeWithWord = false;
+                break;
+            }
+        }
+        if (wordsInsideRange.empty()) {
+            currentFrom = w.id();
+            currentTo = currentFrom;
+        } else {
+            if (noFeWithWord && w.id() != m_lu.id()) {
+                ++currentTo;
+            } else {
+                freeWordRanges.emplace(WordRange(currentFrom, currentTo), wordsInsideRange);
+                currentFrom = w.id();
+                currentTo = currentFrom;
+                wordsInsideRange.clear();
+            } 
+        }
+        if (noFeWithWord && w.id() != m_lu.id())
+            wordsInsideRange.emplace_back(w);
+    }
+    if (!wordsInsideRange.empty()) {
+        freeWordRanges.emplace(WordRange(currentFrom, currentTo), wordsInsideRange);
+    }
+
     for (const std::pair<WordRange, FrameElement>& fe : m_elements) {
+        while (freeWordRanges.size() > 0 && freeWordRanges.begin()->first < fe.first) {
+            FrameElement("???", freeWordRanges.begin()->second).toTreantJson(ret, depth + 1, maxDepth, qMakePair(QString("FFFFFF"), QString("000000")));
+            ret += ",";
+            freeWordRanges.erase(freeWordRanges.begin());
+        }
+        // если есть разрыв с предыдущим, то что между разрывом вставить как ???
         auto colors = m_frameNetDb.getColorsForFE(m_name, fe.second.name());
         fe.second.toTreantJson(ret, depth + 1, maxDepth, colors);
         ret += ",";
+    }
+    while (!freeWordRanges.empty()) {
+        FrameElement("???", freeWordRanges.begin()->second).toTreantJson(ret, depth + 1, maxDepth, qMakePair(QString("FFFFFF"), QString("000000")));
+        ret += ",";
+        freeWordRanges.erase(freeWordRanges.begin());
     }
 
     ret += "]} \n";
