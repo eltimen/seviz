@@ -206,7 +206,7 @@ void Frame::toTreantJson(QString& ret, int depth, int maxDepth, const QString& p
     int currentFrom = -1;
     int currentTo = -1;
     std::vector<Word> wordsInsideRange;
-    for (const Word& w : m_currentWords) {
+    for (const Word& w : m_words) {
         bool noFeWithWord = true;
         for (const std::pair<WordRange, FrameElement>& fe : m_elements) {
             if (fe.first.contains(w.id())) {
