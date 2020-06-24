@@ -45,14 +45,21 @@ public:
     virtual void save(QDir& moduleDir) override;
 
     // TODO public sentenceData(pos...)
+    bool currentSentenceSelected() const;
     SentenceData& SentenceTree::currentSentenceData(); // TODO private, friend class
     const Position& SentenceTree::currentSentencePos() const; // TODO private, friend class
     const FrameNetModel& framesModel();
 
 public slots:
     void onSentenceChanged(const Position& pos);
+    void onRunParser();
 
 private:
+    QJsonDocument execCoreNlp();
+
+    void loadTokensDataCoreNlp(const QString& json, Sentence& sent);
+    QString tokensDataToCoreNlpJson(const Sentence& sent);
+
     Feature m_feature;
     STWindow m_widget;
     FrameNetModel m_framesModel;

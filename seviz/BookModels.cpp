@@ -258,7 +258,7 @@ const QStringList Word::PosTagsStr =
 {
     "?",
     "CC", "CD", "DT", "EX", "FW", "IN", "JJ", "JJR", "JJS", "LS", "MD", "NN", "NNS", "NNP", "NNPS",
-    "PDT", "POS", "PRP", "PP$", "RB", "RBR", "RBS", "RP", "SYM", "TO", "UH", "VB", "VBD", "VBG", "VBN",
+    "PDT", "POS", "PRP", "PRP$", "PP$", "RB", "RBR", "RBS", "RP", "SYM", "TO", "UH", "VB", "VBD", "VBG", "VBN",
     "VBP", "VBZ", "WDT", "WP", "WP$", "WRB",
     "#", "$", ".", ",", ":", "(", ")", "\"", "‘", "“", "’", "”"
 };
@@ -300,4 +300,12 @@ QString Word::getPosTagColor(const QString& posTag){
         return "#E3E3E3";
     }
     return QString();
+}
+
+QStringList Sentence::toStringList() {
+    QStringList tokens;
+    for (const auto& w : *this) {
+        tokens << w.text();
+    }
+    return tokens;
 }

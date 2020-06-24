@@ -126,6 +126,8 @@ public:
         m_id(id), QList<Word>(content) {}
 
     int id() const { return m_id; }
+
+    QStringList toStringList();
 };
 
 class Word {

@@ -20,6 +20,8 @@ public:
         assert(to > 0);
     }
 
+    inline bool isNull() const { return first == -1; }
+
     bool operator==(const WordRange& other) const {
         return first == other.first && second == other.second;
     }
@@ -30,6 +32,10 @@ public:
 
     bool operator<(int wordId) const {
         return second < wordId;
+    }
+
+    bool operator<(const WordRange& o) const {
+        return second < o.first;
     }
 
     bool contains(int wordId) const {

@@ -58,6 +58,8 @@ public:
     ConstituencyTreeNode(const Word& token, int id);
     ~ConstituencyTreeNode();
 
+    static ConstituencyTreeNode* createNodeFromBracedString(const QStringList& tokens, int& indexTokenFrom, int& lastTokenId, const QString& sep);
+
     int id() const;
     std::pair<int, int> tokenRange() const;
     bool isSentenceToken() const;
@@ -109,7 +111,7 @@ public:
     void fromJson(const QString& json);
     QString toJson();
 
-    //void fromBracedString(const QString& str, int lastTokenId = 0, const QString& sep = "()");
+    void fromBracedString(const QString& str, const QString& sep = "()");
     QString toBracedString(const QString& sep = "()") const;
 
     QString toTreantJson() const;
@@ -118,7 +120,6 @@ private:
     int m_lastId = 0;
     ConstituencyTreeNode *m_root;
 
-    int createNodeFromBracedString(const QStringList& str, int lastTokenId, const QString& sep);
     void fromJsonHelper(const QJsonArray& children);
 };
 
