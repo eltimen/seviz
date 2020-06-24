@@ -32,10 +32,7 @@ private:
     std::unordered_map<QComboBox*,int> m_previousFrom;
     std::unordered_map<QComboBox*,int> m_previousTo;
 
-    std::vector<std::shared_ptr<Frame>> m_subFrames;
-    std::map<QString, int> m_subFrameIndexByFEName;
-    std::unordered_set<int> m_subframeIndexesPool;
-    std::unordered_map<QComboBox*, int> m_previousSubFrameIndex;
+    std::map<QString, std::shared_ptr<Frame>> m_subFrames;
 
     std::vector<Word> getPossibleEndsOfWordRangeFrom(int id);
     void takeWordRangeFromPool(int from, int to);
