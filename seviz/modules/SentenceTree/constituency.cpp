@@ -129,10 +129,7 @@ ConstituencyTreeNode* ConstituencyTreeNode::createNodeFromBracedString(const QSt
         QString token = tokens[i];
         if (token == sep[0]) { // (
             if (i + 1 < tokens.size() && tokens[i + 1] == sep[1]) {
-                ++lastTokenId;
-                ++i;
-                ++i;
-                return new ConstituencyTreeNode(Word(lastTokenId, sep[0]), lastTokenId);
+                text = tokens[i];
             } else {
                 // добавить как потомка к текущей
                 children.push_back(createNodeFromBracedString(tokens, ++i, lastTokenId, sep));
@@ -359,9 +356,9 @@ QString ConstituencyTreeNode::toBracedString(const QString& sep) const {
 
     if (m_isTerminal) {
         if (m_token.text() == sep[0]) {
-            return "( " + m_token.POS() + " " + sep[0] + sep[1]+" )";
+            return sep[0] + m_token.POS() + " " + sep[0] + sep[1]+sep[1];
         }
-        return "(" + m_token.POS() + " " + m_token.text() + ")";
+        return sep[0] + m_token.POS() + " " + m_token.text() + sep[1];
     } else {
         QString ret = sep[0];
         ret.append(ConstituencyLabelStr[m_label] + " ");
