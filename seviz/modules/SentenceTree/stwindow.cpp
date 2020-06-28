@@ -61,7 +61,7 @@ STWindow::~STWindow()
 }
 
 void STWindow::updateTreesView() {
-    renderConstituency(m_core->currentSentenceData().constituency);
+    renderConstituency(m_core->currentSentenceData());
     renderDependencies(m_core->currentSentenceData().dependency);
     renderFrameNet(m_core->currentSentenceData().framenet);
 }
@@ -76,7 +76,7 @@ void STWindow::showSentence(const SentenceData& data) {
     }
     ui->idLabel->setText(QStringLiteral("ID: %1").arg(data.sentence.id()));
 
-    renderConstituency(data.constituency);
+    renderConstituency(data);
     renderDependencies(data.dependency); 
     renderFrameNet(data.framenet); 
 
@@ -154,7 +154,7 @@ void STWindow::onConstituencyCreateNode(int from, int to) {
         if (chooser->exec()) {
             ConstituencyLabel label = chooser->getChoosedAsEnum<ConstituencyLabel>();
             tree.insert(std::make_pair(from, to), label, &pos);
-            renderConstituency(tree);
+            renderConstituency(m_core->currentSentenceData());
         }
     } else {
         QMessageBox::warning(this, "Ошибка", "Дерево составляющих не может содержать пересекающиеся узлы");
@@ -172,7 +172,7 @@ void STWindow::onConstituencyChangeNodeType(int id) {
         if (chooser->exec()) {
             ConstituencyLabel rel = static_cast<ConstituencyLabel>(chooser->getChoosedIndex());
             tree.change(id, rel);
-            renderConstituency(tree);
+            renderConstituency(m_core->currentSentenceData());
         }
     } else {
         QMessageBox::warning(this, "Ошибка", "Нельзя менять тип узла корня или элементов предложения");
@@ -184,7 +184,7 @@ void STWindow::onConstituencyDeleteNode(int id) {
 
     if (tree.canChangeOrDeleteNode(id)) {
          tree.remove(id);
-         renderConstituency(tree);
+         renderConstituency(m_core->currentSentenceData());
     } else {
         QMessageBox::warning(this, "Ошибка", "Нельзя удалить корень или элемент предложения");
     }
@@ -247,6 +247,7 @@ void STWindow::onPOSChange(int id) {
     if (chooser->exec()) {
         int i = chooser->getChoosedIndex();
         w.setPOS(Word::PosTagsStr[i]);
+        renderConstituency(m_core->currentSentenceData());
         renderDependencies(m_core->currentSentenceData().dependency);
     } 
 }
@@ -258,8 +259,8 @@ void STWindow::clear() {
     ui->framenetView->page()->runJavaScript("clear();");
 }
 
-void STWindow::renderConstituency(const ConstituencyTree& tree) {
-    QString data = tree.toTreantJson();
+void STWindow::renderConstituency(const SentenceData& tree) {
+    QString data = tree.constituency.toTreantJson(tree.sentence);
     ui->constituencyView->page()->runJavaScript("var constituency = " + data + "; render(constituency);");
 }
 void STWindow::renderDependencies(const DependencyTree& tree) {

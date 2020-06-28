@@ -59,7 +59,7 @@ private:
     SentenceTree* m_core;
     QString m_sentenceText;
 
-    void renderConstituency(const ConstituencyTree& tree);
+    void renderConstituency(const SentenceData& tree);
     void renderDependencies(const DependencyTree& tree);
     void renderFrameNet(const FrameTree& tree);
 

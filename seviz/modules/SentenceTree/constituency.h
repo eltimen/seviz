@@ -75,7 +75,7 @@ public:
     QString toJson();
 
     QString toBracedString(const QString& sep) const;
-    void toTreantJson(QString& ret, int depth, int maxDepth) const;
+    void toTreantJson(QString& ret, int depth, int maxDepth, const Sentence& sent) const;
 
 private:
     int m_id;
@@ -114,7 +114,7 @@ public:
     void fromBracedString(const QString& str, const QString& sep = "()");
     QString toBracedString(const QString& sep = "()") const;
 
-    QString toTreantJson() const;
+    QString toTreantJson(const Sentence& sent) const;
 
 private:
     int m_lastId = 0;

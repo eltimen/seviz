@@ -11,7 +11,13 @@ body { background: #fff; }
     padding: 3px;
 }
 
-.node :hover { 
+.node-pos {
+    font-size: 80%;
+    font-style: italic;
+    text-align: center;
+}
+
+.node :hover {
     font-weight: bold
 }
 

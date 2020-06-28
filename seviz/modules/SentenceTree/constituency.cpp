@@ -176,7 +176,7 @@ QString ConstituencyTree::toBracedString(const QString& sep) const {
     return m_root->toBracedString(sep);
 }
 
-QString ConstituencyTree::toTreantJson() const {
+QString ConstituencyTree::toTreantJson(const Sentence& sent) const {
     QString ret = QStringLiteral(R"(
     {
     "chart": {
@@ -191,7 +191,7 @@ QString ConstituencyTree::toTreantJson() const {
     },
     "nodeStructure": 
     )");
-    m_root->toTreantJson(ret, 0, m_root->maxDepth());
+    m_root->toTreantJson(ret, 0, m_root->maxDepth(), sent);
     ret += "}";
     return ret;
 }
@@ -372,25 +372,28 @@ QString ConstituencyTreeNode::toBracedString(const QString& sep) const {
     }
 }
 
-void ConstituencyTreeNode::toTreantJson(QString& ret, int depth, int maxDepth) const {
+void ConstituencyTreeNode::toTreantJson(QString& ret, int depth, int maxDepth, const Sentence& sent) const {
     
     int dropLevel = m_isTerminal ? maxDepth - 1 - depth : 0;
     for (int i = 0; i < dropLevel; ++i) {
         ret.append("{ pseudo: true, children: [");
     }
 
+    //
+    // innerHTML: "<div class=\"pos\">%1<div class=\"cnode\">%2</div>",
     ret += QStringLiteral(R"(
         {
-        "text": { "name": "%1" },
-        "HTMLclass": "%2",
-        "HTMLid": "%3",
+        "text": { pos: "%1", "name": "%2" },
+        "HTMLclass": "%3",
+        "HTMLid": "%4",
         "children": [
-    )").arg(m_isTerminal ? m_token.text() : ConstituencyLabelStr[m_label])
+    )").arg(m_isTerminal ? sent.at(m_token.id() - 1).POS() : "\\n")
+        .arg(m_isTerminal ? sent.at(m_token.id() - 1).text() : ConstituencyLabelStr[m_label])
         .arg(m_isTerminal ? "token" : (depth == 0 ? "label root" : "label"))
         .arg(QString::number(m_id));
 
     for (const ConstituencyTreeNode* child : m_children) {
-        child->toTreantJson(ret, depth+1, maxDepth);
+        child->toTreantJson(ret, depth+1, maxDepth, sent);
         ret += ",";
     }
 
