@@ -122,6 +122,30 @@ FORMS += \
 
 RC_ICONS = app.ico
 
+Release:DESTDIR = release
+Release:OBJECTS_DIR = release/obj
+Release:MOC_DIR = release/moc
+Release:RCC_DIR = release/rcc
+Release:UI_DIR = release/ui
+
+Debug:DESTDIR = debug
+Debug:OBJECTS_DIR = debug/obj
+Debug:MOC_DIR = debug/moc
+Debug:RCC_DIR = debug/rcc
+Debug:UI_DIR = debug/ui
+
+# copy assets to build folder
+CONFIG += file_copies
+webcore.files = embedded_web_resources/
+webcore.path = $$DESTDIR/
+COPIES += webcore
+test_books.files = test/
+test_books.path = $$DESTDIR/
+COPIES += test_books
+ST_webcore.files = SentenceTree_resources/
+ST_webcore.path = $$DESTDIR/
+COPIES += ST_webcore
+
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
