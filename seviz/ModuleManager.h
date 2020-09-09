@@ -4,10 +4,11 @@
 #include <QList>
 #include <QShortcut>
 #include <QTemporaryDir>
+#include <QPluginLoader>
+#include <QSharedPointer>
 #include <functional>
-#include <memory>
 #include "IEngine.h"
-#include "AbstractModule.h"
+#include "ISevizPlugin.h"
 #include "epubrenderer.h"
 #include "exceptions.h"
 #include "bookloader/bookloader.h"
@@ -32,8 +33,8 @@ public:
     EpubRenderer& getBookRender();
 
     // методы для модулей (реализация интерфейса IEngine)
-    AbstractModule* getModule(const QString& id, int minVersion = 0) override;
-    void forEachModule(std::function<void(AbstractModule*)> functor);
+    ISevizPlugin* getPlugin(const QString& id, int minVersion = 0) override;
+    void forEachModule(std::function<void(ISevizPlugin*)> functor) override;
     const Book& getBook() override;
 
     void triggerRerendering(const Position& from, const Position& to) override;
@@ -45,13 +46,13 @@ public:
     Position mouseHoverElement() override;
     
 private:
-    QMap<QString,AbstractModule*> m_container;
+    QMap<QString, QPair<QSharedPointer<QPluginLoader>, ISevizPlugin*>> m_container;
     BookLoader m_loader;
 
     EpubRenderer& m_render;
     MainWindow* m_window;
     Book* m_book = nullptr;
-    QMultiMap<const AbstractModule*, Feature*> m_enabledFeatures;
+    QMultiMap<const ISevizPlugin*, Feature*> m_enabledFeatures;
 
     QMultiMap<Feature, QPair<Handler, bool>> m_handlers;
     QMultiMap<Feature, QShortcut*> m_hotkeys;
@@ -60,5 +61,4 @@ private:
     QList<Feature*> getConflictFeaturesFor(const Feature& f);
 
     void destroy();
-    std::vector<AbstractModule*> registrar();
 };

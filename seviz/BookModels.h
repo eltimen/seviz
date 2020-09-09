@@ -2,6 +2,7 @@
 
 #include <QList>
 #include <QString>
+#include "helpers.h"
 #include "EventModels.h"
 
 class Book;
@@ -22,7 +23,9 @@ enum TailPosition {
     BOTTOMRIGHT
 };
 
-class Position {
+uint qHash(const Word& w, uint seed=0) noexcept;
+
+class SEVIZSHARED_EXPORT Position {
 public:
     explicit Position(int idChapter, int idSection = -1, int idParagraph = -1, int idSentence = -1, int idWord = -1, TailPosition tail = NOT_TAIL);
     Position() : Position(1) {}
@@ -95,42 +98,46 @@ private:
     static const Book* m_book;
 };
 
-class Section : public QList<Paragraph> {
+class SEVIZSHARED_EXPORT Section : public QList<Paragraph> {
 public:
-    //Section(int id, const QString& name, const QList<Paragraph>& content) : 
-    //	m_id(id), m_name(name), QList<Paragraph>(content) {}
     Section(int id, const QList<Paragraph>& content) :
         m_id(id), QList<Paragraph>(content) {}
 
+    Section() : Section(-1, {})
+    {}
+
     int id() const { return m_id; }
-    //const QString& name() const { return m_name; }
 private:
     int m_id;
-    //QString m_name;
 };
 
-class Paragraph : public QList<Sentence> {
+class SEVIZSHARED_EXPORT Paragraph : public QList<Sentence> {
 public:
     Paragraph(int id, const QList<Sentence>& content) :
         m_id(id), QList<Sentence>(content) {}
+
+    Paragraph() : Paragraph(-1, {})
+    {}
+
     int id() const { return m_id; }
 private:
     int m_id;
 };
 
-class Sentence : public QList<Word> {
+class SEVIZSHARED_EXPORT Sentence : public QList<Word> {
     int m_id;
 public:
-    Sentence() : Sentence(-1, {}) {};
+    Sentence() : Sentence(-1, {}) {}
     Sentence(int id, const QList<Word>& content) :
         m_id(id), QList<Word>(content) {}
 
     int id() const { return m_id; }
 
     QStringList toStringList();
+
 };
 
-class Word {
+class SEVIZSHARED_EXPORT Word {
     int m_id;
     QString m_text;
     QString m_POS = "?";
@@ -142,6 +149,9 @@ public:
     Word(int id, const QString& text) :
         m_id(id), m_text(text) {
     }
+
+    Word() : Word(-1, "")
+    {}
 
     bool operator< (const Word& o) const {
         return m_id < o.m_id;
@@ -156,9 +166,10 @@ public:
     bool isPunct() const { return m_text.length() == 1 && !QRegExp("\\w+").exactMatch(m_text); }
     QString POS() const { return m_POS; }
     void setPOS(const QString& posTag);
+
 };
 
-class Chapter {
+class SEVIZSHARED_EXPORT Chapter {
 public:
     Chapter(const Book* book, int id, const QString& name) :
         m_id(id), m_name(name), m_book(book) {}

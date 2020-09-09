@@ -4,11 +4,24 @@
 #include "ModuleManager.h"
 
 BookLoader::BookLoader(ModuleManager* engine)
-    : AbstractModule(engine, "_bookloader"),
+    : ISevizPlugin(),
       m_engine(engine) {}
 
 BookLoader::~BookLoader() {
     delete m_dialog;
+}
+
+const QString& BookLoader::id() const {
+    static QString id = "_bookloader";
+    return id;
+}
+
+int BookLoader::version() const {
+    return 0;
+}
+
+void BookLoader::init(IEngine*) {
+
 }
 
 QList<Feature> BookLoader::features() {
@@ -49,4 +62,8 @@ void BookLoader::save(QDir& dir) {
     } else {
         // TODO exception
     }
+}
+
+void BookLoader::render(const Position &from, const Position &to, DomChapter &dom, const QVector<Feature *> &activeFeatures) {
+
 }

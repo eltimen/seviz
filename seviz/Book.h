@@ -2,14 +2,16 @@
 #include <QObject>
 #include <QString>
 #include <QStringList>
-#include <QWebEngineView>
+#ifdef SEVIZ_CORE
+    #include <QWebEngineView>
+#endif
 #include <QTemporaryDir>
 #include "BookModels.h"
 
 class EpubRenderer;
 class ModuleManager;
 
-class Book : public QObject
+class SEVIZSHARED_EXPORT Book : public QObject
 {
     Q_OBJECT
 

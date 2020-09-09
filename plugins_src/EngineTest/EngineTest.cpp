@@ -3,10 +3,16 @@
 #include <QMessageBox>
 #include <QMenu>
 
-EngineTest::EngineTest(IEngine* engine)
-    : AbstractModule(engine, "EngineTest"),
-      m_widget(*this),
-      m_feat("Тесты", QIcon(), new QDockWidget(), this, true, new QMenu("Тест")) {
+EngineTest::EngineTest()
+    : ISevizPlugin(),
+      m_feat("Тесты", QIcon(), new QDockWidget(), this, true, new QMenu("Тест")),
+      m_widget(*this)
+{
+}
+
+void EngineTest::init(IEngine* engine) {
+    m_engine = engine;
+
     m_widget.m_engine = m_engine;
     m_feat.window()->setWidget(&m_widget);
     m_feat.menu()->addAction("Тест", [this]() { QMessageBox::information(m_feat.window(), "Сообщение", "Тест"); });
@@ -21,6 +27,15 @@ EngineTest::EngineTest(IEngine* engine)
 }
 
 EngineTest::~EngineTest() {
+}
+
+const QString &EngineTest::id() const {
+    static QString id = "EngineTest";
+    return id;
+}
+
+int EngineTest::version() const {
+    return 0;
 }
 
 QList<Feature> EngineTest::features() {

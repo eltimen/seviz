@@ -61,7 +61,7 @@ void Book::save() {
     QDir dir(m_epubDir.path());
     dir.cd("seviz");
     
-    m_moduleManager.forEachModule([this, &dir, &progress](AbstractModule* m) {
+    m_moduleManager.forEachModule([this, &dir, &progress](ISevizPlugin* m) {
         if (dir.cd(m->id())) {
             m->save(dir);
             dir.cdUp();

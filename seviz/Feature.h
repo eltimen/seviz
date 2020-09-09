@@ -5,7 +5,7 @@
 #include <QDockWidget>
 #include <QString>
 
-class AbstractModule;
+class ISevizPlugin;
 
 struct Feature {
 
@@ -15,7 +15,7 @@ public:
 	Feature(const QString& name,
 		const QIcon& icon,
 		QDockWidget* window,
-		AbstractModule* owner,
+		ISevizPlugin* owner,
 		bool affectsView = false,
 		QMenu* menu = nullptr,
 		Qt::DockWidgetArea dockLocation = Qt::BottomDockWidgetArea) :
@@ -36,7 +36,7 @@ public:
 
 	const QString& name() const { return m_name; }
 	const QIcon& icon() const { return m_icon; }
-	const AbstractModule* owner() const { return m_owner; }
+	const ISevizPlugin* owner() const { return m_owner; }
 	QDockWidget* window() { return m_window; }
 	QMenu* menu() const { return m_menu; }
 	Qt::DockWidgetArea dockLocation() const { return m_dockLocation; }
@@ -49,7 +49,7 @@ private:
 	QString m_name;
 	QIcon m_icon;
 
-	AbstractModule* m_owner;
+	ISevizPlugin* m_owner;
 
 	QMenu* m_menu = nullptr;
 	QDockWidget* m_window = nullptr;

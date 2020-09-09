@@ -15,8 +15,8 @@
 
 class IEngine {
 public:
-    virtual void forEachModule(std::function<void(AbstractModule*)> functor) = 0;
-    virtual AbstractModule* getModule(const QString& id, int minVersion = 0) = 0;
+    virtual void forEachModule(std::function<void(ISevizPlugin*)> functor) = 0;
+    virtual ISevizPlugin* getPlugin(const QString& id, int minVersion = 0) = 0;
     virtual const Book& getBook() = 0;
 
     virtual void triggerRerendering(const Position& from, const Position& to) = 0;

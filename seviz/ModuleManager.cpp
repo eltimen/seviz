@@ -1,19 +1,28 @@
-#include "mainwindow.h"
+#include "ModuleManager.h"
 #include <tuple>
 #include <iterator>
 #include "DomChapter.h"
-#include "modules/modules.h"
+#include "mainwindow.h"
 
 ModuleManager::ModuleManager(EpubRenderer& render, MainWindow* w)
     : m_render(render),
       m_window(w),
       m_loader(this) {
-    for (AbstractModule* m : registrar()) {
-        if (!m_container.contains(m->id())) {
-            m_container.insert(m->id(), m);
+    QDir pluginsDir( "./plugins" );
+    for (const QString& pluginName : pluginsDir.entryList(QDir::Files)) {
+        QPluginLoader* loader = new QPluginLoader(pluginsDir.absoluteFilePath(pluginName));
+        ISevizPlugin* plugin = nullptr;
+        if(loader->load() && (plugin=qobject_cast<ISevizPlugin*>(loader->instance()))) {
+            plugin->init(this);
+            if (!m_container.contains(plugin->id())) {
+                m_container.insert(plugin->id(), qMakePair(loader, plugin));
+            } else {
+                destroy();
+                throw DuplicateModulesException();
+            }
         } else {
-            destroy();
-            throw DuplicateModulesException();
+            qDebug() << "Failed to load :(";
+            qDebug() << loader->errorString();
         }
     }
 }
@@ -46,7 +55,8 @@ void ModuleManager::bookOpened(Book* book, QTemporaryDir& epubDir, QList<Chapter
 
     // загрузка данных остальных плагинов
     m_container.remove(m_loader.id());
-	for (AbstractModule* m : m_container) {
+    for (auto& val : m_container) {
+        ISevizPlugin* m = val.second;
         try {
             QDir dir(epubDir.path()); // QDir каждый раз создается, чтобы гарантировать, что плагин не поменял текущую директорию
             if (dir.cd("seviz") && dir.cd(m->id())) {
@@ -59,12 +69,12 @@ void ModuleManager::bookOpened(Book* book, QTemporaryDir& epubDir, QList<Chapter
             throw QString("Не удалось загрузить данные модуля ") + m->id() + ": " + msg;
         }
 	}
-    m_container.insert(m_loader.id(), &m_loader);
+    m_container.insert(m_loader.id(), qMakePair(nullptr, &m_loader));
 }
 
-void ModuleManager::forEachModule(std::function<void(AbstractModule*)> functor) {
-    for (AbstractModule* i : m_container) {
-        functor(i);
+void ModuleManager::forEachModule(std::function<void(ISevizPlugin*)> functor) {
+    for (auto& i : m_container) {
+        functor(i.second);
     }
 }
 
@@ -86,14 +96,15 @@ QList<Feature*> ModuleManager::getConflictFeaturesFor(const Feature& f) {
 
 void ModuleManager::destroy() {
     m_container.remove(m_loader.id());
-    for (AbstractModule* i : m_container) {
-        delete i;
+    for (auto& val : m_container) {
+        val.first->unload();
+        val.second = nullptr;
     }
     m_container.clear();
 }
 
-AbstractModule* ModuleManager::getModule(const QString& id, int minVersion) {
-    AbstractModule* m = m_container.value(id, nullptr);
+ISevizPlugin* ModuleManager::getPlugin(const QString& id, int minVersion) {
+    ISevizPlugin* m = m_container.value(id, qMakePair(nullptr, nullptr)).second;
     return m->version() >= minVersion ? m : nullptr;
 }
 
@@ -107,7 +118,8 @@ void ModuleManager::triggerRerendering(const Position& from, const Position& to)
     //}
 
     DomChapter styles(m_book->getCurrentChapter());
-    for (AbstractModule* m : m_container) {
+    for (auto& val : m_container) {
+        ISevizPlugin* m = val.second;
         QList<Feature*> active = m_enabledFeatures.values(m);
         if (!active.empty()) {
             m->render(from, to, styles, active.toVector());

@@ -1,26 +1,13 @@
-#-------------------------------------------------
-#
-# Project created by QtCreator 2020-01-12T11:48:05
-#
-#-------------------------------------------------
+include(../includes.pri)
 
 QT       += core gui webengine webenginewidgets webchannel sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+DEFINES += QT_DEPRECATED_WARNINGS
+DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 TARGET = seviz
 TEMPLATE = app
-
-# The following define makes your compiler emit warnings if you use
-# any feature of Qt which has been marked as deprecated (the exact warnings
-# depend on your compiler). Please consult the documentation of the
-# deprecated API in order to know how to port your code away from it.
-DEFINES += QT_DEPRECATED_WARNINGS
-
-# You can also make your code fail to compile if you use deprecated APIs.
-# In order to do so, uncomment the following line.
-# You can also select to disable deprecated APIs only up to a certain version of Qt.
-#DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 CONFIG += c++17
 
@@ -28,6 +15,7 @@ DEFINES += QUAZIP_STATIC
 INCLUDEPATH += 3rdparty/quazip/quazip
 INCLUDEPATH += 3rdparty/zlib
 
+DEFINES += SEVIZ_CORE
 SOURCES += \
         3rdparty/quazip/quazip/JlCompress.cpp \
         3rdparty/quazip/quazip/qioapi.cpp \
@@ -57,7 +45,6 @@ SOURCES += \
         3rdparty/zlib/trees.c \
         3rdparty/zlib/uncompr.c \
         3rdparty/zlib/zutil.c \
-        AbstractModule.cpp \
         Book.cpp \
         BookModels.cpp \
         DomChapter.cpp \
@@ -66,91 +53,45 @@ SOURCES += \
         bookloader/bookloaderdialog.cpp \
         epubrenderer.cpp \
         main.cpp \
-        mainwindow.cpp \
-        modules/EngineTest/EngineTest.cpp \
-        modules/EngineTest/enginetestwidget.cpp \
-        modules/SentenceTree/SentenceTree.cpp \
-        modules/SentenceTree/constituency.cpp \
-        modules/SentenceTree/dependency.cpp \
-        modules/SentenceTree/choosepalettedialog.cpp \
-        modules/SentenceTree/frame.cpp \
-        modules/SentenceTree/frameelement.cpp \
-        modules/SentenceTree/frameelementseditor.cpp \
-        modules/SentenceTree/framenet.cpp \
-        modules/SentenceTree/framenetmodel.cpp \
-        modules/SentenceTree/stwindow.cpp \
-        modules/SentenceTree/wordrange.cpp
+        mainwindow.cpp
 
 HEADERS += \
         3rdparty/quazip/quazip/quagzipfile.h \ #for moc
         3rdparty/quazip/quazip/quaziodevice.h \
         3rdparty/quazip/quazip/quazipfile.h \
-        AbstractModule.h \
         Book.h \
         BookModels.h \
         DomChapter.h \
         EventModels.h \
         IEngine.h \
+        ISevizPlugin.h \
         ModuleManager.h \
         bookloader/bookloader.h \
         bookloader/bookloaderdialog.h \
         epubrenderer.h \
         exceptions.h \
-        mainwindow.h \
-        modules/EngineTest/EngineTest.h \
-        modules/EngineTest/enginetestwidget.h \
-        modules/SentenceTree/SentenceTree.h \
-        modules/SentenceTree/constituency.h \
-        modules/SentenceTree/dependency.h \
-        modules/SentenceTree/choosepalettedialog.h \
-        modules/SentenceTree/frame.h \
-        modules/SentenceTree/frameelement.h \
-        modules/SentenceTree/frameelementseditor.h \
-        modules/SentenceTree/framenet.h \
-        modules/SentenceTree/framenetmodel.h \
-        modules/SentenceTree/stwindow.h \
-        modules/SentenceTree/wordrange.h \
-        modules/modules.h
+        helpers.h \
+        mainwindow.h
 
 FORMS += \
         bookloader/bookloaderdialog.ui \
-        mainwindow.ui \
-        modules/EngineTest/enginetestwidget.ui \
-        modules/SentenceTree/choosepalettedialog.ui \
-        modules/SentenceTree/frameelementseditor.ui \
-        modules/SentenceTree/stwindow.ui
+        mainwindow.ui
 
 RC_ICONS = app.ico
 
-Release:DESTDIR = release
-Release:OBJECTS_DIR = release/obj
-Release:MOC_DIR = release/moc
-Release:RCC_DIR = release/rcc
-Release:UI_DIR = release/ui
-
-Debug:DESTDIR = debug
-Debug:OBJECTS_DIR = debug/obj
-Debug:MOC_DIR = debug/moc
-Debug:RCC_DIR = debug/rcc
-Debug:UI_DIR = debug/ui
+RESOURCES += \
+    main.qrc
 
 # copy assets to build folder
 CONFIG += file_copies
 webcore.files = embedded_web_resources/
 webcore.path = $$DESTDIR/
 COPIES += webcore
-test_books.files = test/
-test_books.path = $$DESTDIR/
+example_books.files = ../example_books/
+example_books.path = $$DESTDIR/
 COPIES += test_books
-ST_webcore.files = SentenceTree_resources/
-ST_webcore.path = $$DESTDIR/
-COPIES += ST_webcore
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
-
-RESOURCES += \
-    main.qrc \
-    modules/SentenceTree/sentencetree.qrc

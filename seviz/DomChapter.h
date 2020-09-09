@@ -3,8 +3,9 @@
 #include <QObject>
 #include <QMap>
 #include "BookModels.h"
+#include "exceptions.h"
 
-class DomChapter : public QObject
+class SEVIZSHARED_EXPORT DomChapter : public QObject
 {
 	Q_OBJECT
 

@@ -38,7 +38,7 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::setupModules() {
-    m_manager.forEachModule([&](AbstractModule* module) {
+    m_manager.forEachModule([&](ISevizPlugin* module) {
         // для каждой функции плагина
         for (Feature& f : module->features()) {
             // добавление dock-окна

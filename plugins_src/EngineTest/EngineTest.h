@@ -1,17 +1,23 @@
 #pragma once
 
 #include <QObject>
-#include "AbstractModule.h"
+#include "ISevizPlugin.h"
 #include "enginetestwidget.h"
 
-class EngineTest : public AbstractModule
+#include "enginetest_global.h"
+class ENGINETESTSHARED_EXPORT EngineTest : public ISevizPlugin
 {
     Q_OBJECT
+    Q_INTERFACES(ISevizPlugin)
+    Q_PLUGIN_METADATA(IID "seviz.EngineTest")
 
 public:
-    EngineTest(IEngine* engine);
-    ~EngineTest();
+    EngineTest();
+    ~EngineTest() override;
 
+    const QString& id() const override;
+    int version() const override;
+    void init(IEngine* engine) override;
     virtual QList<Feature> features() override;
     void load(QDir* dir) override;
     void save(QDir& dir) override;

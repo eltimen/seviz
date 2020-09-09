@@ -1,20 +1,21 @@
 #pragma once
 #include <exception>
+#include <stdexcept>
 #include <string>
 #include <QString>
 
 
-class qt_info_exception  {
+class SevizException  {
 public:
-    qt_info_exception() {}
+    SevizException() {}
 
-    qt_info_exception(const std::string& description) :
+    SevizException(const std::string& description) :
         m_descr(QString::fromStdString(description)) {}
     
-    qt_info_exception(const QString& description) :
+    SevizException(const QString& description) :
         m_descr(description) {}
   
-    qt_info_exception(const char* description) :
+    SevizException(const char* description) :
         m_descr(description) {}
     
 
@@ -26,7 +27,7 @@ private:
     QString m_descr;
 };
 
-class DuplicateModulesException : public qt_info_exception {
+class DuplicateModulesException : public SevizException {
     QString what() const override {
         return "Найдены модули с одинаковыми ID";
     }

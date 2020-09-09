@@ -1,5 +1,5 @@
 #include "BookModels.h"
-#include <exception>
+#include "exceptions.h"
 #include "Book.h"
 
 const Book* Position::m_book = nullptr;
@@ -32,7 +32,7 @@ bool Position::operator==(const Position& o) const {
         m_idParagraph == o.m_idParagraph &&
         m_idSentence == o.m_idSentence &&
         m_idWord == o.m_idWord &&
-        m_tail == m_tail;
+        m_tail == o.m_tail;
 }
 
 bool Position::operator<=(const Position& o) const {
@@ -308,4 +308,8 @@ QStringList Sentence::toStringList() {
         tokens << w.text();
     }
     return tokens;
+}
+
+uint qHash(const Word &w, uint seed) noexcept {
+    return qHash(w.text(), seed);
 }

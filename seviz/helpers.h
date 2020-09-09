@@ -1,0 +1,10 @@
+#ifndef HELPERS_H
+#define HELPERS_H
+
+#ifdef SEVIZ_CORE
+#  define SEVIZSHARED_EXPORT Q_DECL_EXPORT
+#else
+#  define SEVIZSHARED_EXPORT Q_DECL_IMPORT
+#endif
+
+#endif // HELPERS_H
