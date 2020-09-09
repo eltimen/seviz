@@ -64,6 +64,6 @@ void BookLoader::save(QDir& dir) {
     }
 }
 
-void BookLoader::render(const Position &from, const Position &to, DomChapter &dom, const QVector<Feature *> &activeFeatures) {
+void BookLoader::render(const Position&, const Position&, DomChapter&, const QVector<Feature*>&) {
 
 }

@@ -63,7 +63,7 @@ void EngineTest::save(QDir& dir) {
     file.close();
 }
 
-void EngineTest::render(const Position& from, const Position& to, DomChapter& dom, const QVector<Feature*>& activeFeatures) {
+void EngineTest::render(const Position&, const Position&, DomChapter& dom, const QVector<Feature*>&) {
     try {
         if (renderStateChanged) {
             const Chapter& ch = m_engine->getBook().getCurrentChapter();

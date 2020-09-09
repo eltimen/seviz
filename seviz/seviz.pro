@@ -14,6 +14,11 @@ CONFIG += c++17
 DEFINES += QUAZIP_STATIC
 INCLUDEPATH += 3rdparty/quazip/quazip
 INCLUDEPATH += 3rdparty/zlib
+# suppress some warnings from zlib
+win32-msvc* {
+    DEFINES += _CRT_SECURE_NO_WARNINGS
+    DEFINES += _CRT_NONSTDC_NO_DEPRECATE
+}
 
 DEFINES += SEVIZ_CORE
 SOURCES += \

@@ -1,8 +1,9 @@
 #include "Book.h"
 #include <QRegularExpression>
 #include <QProgressDialog>
-#include <JLCompress.h>
 #include <QDir>
+#include <JLCompress.h>
+
 #include "exceptions.h"
 #include "epubrenderer.h"
 #include "ModuleManager.h"

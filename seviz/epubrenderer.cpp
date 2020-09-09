@@ -133,8 +133,8 @@ void EpubRenderer::removeHandler(const Handler& h) {
 }
 
 QPair<Position, Position> EpubRenderer::selectedTextPos() {
-    QPair<Position, Position> ret;
-    bool retIsEmpty = true;
+    QPair<Position, Position> sel;
+    bool selIsEmpty = true;
     QEventLoop loop;
 
     m_view->page()->runJavaScript(R"(getSelectionBorders())", [&](const QVariant& pair) {
@@ -145,21 +145,21 @@ QPair<Position, Position> EpubRenderer::selectedTextPos() {
             try {
                 Position firstPos(m_book->getCurrentChapter().id(), 1, first["paragraph"].toInt(), first["sentence"].toInt(), first["word"].toInt());
                 Position secondPos(m_book->getCurrentChapter().id(), 1, second["paragraph"].toInt(), second["sentence"].toInt(), second["word"].toInt());
-                ret = qMakePair(firstPos, secondPos);
-                retIsEmpty = false;
-            } catch (std::invalid_argument & e) {
-                retIsEmpty = true;
+                sel = qMakePair(firstPos, secondPos);
+                selIsEmpty = false;
+            } catch (std::invalid_argument&) {
+                selIsEmpty = true;
             }  
         } 
         loop.exit(0);
     });
     loop.exec();
 
-    if (retIsEmpty) {
+    if (selIsEmpty) {
         throw EmptySelectionException();
     }
 
-    return ret;
+    return sel;
 }
 
 Position EpubRenderer::mouseHoverElement() {
