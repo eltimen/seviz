@@ -59,6 +59,4 @@ private:
 
     // возвращает функции, которые имеют конфликтующие обработчики или хоткеи с указанной
     QList<Feature*> getConflictFeaturesFor(const Feature& f);
-
-    void destroy();
 };

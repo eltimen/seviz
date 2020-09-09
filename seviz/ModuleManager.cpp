@@ -1,6 +1,7 @@
 #include "ModuleManager.h"
 #include <tuple>
 #include <iterator>
+#include <QMessageBox>
 #include "DomChapter.h"
 #include "mainwindow.h"
 
@@ -10,26 +11,32 @@ ModuleManager::ModuleManager(EpubRenderer& render, MainWindow* w)
       m_loader(this) {
     QDir pluginsDir( "./plugins" );
     for (const QString& pluginName : pluginsDir.entryList(QDir::Files)) {
+        qDebug() << "seviz: trying to load plugin " << pluginName;
         QPluginLoader* loader = new QPluginLoader(pluginsDir.absoluteFilePath(pluginName));
         ISevizPlugin* plugin = nullptr;
         if(loader->load() && (plugin=qobject_cast<ISevizPlugin*>(loader->instance()))) {
-            plugin->init(this);
             if (!m_container.contains(plugin->id())) {
+                plugin->init(this);
                 m_container.insert(plugin->id(), qMakePair(loader, plugin));
             } else {
-                destroy();
-                throw DuplicateModulesException();
+                QMessageBox::warning(w, "Ошибка", "Обнаружен дублирующийся плагин " + plugin->id());
+                loader->unload();
+                plugin = nullptr;
             }
         } else {
-            qDebug() << "Failed to load :(";
-            qDebug() << loader->errorString();
+            QMessageBox::warning(w, "Ошибка", "Не удалось загрузить плагин: " + loader->errorString());
         }
     }
 }
 
 ModuleManager::~ModuleManager() {
-    // Qt smart pointers can't be stored in Qt containers
-    destroy();
+    // smart pointers std::unique_ptr or QScopedPointer can't be stored inside Qt containers
+    m_container.remove(m_loader.id());
+    for (auto& val : m_container) {
+        val.first->unload();
+        val.second = nullptr;
+    }
+    m_container.clear();
 }
 
 void ModuleManager::bookOpened(Book* book, QTemporaryDir& epubDir, QList<Chapter>& chapters) {
@@ -92,15 +99,6 @@ QList<Feature*> ModuleManager::getConflictFeaturesFor(const Feature& f) {
     // TODO аналогично для обработчиков
 
     return {};
-}
-
-void ModuleManager::destroy() {
-    m_container.remove(m_loader.id());
-    for (auto& val : m_container) {
-        val.first->unload();
-        val.second = nullptr;
-    }
-    m_container.clear();
 }
 
 ISevizPlugin* ModuleManager::getPlugin(const QString& id, int minVersion) {

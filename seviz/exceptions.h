@@ -27,10 +27,4 @@ private:
     QString m_descr;
 };
 
-class DuplicateModulesException : public SevizException {
-    QString what() const override {
-        return "Найдены модули с одинаковыми ID";
-    }
-};
-
 class EmptySelectionException {};
