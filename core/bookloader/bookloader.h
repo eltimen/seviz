@@ -6,7 +6,7 @@
 
 class BookLoader : public ISevizPlugin {
 public:
-    BookLoader(ModuleManager* engine);
+    BookLoader(PluginManager* engine);
     ~BookLoader();
 
     const QString &id() const override;
@@ -21,7 +21,7 @@ public:
 
 private:
     BookLoaderDialog* m_dialog = nullptr;
-    ModuleManager* m_engine = nullptr;
+    PluginManager* m_engine = nullptr;
 
 public slots:
     void render(const Position &from, const Position &to, DomChapter &dom, const QVector<Feature *> &activeFeatures) override;

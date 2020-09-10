@@ -3,7 +3,7 @@
 
 #include <QMainWindow>
 #include "Book.h"
-#include "ModuleManager.h"
+#include "PluginManager.h"
 
 namespace Ui {
 class MainWindow;
@@ -30,7 +30,7 @@ private:
     Ui::MainWindow *ui;
     Book* m_book = nullptr;
     EpubRenderer* m_bookViewer = nullptr;
-    ModuleManager m_manager;
+    PluginManager m_manager;
 
     QMap<Feature, QPair<QAction*,QAction*>> m_actions;
 };

@@ -1,11 +1,11 @@
 #include "bookloaderdialog.h"
 
 #include <QTimer>
-#include "ModuleManager.h"
+#include "PluginManager.h"
 #include "Book.h"
 #include "ui_bookloaderdialog.h"
 
-BookLoaderDialog::BookLoaderDialog(QWidget* parent, ModuleManager* engine, QList<Chapter>& chapters, QDir& dir)
+BookLoaderDialog::BookLoaderDialog(QWidget* parent, PluginManager* engine, QList<Chapter>& chapters, QDir& dir)
 	: QDialog(parent, Qt::CustomizeWindowHint
 					| Qt::WindowTitleHint
 					| Qt::WindowSystemMenuHint

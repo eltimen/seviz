@@ -15,13 +15,13 @@
 
 class MainWindow;
 
-class ModuleManager : public QObject, public IEngine
+class PluginManager : public QObject, public IEngine
 {
     Q_OBJECT
 
 public:
-    ModuleManager(EpubRenderer& render, MainWindow* w);
-    ~ModuleManager();
+    PluginManager(EpubRenderer& render, MainWindow* w);
+    ~PluginManager();
 
     // методы для ядра
     void bookOpened(Book* book, QTemporaryDir& epubDir, QList<Chapter>& chapters);

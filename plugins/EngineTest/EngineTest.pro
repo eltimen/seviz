@@ -10,11 +10,11 @@ DEFINES += ENGINETEST_LIBRARY
 DEFINES += QT_DEPRECATED_WARNINGS
 DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-Debug:SEVIZ_DESTDIR = ../../seviz/debug
-Release:SEVIZ_DESTDIR = ../../seviz/release
+Debug:SEVIZ_DESTDIR = ../../core/debug
+Release:SEVIZ_DESTDIR = ../../core/release
 
 # path to seviz header files
-INCLUDEPATH += ../../seviz/
+INCLUDEPATH += ../../core/
 LIBS += $$SEVIZ_DESTDIR/seviz.lib
 
 SOURCES += \

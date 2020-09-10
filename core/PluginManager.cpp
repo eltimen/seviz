@@ -1,11 +1,11 @@
-#include "ModuleManager.h"
+#include "PluginManager.h"
 #include <tuple>
 #include <iterator>
 #include <QMessageBox>
 #include "DomChapter.h"
 #include "mainwindow.h"
 
-ModuleManager::ModuleManager(EpubRenderer& render, MainWindow* w)
+PluginManager::PluginManager(EpubRenderer& render, MainWindow* w)
     : m_render(render),
       m_window(w),
       m_loader(this) {
@@ -29,7 +29,7 @@ ModuleManager::ModuleManager(EpubRenderer& render, MainWindow* w)
     }
 }
 
-ModuleManager::~ModuleManager() {
+PluginManager::~PluginManager() {
     // smart pointers std::unique_ptr or QScopedPointer can't be stored inside Qt containers
     m_container.remove(m_loader.id());
     for (auto& val : m_container) {
@@ -39,7 +39,7 @@ ModuleManager::~ModuleManager() {
     m_container.clear();
 }
 
-void ModuleManager::bookOpened(Book* book, QTemporaryDir& epubDir, QList<Chapter>& chapters) {
+void PluginManager::bookOpened(Book* book, QTemporaryDir& epubDir, QList<Chapter>& chapters) {
     m_book = book;
 
     try {
@@ -79,17 +79,17 @@ void ModuleManager::bookOpened(Book* book, QTemporaryDir& epubDir, QList<Chapter
     m_container.insert(m_loader.id(), qMakePair(nullptr, &m_loader));
 }
 
-void ModuleManager::forEachModule(std::function<void(ISevizPlugin*)> functor) {
+void PluginManager::forEachModule(std::function<void(ISevizPlugin*)> functor) {
     for (auto& i : m_container) {
         functor(i.second);
     }
 }
 
-EpubRenderer& ModuleManager::getBookRender() {
+EpubRenderer& PluginManager::getBookRender() {
     return m_render;
 }
 
-QList<Feature*> ModuleManager::getConflictFeaturesFor(const Feature& f) {
+QList<Feature*> PluginManager::getConflictFeaturesFor(const Feature& f) {
     // для каждого хоткея из f
     for (decltype(m_hotkeys)::iterator it = m_hotkeys.begin(); it != m_hotkeys.end(); ++it) {
         // ищем его среди относящихся к другой функции
@@ -101,16 +101,16 @@ QList<Feature*> ModuleManager::getConflictFeaturesFor(const Feature& f) {
     return {};
 }
 
-ISevizPlugin* ModuleManager::getPlugin(const QString& id, int minVersion) {
+ISevizPlugin* PluginManager::getPlugin(const QString& id, int minVersion) {
     ISevizPlugin* m = m_container.value(id, qMakePair(nullptr, nullptr)).second;
     return m->version() >= minVersion ? m : nullptr;
 }
 
-const Book& ModuleManager::getBook() {
+const Book& PluginManager::getBook() {
     return *m_book;
 }
 
-void ModuleManager::triggerRerendering(const Position& from, const Position& to) {
+void PluginManager::triggerRerendering(const Position& from, const Position& to) {
     //if (!from.hasSameLevelWith(to)) {
     //    throw std::invalid_argument("if FROM is paragraph then TO must be paragraph, etc");
     //}
@@ -127,7 +127,7 @@ void ModuleManager::triggerRerendering(const Position& from, const Position& to)
     m_render.updateChapterView(styles);
 }
 
-QList<Feature*> ModuleManager::featureEnabled(const Feature& feature) {
+QList<Feature*> PluginManager::featureEnabled(const Feature& feature) {
     QList<Feature*> conflicts = getConflictFeaturesFor(feature);
 
     m_enabledFeatures.insert(feature.owner(), const_cast<Feature*>(&feature));
@@ -146,7 +146,7 @@ QList<Feature*> ModuleManager::featureEnabled(const Feature& feature) {
     return conflicts;
 }
 
-void ModuleManager::featureDisabled(const Feature& feature) {
+void PluginManager::featureDisabled(const Feature& feature) {
 
     m_enabledFeatures.remove(feature.owner(), const_cast<Feature*>(&feature));
 
@@ -162,11 +162,11 @@ void ModuleManager::featureDisabled(const Feature& feature) {
     }
 }
 
-QWidget* ModuleManager::mainWindow() const {
+QWidget* PluginManager::mainWindow() const {
     return m_window;
 }
 
-void ModuleManager::registerHandler(EventType onEvent, ElementType onElements, Button withKey, const Feature& feature, const std::function<void(const Position&)>& slot) {
+void PluginManager::registerHandler(EventType onEvent, ElementType onElements, Button withKey, const Feature& feature, const std::function<void(const Position&)>& slot) {
     Handler h(onEvent, onElements, withKey, slot);
 
     // TODO проверка
@@ -174,7 +174,7 @@ void ModuleManager::registerHandler(EventType onEvent, ElementType onElements, B
     m_handlers.insert(feature, qMakePair(h, false));
 }
 
-void ModuleManager::registerHotkey(const QKeySequence& hotkey, const Feature& feature, const std::function<void()>& slot) {
+void PluginManager::registerHotkey(const QKeySequence& hotkey, const Feature& feature, const std::function<void()>& slot) {
     // TODO проверить, что модуль не регистрирует один и тот же хоткей дважды
 
     QShortcut* sh = new QShortcut(hotkey, m_window, nullptr, nullptr, Qt::ApplicationShortcut);
@@ -183,11 +183,11 @@ void ModuleManager::registerHotkey(const QKeySequence& hotkey, const Feature& fe
     m_hotkeys.insert(feature, sh);
 }
 
-QPair<Position, Position> ModuleManager::selectedTextPos() {
+QPair<Position, Position> PluginManager::selectedTextPos() {
     return m_render.selectedTextPos();
 }
 
-Position ModuleManager::mouseHoverElement() {
+Position PluginManager::mouseHoverElement() {
     return m_render.mouseHoverElement();
 }
 

@@ -33,6 +33,7 @@ SOURCES += \
         3rdparty/quazip/quazip/quazipfile.cpp \
         3rdparty/quazip/quazip/quazipfileinfo.cpp \
         3rdparty/quazip/quazip/quazipnewinfo.cpp \
+        3rdparty/quazip/quazip/quachecksum32.cpp \
         3rdparty/quazip/quazip/unzip.c \
         3rdparty/quazip/quazip/zip.c \
         3rdparty/zlib/adler32.c \
@@ -53,7 +54,7 @@ SOURCES += \
         Book.cpp \
         BookModels.cpp \
         DomChapter.cpp \
-        ModuleManager.cpp \
+        PluginManager.cpp \
         bookloader/bookloader.cpp \
         bookloader/bookloaderdialog.cpp \
         epubrenderer.cpp \
@@ -70,7 +71,7 @@ HEADERS += \
         EventModels.h \
         IEngine.h \
         ISevizPlugin.h \
-        ModuleManager.h \
+        PluginManager.h \
         bookloader/bookloader.h \
         bookloader/bookloaderdialog.h \
         epubrenderer.h \
@@ -94,7 +95,7 @@ webcore.path = $$DESTDIR/
 COPIES += webcore
 example_books.files = ../example_books/
 example_books.path = $$DESTDIR/
-COPIES += test_books
+COPIES += example_books
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

@@ -6,11 +6,11 @@
 
 #include "exceptions.h"
 #include "epubrenderer.h"
-#include "ModuleManager.h"
+#include "PluginManager.h"
 
 #pragma warning(disable:4129)
 
-Book::Book(const QString& epubPath, EpubRenderer* view, ModuleManager& moduleManager) :
+Book::Book(const QString& epubPath, EpubRenderer* view, PluginManager& moduleManager) :
     QObject(nullptr),
     m_renderer(view),
     m_epubPath(epubPath),

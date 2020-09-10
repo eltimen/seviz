@@ -1,9 +1,9 @@
 #include "bookloader.h"
 #include <QFile>
 #include <QTextStream>
-#include "ModuleManager.h"
+#include "PluginManager.h"
 
-BookLoader::BookLoader(ModuleManager* engine)
+BookLoader::BookLoader(PluginManager* engine)
     : ISevizPlugin(),
       m_engine(engine) {}
 

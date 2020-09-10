@@ -9,14 +9,14 @@
 #include "BookModels.h"
 
 class EpubRenderer;
-class ModuleManager;
+class PluginManager;
 
 class SEVIZSHARED_EXPORT Book : public QObject
 {
     Q_OBJECT
 
 public:
-    Book(const QString& epubPath, EpubRenderer* view, ModuleManager& moduleManager);
+    Book(const QString& epubPath, EpubRenderer* view, PluginManager& moduleManager);
     ~Book();
 
     void open();
@@ -38,7 +38,7 @@ private:
     QTemporaryDir m_epubDir;
     EpubRenderer* m_renderer;
     QString m_epubPath;
-    ModuleManager& m_moduleManager;
+    PluginManager& m_moduleManager;
 
     int m_currentChapterIndex = -1;
     QList<Chapter> m_chapters;
