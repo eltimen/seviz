@@ -7,6 +7,7 @@
 #include <QDebug>
 #include <QSignalBlocker>
 #include <QtGlobal>
+#include <stdexcept>
 #include <algorithm>
 #include "framenet.h"
 #include "frameelement.h"

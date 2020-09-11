@@ -8,7 +8,7 @@
 
 FrameNetModel::FrameNetModel() {
     m_db = QSqlDatabase::addDatabase("QSQLITE");
-    m_db.setDatabaseName("SentenceTree_resources/framenet/framenet.db");
+    m_db.setDatabaseName("plugins/SentenceTree_resources/framenet/framenet.db");
 
     if (!m_db.open()) {
         qDebug() << m_db.lastError().text();
@@ -20,7 +20,7 @@ FrameNetModel::FrameNetModel() {
 QStringList FrameNetModel::frameNamesForLexicalUnit(const QString& word) const {
     QSqlQuery query(m_db);
     // TODO добавить POS-тег в качестве параметра
-    // DISTICT ниже нужен для удаления одинаковых слов, у которых разная часть речи
+    // DISTICT ниже временно нужен для удаления одинаковых слов, у которых разная часть речи
     // TODO фильтр по части речи
     query.prepare("SELECT DISTINCT frameName FROM lexical_units "
                   "WHERE text IS :text");

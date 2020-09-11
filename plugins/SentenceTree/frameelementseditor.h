@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QComboBox>
+#include <memory>
 #include <unordered_map>
 #include <unordered_set>
 #include "BookModels.h"

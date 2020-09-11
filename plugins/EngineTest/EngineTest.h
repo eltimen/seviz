@@ -4,7 +4,12 @@
 #include "ISevizPlugin.h"
 #include "enginetestwidget.h"
 
-#include "enginetest_global.h"
+#if defined(ENGINETEST_LIBRARY)
+#  define ENGINETESTSHARED_EXPORT Q_DECL_EXPORT
+#else
+#  define ENGINETESTSHARED_EXPORT Q_DECL_IMPORT
+#endif
+
 class ENGINETESTSHARED_EXPORT EngineTest : public ISevizPlugin
 {
     Q_OBJECT

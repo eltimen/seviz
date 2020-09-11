@@ -23,7 +23,6 @@ SOURCES += \
 
 HEADERS += \
         enginetest.h \
-        enginetest_global.h \
         enginetestwidget.h
 		
 FORMS += \

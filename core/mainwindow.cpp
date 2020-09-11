@@ -2,7 +2,7 @@
 #include "ui_mainwindow.h"
 
 #include <QtGlobal>
-#include <QToolbar>
+#include <QToolBar>
 #include <QFileDialog>
 #include <QDockWidget>
 #include <QComboBox>

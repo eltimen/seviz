@@ -38,20 +38,20 @@ STWindow::STWindow(SentenceTree* core) :
     ui->dependencyView->page()->settings()->setAttribute(QWebEngineSettings::LocalContentCanAccessFileUrls, true);  
     ui->dependencyView->setContextMenuPolicy(Qt::NoContextMenu);
     ui->dependencyView->page()->setWebChannel(m_webchannel);
-    ui->dependencyView->setUrl(QUrl("file:///SentenceTree_resources/dep.html"));
+    ui->dependencyView->setUrl(QUrl("file:///plugins/SentenceTree_resources/dep.html"));
     connect(ui->dependencyView, &QWebEngineView::loadFinished, [this]() { initPosTagColors(); });
 
     ui->constituencyView->page()->settings()->setAttribute(QWebEngineSettings::LocalContentCanAccessRemoteUrls, true);
     ui->constituencyView->page()->settings()->setAttribute(QWebEngineSettings::LocalContentCanAccessFileUrls, true); 
     ui->constituencyView->setContextMenuPolicy(Qt::NoContextMenu);
     ui->constituencyView->page()->setWebChannel(m_webchannel);
-    ui->constituencyView->setUrl(QUrl("file:///SentenceTree_resources/constituency.html"));
+    ui->constituencyView->setUrl(QUrl("file:///plugins/SentenceTree_resources/constituency.html"));
 
     ui->framenetView->page()->settings()->setAttribute(QWebEngineSettings::LocalContentCanAccessRemoteUrls, true);
     ui->framenetView->page()->settings()->setAttribute(QWebEngineSettings::LocalContentCanAccessFileUrls, true);
     ui->framenetView->setContextMenuPolicy(Qt::NoContextMenu);
     ui->framenetView->page()->setWebChannel(m_webchannel);
-    ui->framenetView->setUrl(QUrl("file:///SentenceTree_resources/frame.html"));
+    ui->framenetView->setUrl(QUrl("file:///plugins/SentenceTree_resources/frame.html"));
 }
 
 STWindow::~STWindow()
@@ -143,7 +143,7 @@ void STWindow::onFrameInsert(IEngine* engine) {
         QMessageBox::warning(this, "Ошибка", "Выделен диапазон слов из нескольких предложений");
     }
    
-}// ------------------ constituency tree event handlers ---------------------
+}// ------------------ constituency tree event handlers ---------------------
 void STWindow::onConstituencyCreateNode(int from, int to) {
     ConstituencyTree& tree = m_core->currentSentenceData().constituency;
 

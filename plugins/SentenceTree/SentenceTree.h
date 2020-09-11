@@ -3,7 +3,7 @@
 #include <QObject>
 #include <memory>
 #include <map>
-#include "AbstractModule.h"
+#include "ISevizPlugin.h"
 #include "stwindow.h"
 #include "constituency.h"
 #include "dependency.h"
@@ -30,15 +30,27 @@ struct SentenceData {
     SentenceState framenetState = NODATA;
 };
 
-class SentenceTree : public AbstractModule
+#if defined(SENTENCETREE_LIBRARY)
+#  define SENTENCETREESHARED_EXPORT Q_DECL_EXPORT
+#else
+#  define SENTENCETREESHARED_EXPORT Q_DECL_IMPORT
+#endif
+
+class SENTENCETREESHARED_EXPORT SentenceTree : public ISevizPlugin
 {
     Q_OBJECT
+    Q_INTERFACES(ISevizPlugin)
+    Q_PLUGIN_METADATA(IID "seviz.SentenceTree")
 
 public:
-    SentenceTree(IEngine* engine);
-    ~SentenceTree();
+    SentenceTree();
+    ~SentenceTree() override;
 
+    const QString& id() const override;
+    int version() const override;
+    void init(IEngine* engine) override;
     virtual QList<Feature> features() override;
+
     virtual void render(const Position& from, const Position& to, DomChapter& dom, const QVector<Feature*>& activeFeatures) override;
 
     virtual void load(QDir* moduleDir) override;

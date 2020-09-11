@@ -10,21 +10,32 @@
 #include <QJsonObject>
 #include <QProgressDialog>
 
-SentenceTree::SentenceTree(IEngine* engine) :
-    AbstractModule(engine, "SentenceTree"),
+SentenceTree::SentenceTree() :
     m_feature("Деревья предложений", QIcon(":/st/icon.png"), new QDockWidget(), this, true),
     m_widget(this)
 {
     m_feature.window()->setWidget(&m_widget);
-    
+}
+
+SentenceTree::~SentenceTree() {
+    // TODO
+}
+
+void SentenceTree::init(IEngine *engine) {
+    m_engine = engine;
     m_engine->registerHandler(EventType::MOUSE_OVER, ElementType::SENTENCE, CTRL, m_feature, SLOTPOS(onSentenceChanged));
     m_engine->registerHotkey(QKeySequence("Ctrl+F"), m_feature, [this]() {
         m_widget.onFrameInsert(m_engine);
     });
 }
 
-SentenceTree::~SentenceTree() {
-    // TODO
+const QString &SentenceTree::id() const {
+    static QString id = "SentenceTree";
+    return id;
+}
+
+int SentenceTree::version() const {
+    return 0;
 }
 
 QList<Feature> SentenceTree::features() {
