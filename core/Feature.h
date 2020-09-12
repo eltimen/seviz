@@ -4,6 +4,8 @@
 #include <QString>
 #include <QDockWidget>
 #include <QString>
+#include <QDebug>
+#include <tuple>
 
 class ISevizPlugin;
 
@@ -31,7 +33,7 @@ public:
 	}
 
 	inline friend bool operator< (const Feature& first, const Feature& second) {
-		return first.m_name < second.m_name && first.m_owner < second.m_owner;
+        return std::tie(first.m_name, first.m_owner) < std::tie(second.m_name, second.m_owner);
 	}
 
 	const QString& name() const { return m_name; }
