@@ -44,7 +44,7 @@ QList<Feature> SentenceTree::features() {
     };
 }
 
-void SentenceTree::render(const Position& from, const Position& to, DomChapter& dom, const QVector<Feature*>& activeFeatures) {
+void SentenceTree::render(const Position&, const Position&, DomChapter& dom, const QVector<Feature*>&) {
     if (m_currentSentenceData) {
         dom.addStyle(m_currentSentencePos.firstWord(), "border-left: 1px solid black;");
         Position pos = m_currentSentencePos.firstWord();

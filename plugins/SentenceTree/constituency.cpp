@@ -26,10 +26,10 @@ int ConstituencyTree::insert(const std::pair<int, int>& range, ConstituencyLabel
     try {
         ConstituencyTreeNode* newNode = new ConstituencyTreeNode(label, ++m_lastId);
         if (position) {
-            position->parent->replaceChildrenToNode(position->childrenRange, range, newNode);
+            position->parent->replaceChildrenToNode(position->childrenRange, newNode);
         } else {
             NodeInsertPosition pos = m_root->findPositionToInsertNode(range);
-            pos.parent->replaceChildrenToNode(pos.childrenRange, range, newNode);
+            pos.parent->replaceChildrenToNode(pos.childrenRange, newNode);
         }
         return m_lastId;
     } catch (int) {
@@ -58,10 +58,6 @@ void ConstituencyTree::fromJson(const QString& json) {
     QJsonParseError error;
     QJsonDocument doc = QJsonDocument::fromJson(json.toUtf8(), &error);
     if (!doc.isNull()) {
-        QString labelStr = doc.object().value("label").toString();
-        ConstituencyLabel label = static_cast<ConstituencyLabel>(ConstituencyLabelStr.indexOf(labelStr));
-        int from = doc.object().value("fromWordId").toInt();
-        int to = doc.object().value("toWordId").toInt();
         QJsonArray children = doc.object().value("children").toArray();
         
         fromJsonHelper(children);
@@ -285,7 +281,7 @@ NodeInsertPosition ConstituencyTreeNode::findPositionToInsertNode(const std::pai
     throw -1;
 }
 
-void ConstituencyTreeNode::replaceChildrenToNode(const ItersPair& iters, const std::pair<int, int>& range, ConstituencyTreeNode* node) {
+void ConstituencyTreeNode::replaceChildrenToNode(const ItersPair& iters, ConstituencyTreeNode* node) {
     assert(!m_isTerminal);
     ChildrenContainer newNodeChildren(iters.first, iters.second);
     ChildrenContainer::iterator it = m_children.erase(iters.first, iters.second);

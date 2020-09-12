@@ -67,7 +67,7 @@ public:
     void setChildren(ChildrenContainer children);
     void setLabel(ConstituencyLabel label);
     void removeNode(int nodeId);
-    void replaceChildrenToNode(const ItersPair&, const std::pair<int, int>& range, ConstituencyTreeNode* node);
+    void replaceChildrenToNode(const ItersPair&, ConstituencyTreeNode* node);
     NodeInsertPosition findPositionToInsertNode(const std::pair<int, int>& range);
     ConstituencyTreeNode* find(int nodeId);
     int maxDepth() const;
