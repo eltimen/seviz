@@ -10,6 +10,8 @@
 #include "exceptions.h"
 
 // макросы для передачи слотов-методов класса как колбеков в методы register...
+// пример использования: SLOTPOS(MyOwnPlugin::onSentenceClicked)
+// TODO избавиться от макросов, сделать на шаблонах наподобие QObject::connect
 #define SLOTVOID(x) [this](){x();}
 #define SLOTPOS(x) [this](const Position& pos){x(pos);}
 
